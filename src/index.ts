@@ -147,7 +147,7 @@ function restart() {
   }
   
   function moveRobot(robot: HTMLElement, newPos: Pos) {
-    robot.style.transform = `translate(${newPos.x*41+13}px, ${newPos.y*41+13}px)`
+    robot.style.transform = `translate(${newPos.x*45+12}px, ${newPos.y*45+12}px)`
   }
 
   function goalIsReached() {

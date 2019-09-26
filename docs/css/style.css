@@ -1,5 +1,18 @@
 html {
+  background-color: black;
+}
+
+body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: rgb(154, 185, 206);
+}
+
+.button {
+  background-color: #234567;
+  border: 0;
+  padding: 0.3rem 0.5rem;
+  color: inherit;
+  font-size: inherit;
 }
 
 
@@ -8,24 +21,24 @@ html {
 }
 
 table {
-  border: 0.2em solid black;
+  border: 2px solid #756856;
   border-collapse: separate;
-  border-spacing: 1px;
-  font-size: 20px;
+  border-spacing: 0;
   background-color: #ddd;
 }
 table td { 
-  border: 0.2em solid transparent;
-  width: 2em;
-  height: 2em;
-  background-color: white;
+  border: 2px solid transparent;
+  width: 45px;
+  height: 45px;
+  background-color: rgb(31, 31, 31);
   box-sizing: border-box;
-  padding: 0.2em;
+  padding: 5px;
+  box-shadow: 0 0 13px rgba(0,0,0,.41) inset;
 }
-table td.wall-south { border-bottom-color: black }
-table td.wall-north { border-top-color: black }
-table td.wall-west { border-left-color: black }
-table td.wall-east { border-right-color: black }
+table td.wall-south { border-bottom-color: inherit }
+table td.wall-north { border-top-color: inherit }
+table td.wall-west { border-left-color: inherit }
+table td.wall-east { border-right-color: inherit }
 
 .goal {
   width: 100%;
@@ -40,10 +53,10 @@ table td.wall-east { border-right-color: black }
 	background-color: inherit;
 	display: block;
 }
-.goal-0 {background-color: hsl(0, 80%, 70%)}
-.goal-1 {background-color: hsl(140, 80%, 70%)}
-.goal-2 {background-color: hsl(220, 80%, 70%)}
-.goal-3 {background-color: hsl(60, 80%, 70%)}
+.goal-0 {background-color: hsla(0, 80%, 30%, 0.5)}
+.goal-1 {background-color: hsla(140, 80%, 30%, 0.5)}
+.goal-2 {background-color: hsla(220, 80%, 30%, 0.5)}
+.goal-3 {background-color: hsla(60, 80%, 30%, 0.5)}
 
 
 .start {
@@ -55,10 +68,10 @@ table td.wall-east { border-right-color: black }
   border-radius: 100%;
   box-sizing: border-box;
 }
-.start-0 {border-color: hsl(0, 80%, 90%); background-color: hsl(0, 80%, 95%);}
-.start-1 {border-color: hsl(140, 80%, 90%); background-color: hsl(140, 80%, 90%);}
-.start-2 {border-color: hsl(220,80%, 90%); background-color: hsl(220, 80%, 95%);}
-.start-3 {border-color: hsl(60, 80%, 80%); background-color: hsl(70, 80%, 85%);}
+.start-0 {background-color: hsla(0, 80%, 25%, 0.5);}
+.start-1 {background-color: hsla(140, 80%, 20%, 0.5);}
+.start-2 {background-color: hsla(220, 80%, 25%, 0.5);}
+.start-3 {background-color: hsla(70, 80%, 25%, 0.5);}
 
 
 
@@ -81,8 +94,8 @@ table td.wall-east { border-right-color: black }
   background-color: rebeccapurple;
   transition: transform 0.3s, box-shadow 0.5s;
   opacity: 0.6;
-  box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
-  border: 2px solid white;
+  box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 1);
+  border: 2px solid rgba(255,255,255,0.3);
   font-size: 14px;
   line-height: 20px;
   color: white;
@@ -93,7 +106,7 @@ table td.wall-east { border-right-color: black }
   box-shadow: 0 3px 4px 1px rgba(0, 0, 0, 0.3);
   margin-top: -1px;
 }
-.robot-0 {background-color: hsl(0, 50%, 50%)}
-.robot-1 {background-color: hsl(140, 50%, 50%)}
-.robot-2 {background-color: hsl(220, 50%, 50%)}
-.robot-3 {background-color: hsl(60, 50%, 50%)}
+.robot-0 {background-color: hsl(0, 50%, 40%)}
+.robot-1 {background-color: hsl(140, 50%, 40%)}
+.robot-2 {background-color: hsl(220, 50%, 40%)}
+.robot-3 {background-color: hsl(60, 50%, 40%)}
