@@ -1,0 +1,99 @@
+html {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.board {
+  position: relative;
+}
+
+table {
+  border: 0.2em solid black;
+  border-collapse: separate;
+  border-spacing: 1px;
+  font-size: 20px;
+  background-color: #ddd;
+}
+table td { 
+  border: 0.2em solid transparent;
+  width: 2em;
+  height: 2em;
+  background-color: white;
+  box-sizing: border-box;
+  padding: 0.2em;
+}
+table td.wall-south { border-bottom-color: black }
+table td.wall-north { border-top-color: black }
+table td.wall-west { border-left-color: black }
+table td.wall-east { border-right-color: black }
+
+.goal {
+  width: 100%;
+  height: 20%;
+  transform: rotate(45deg)
+}
+.goal:before {
+  content: '';
+	width: 100%;
+	height: 100%;
+	transform: rotate(90deg);
+	background-color: inherit;
+	display: block;
+}
+.goal-0 {background-color: hsl(0, 80%, 70%)}
+.goal-1 {background-color: hsl(140, 80%, 70%)}
+.goal-2 {background-color: hsl(220, 80%, 70%)}
+.goal-3 {background-color: hsl(60, 80%, 70%)}
+
+
+.start {
+  display: block;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  border: 0 solid;
+  border-radius: 100%;
+  box-sizing: border-box;
+}
+.start-0 {border-color: hsl(0, 80%, 90%); background-color: hsl(0, 80%, 95%);}
+.start-1 {border-color: hsl(140, 80%, 90%); background-color: hsl(140, 80%, 90%);}
+.start-2 {border-color: hsl(220,80%, 90%); background-color: hsl(220, 80%, 95%);}
+.start-3 {border-color: hsl(60, 80%, 80%); background-color: hsl(70, 80%, 85%);}
+
+
+
+.dot {
+  position: absolute;
+  width:10px;
+  height:10px;
+  border-radius: 100%;
+  background-color: rebeccapurple;
+}
+
+
+.robot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  background-color: rebeccapurple;
+  transition: transform 0.3s, box-shadow 0.5s;
+  opacity: 0.6;
+  box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+  border: 2px solid white;
+  font-size: 14px;
+  line-height: 20px;
+  color: white;
+  text-align: center;
+}
+.robot.active {
+  opacity: 1;
+  box-shadow: 0 3px 4px 1px rgba(0, 0, 0, 0.3);
+  margin-top: -1px;
+}
+.robot-0 {background-color: hsl(0, 50%, 50%)}
+.robot-1 {background-color: hsl(140, 50%, 50%)}
+.robot-2 {background-color: hsl(220, 50%, 50%)}
+.robot-3 {background-color: hsl(60, 50%, 50%)}
