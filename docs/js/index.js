@@ -81,6 +81,7 @@ function restart() {
         moveRobot(elem, r.getPos());
         elem.classList.add('robot', 'robot-' + r.color);
         elem.innerText = (r.color + 1).toString();
+        elem.addEventListener('click', e => switchRobot(r.color));
         return elem;
     });
     robotElems.forEach(robotElem => {
@@ -116,6 +117,18 @@ function restart() {
                 break;
         }
     });
+    const btnUp = document.getElementById('btnUp');
+    if (btnUp)
+        btnUp.addEventListener('click', e => moveActiveRobot(Solver.goNorth));
+    const btnDown = document.getElementById('btnDown');
+    if (btnDown)
+        btnDown.addEventListener('click', e => moveActiveRobot(Solver.goSouth));
+    const btnLeft = document.getElementById('btnLeft');
+    if (btnLeft)
+        btnLeft.addEventListener('click', e => moveActiveRobot(Solver.goWest));
+    const btnRight = document.getElementById('btnRight');
+    if (btnRight)
+        btnRight.addEventListener('click', e => moveActiveRobot(Solver.goEast));
     if (!btnReset)
         throw Error("reset button not found");
     btnReset.addEventListener('click', reset);
@@ -143,7 +156,7 @@ function restart() {
         }
     }
     function moveRobot(robot, newPos) {
-        robot.style.transform = `translate(${newPos.x * 45 + 12}px, ${newPos.y * 45 + 12}px)`;
+        robot.style.transform = `translate(${newPos.x * 38 + 10}px, ${newPos.y * 38 + 10}px)`;
     }
     function goalIsReached() {
         const correctRobot = robots[level.goal.color];
@@ -191,7 +204,7 @@ function createHTMLBoard(level) {
 function calculateScore(moves, optimalMoves) {
     if (moves === optimalMoves)
         return 3;
-    if (moves < optimalMoves * 1.3)
+    if (moves <= 1 + Math.floor(optimalMoves * 1.3))
         return 2;
     return 1;
 }

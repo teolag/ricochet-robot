@@ -16,6 +16,34 @@ body {
 }
 
 
+.controls {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.control-arrow {
+  width: 40px;
+  height: 40px;
+  line-height: 20px;
+  color: inherit;
+  background-color: #222;
+  border: 0;
+  border-radius: 100%;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+}
+.control-arrow:active {
+  background-color: #234567
+}
+#btnUp { grid-column: 2; grid-row: 1; }
+#btnLeft { grid-column: 1; grid-row: 2; }
+#btnRight { grid-column: 3; grid-row: 2; }
+#btnDown { grid-column: 2; grid-row: 3; }
+
+
 .board {
   position: relative;
 }
@@ -28,8 +56,8 @@ table {
 }
 table td { 
   border: 2px solid transparent;
-  width: 45px;
-  height: 45px;
+  width: 38px;
+  height: 38px;
   background-color: rgb(31, 31, 31);
   box-sizing: border-box;
   padding: 5px;
@@ -88,25 +116,26 @@ table td.wall-east { border-right-color: inherit }
   position: absolute;
   top: 0;
   left: 0;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 100%;
   background-color: rebeccapurple;
   transition: transform 0.3s, box-shadow 0.5s;
-  opacity: 0.6;
+  opacity: 0.4;
   box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 1);
   border: 2px solid rgba(255,255,255,0.3);
   font-size: 14px;
-  line-height: 20px;
-  color: white;
+  line-height: 18px;
+  color: rgba(255, 255, 255, 0.5);
   text-align: center;
+  cursor: pointer;
 }
 .robot.active {
   opacity: 1;
   box-shadow: 0 3px 4px 1px rgba(0, 0, 0, 0.3);
   margin-top: -1px;
 }
-.robot-0 {background-color: hsl(0, 50%, 40%)}
-.robot-1 {background-color: hsl(140, 50%, 40%)}
-.robot-2 {background-color: hsl(220, 50%, 40%)}
-.robot-3 {background-color: hsl(60, 50%, 40%)}
+.robot-0 {background-color: hsl(0, 50%, 30%)}
+.robot-1 {background-color: hsl(140, 50%, 30%)}
+.robot-2 {background-color: hsl(220, 50%, 30%)}
+.robot-3 {background-color: hsl(60, 50%, 30%)}
