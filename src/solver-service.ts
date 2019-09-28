@@ -39,7 +39,6 @@ function onWorkerMessage(e: MessageEvent) {
     }
     case SolverWorkerMessage.SOLVE_PROGRESS: {
       progress = e.data.progress as ProgressData
-      console.log("SOLVE PROGRESS", progress.checkedStates)
       setText('Checked ' + progress.checkedStates)
       break;
     }

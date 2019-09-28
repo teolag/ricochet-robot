@@ -5,7 +5,7 @@ import { Pos } from "./models/Pos"
 import { Robot, cloneRobots } from "./models/Robot"
 import {solve, getResult} from "./solver-service"
 import { goNorth, goSouth, goWest, goEast } from "./solver-utils"
-import './solver-status'
+import './service-worker'
 /*
 
 
