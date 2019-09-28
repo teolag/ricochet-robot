@@ -1,7 +1,7 @@
-import { Board } from "./Board.js";
-import { Robot, RobotIds } from "./Robot.js";
-import { Goal } from "./Goal.js";
-import * as Slumpa from "./Slumpa.js"
+import { Board } from "./Board";
+import { Robot, RobotIds } from "./Robot";
+import { Goal } from "./Goal";
+import * as Slumpa from "../libs/Slumpa"
 
 export class Level {
   public board: Board

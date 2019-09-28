@@ -1,9 +1,16 @@
-import {Board, Wall} from './Board.js'
-import {Robot, cloneRobots} from './Robot.js'
-import {Goal} from './Goal.js'
-import {Pos} from './Pos.js'
+import {Board} from './models/Board'
+import {Goal} from './models/Goal'
+import {Pos} from './models/Pos'
+import { goNorth, goSouth, goWest, goEast } from './solver-utils'
+import { Level } from './models/Level'
 
 const MAX_CHECKED = 100000
+
+interface Robot {
+  x: number
+  y: number
+  color: number
+}
 
 const notNull = <T>(value: T | null): value is T => value !== null
 interface State {
@@ -23,6 +30,10 @@ export interface CompletedData {
   message: string
 }
 
+export interface ProgressData {
+  checkedStates: number
+}
+
 export class Solver {
   private readonly board: Board
   private readonly robots: Robot[]
@@ -35,6 +46,7 @@ export class Solver {
   private running = false
   private foundRoute: State[] = []
   private completeCallback: Function|undefined
+  private progressCallback: Function|undefined
   private message = ''
   private duration = 0
 
@@ -45,17 +57,21 @@ export class Solver {
     this.board = board
     this.robots = robots
     this.goal = goal
+    console.log("GOAL", goal)
     this.goalTile = this.tile(this.goal)
   }
 
   public solve() {
     const startState = this.getState(this.robots)
-    this.uncheckedStates = [{previous: '', color:0, dir:'', state: startState, robots: cloneRobots(this.robots)}]
+    this.uncheckedStates = [{previous: '', color:0, dir:'', state: startState, robots: this.robots.slice()}]
     this.statesUnchecked = new Set(startState)
     const start = new Date()
 
     this.running = true
     while(this.running) {
+      if(this.progressCallback && (this.checkedStates.size % 100 === 0)) {
+        this.progressCallback({checkedStates: this.checkedStates.size})
+      }
       this.checkNext()
     }
     this.duration = (new Date().getTime() - start.getTime()) / 1000
@@ -81,6 +97,10 @@ export class Solver {
 
   public onComplete(callback: (result: CompletedData) => void) {
     this.completeCallback = callback
+  }
+
+  public onProgress(callback: (data: ProgressData) => void) {
+    this.progressCallback = callback
   }
 
   private checkNext() {
@@ -145,58 +165,19 @@ export class Solver {
     const otherRobots = robots.filter(r => r.color !== robotIndex)
 
     return [
-      Solver.goNorth(this.board, robot, otherRobots),
-      Solver.goSouth(this.board, robot, otherRobots),
-      Solver.goWest(this.board, robot, otherRobots),
-      Solver.goEast(this.board, robot, otherRobots)
+      goNorth(this.board, robot, otherRobots),
+      goSouth(this.board, robot, otherRobots),
+      goWest(this.board, robot, otherRobots),
+      goEast(this.board, robot, otherRobots)
     ].filter(notNull).map(move => {
-      const newRobots = cloneRobots(robots)
-      newRobots[robotIndex].setPos(move.pos)
+      const newRobots = robots.slice()
+      newRobots[robotIndex] = {x: move.pos.x, y: move.pos.y, color: newRobots[robotIndex].color}
       const state = this.getState(newRobots)
       return {state, robots: newRobots, dir: move.dir, color: robotIndex}
     })
   }
 
-  public static goNorth (board: Board, robot: Robot, otherRobots: Robot[]) {
-    const pos = robot.getPos()
-    const closestRobotY = Math.max(...otherRobots.filter(r => r.x === pos.x && r.y < pos.y).map(r => r.y))
-    for(; pos.y > 0; pos.y--) {
-      if(pos.y-1 === closestRobotY || board.hasWall(pos.x, pos.y, Wall.NORTH)) break
-    }
-    if(pos.y === robot.y) return null
-    return {pos, dir: 'upp'}
-  }
-
-  public static goSouth (board: Board, robot: Robot, otherRobots: Robot[]) {
-    const pos = robot.getPos()
-    const closestRobotY = Math.min(...otherRobots.filter(r => r.x === robot.x && r.y > pos.y).map(r => r.y))
-    for(; pos.y < board.h; pos.y++) {
-      if(pos.y+1 === closestRobotY || board.hasWall(robot.x, pos.y, Wall.SOUTH)) break
-    }
-    if(pos.y===robot.y) return null
-    return {pos, dir: 'ner'}
-  }
-
-  public static goWest (board: Board, robot: Robot, otherRobots: Robot[]) {
-    const pos = robot.getPos()
-    const closestRobotX = Math.max(...otherRobots.filter(r => r.y === pos.y && r.x < pos.x).map(r => r.x))
-    for(; pos.x > 0; pos.x--) {
-      if(pos.x-1 === closestRobotX || board.hasWall(pos.x, pos.y, Wall.WEST)) break
-    }
-    if(pos.x===robot.x) return null
-    return {pos, dir: 'vänster'}
-  }
-
-  public static goEast (board: Board, robot: Robot, otherRobots: Robot[]) {
-    const pos = robot.getPos()
-    const closestRobotX = Math.min(...otherRobots.filter(r => r.y === pos.y && r.x > pos.x).map(r => r.x))
-    for(; pos.x < board.w; pos.x++) {
-      if(pos.x+1 === closestRobotX || board.hasWall(pos.x, pos.y, Wall.EAST)) break
-    }
-    if(pos.x===robot.x) return null
-    return {pos, dir: 'höger'}
-  }
-
+  
 
 }
 

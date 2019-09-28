@@ -1,11 +1,24 @@
-import { Level } from "./Level.js"
-import { Wall, Board } from "./Board.js"
-import { Solver } from "./Solver.js"
-import * as Slumpa from "./Slumpa.js"
-import { Pos } from "./Pos.js"
-import { Robot, cloneRobots } from "./Robot.js"
-
+import { Level } from "./models/Level"
+import { Wall, Board } from "./models/Board"
+import * as Slumpa from "./libs/Slumpa"
+import { Pos } from "./models/Pos"
+import { Robot, cloneRobots } from "./models/Robot"
+import {solve, getResult} from "./solver-service"
+import { goNorth, goSouth, goWest, goEast } from "./solver-utils"
+import './solver-status'
 /*
+
+
+1drag = 4^2 = 16
+2drag = 4^3 = 64
+3drag = 4^4 = 256
+4drag = 4^5 = 1024
+5drag = 4^6 = 4096
+6drag = 4^7 = 16384
+7drag = 4^8 = 65536
+8drag = 4^9 = 262144
+RIMLIGT??
+
 
 * There and back again
 
@@ -39,6 +52,21 @@ import { Robot, cloneRobots } from "./Robot.js"
 
 */
 
+let level: Level
+let robots: Robot[]
+let activeRobotIndex = 0
+let selectedRobot: Robot
+let otherRobots: Robot[]
+let robotElems: HTMLElement[]
+
+
+
+
+
+
+
+
+
 
 function newSeed() {
   const newSeed = Math.floor(Math.random()*1000000)
@@ -71,27 +99,38 @@ if(!btnRestart) throw Error("restartbutton not found")
 
 btnRestart.addEventListener('click', () => {
   newSeed()
-  restart()
+  newGame()
+})
+newGame()
+
+
+
+document.body.addEventListener('keydown', e => {
+  switch(e.key) {
+    case 'ArrowUp': moveActiveRobot(goNorth); break;
+    case 'ArrowDown': moveActiveRobot(goSouth); break;
+    case 'ArrowLeft': moveActiveRobot(goWest); break;
+    case 'ArrowRight': moveActiveRobot(goEast); break;
+    case '1': switchRobot(0); break 
+    case '2': switchRobot(1); break 
+    case '3': switchRobot(2); break 
+    case '4': switchRobot(3); break 
+  }
 })
 
-restart()
 
 
-function restart() {
-  if(!boardElem) throw Error("could not find board")
-
-  const level = new Level(10, 10, 4)
-  const robots = cloneRobots(level.robots)
-  const html = createHTMLBoard(level)
-  let activeRobotIndex = 0
-  let selectedRobot: Robot
-  let otherRobots: Robot[]
+function newGame() {
   
+  level = new Level(10, 10, 4)
+  solve(level)
+  
+  const html = createHTMLBoard(level)
+  if(!boardElem) throw Error("could not find board")
   boardElem.innerHTML = html
   
-  const robotElems = robots.map(r => {
+  robotElems = level.robots.map(r => {
     const elem = document.createElement('div')
-    moveRobot(elem, r.getPos())
     elem.classList.add('robot', 'robot-'+r.color)
     elem.innerText = (r.color+1).toString()
     elem.addEventListener('click', e => switchRobot(r.color))
@@ -100,90 +139,79 @@ function restart() {
   robotElems.forEach(robotElem => {
     boardElem.appendChild(robotElem)
   })
-  
-  
+
   reset()
+}
+
+reset()
+
+function reset() {
+  if(!level) return
+  setMoveCounter(0)
+  robots = cloneRobots(level.robots)
+  robots.forEach((robot, i) => {
+    moveRobot(robotElems[i], robot.getPos())
+  })
   switchRobot(0)
-  
-  document.body.addEventListener('keydown', e => {
-    switch(e.key) {
-      case 'ArrowUp': moveActiveRobot(Solver.goNorth); break;
-      case 'ArrowDown': moveActiveRobot(Solver.goSouth); break;
-      case 'ArrowLeft': moveActiveRobot(Solver.goWest); break;
-      case 'ArrowRight': moveActiveRobot(Solver.goEast); break;
-      case '1': switchRobot(0); break 
-      case '2': switchRobot(1); break 
-      case '3': switchRobot(2); break 
-      case '4': switchRobot(3); break 
-    }
-  })
-
-
-  const btnUp = document.getElementById('btnUp')
-  if(btnUp) btnUp.addEventListener('click', e => moveActiveRobot(Solver.goNorth))
-  const btnDown = document.getElementById('btnDown')
-  if(btnDown) btnDown.addEventListener('click', e => moveActiveRobot(Solver.goSouth))
-  const btnLeft = document.getElementById('btnLeft')
-  if(btnLeft) btnLeft.addEventListener('click', e => moveActiveRobot(Solver.goWest))
-  const btnRight = document.getElementById('btnRight')
-  if(btnRight) btnRight.addEventListener('click', e => moveActiveRobot(Solver.goEast))
-
-  if(!btnReset) throw Error("reset button not found")
-  btnReset.addEventListener('click', reset)
-
-  function reset() {
-    setMoveCounter(0)
-    switchRobot(0)
-    level.robots.forEach((robot, i) => {
-      robots[i].setPos(robot.getPos())
-      moveRobot(robotElems[i], robot.getPos())
-    })
-  }
-
-
-  function moveActiveRobot(moveFunction: (board: Board, selectedRobot: Robot, otherRobots: Robot[]) => {pos: Pos, dir: string}|null) {
-    const newPos = moveFunction(level.board, selectedRobot, otherRobots)
-    if(!newPos) return
-    moveRobot(robotElems[activeRobotIndex], newPos.pos)
-    selectedRobot.setPos(newPos.pos)
-    setMoveCounter(moves+1)
-    if(goalIsReached()) {
-      const result = solver.getResult()
-      const score = calculateScore(moves, result.route.length)
-
-      setTimeout(() => {
-        alert("tjohooo!! Score: " + '⭐'.repeat(score))
-      }, 400);
-    }
-  }
-  
-  function moveRobot(robot: HTMLElement, newPos: Pos) {
-    robot.style.transform = `translate(${newPos.x*38+10}px, ${newPos.y*38+10}px)`
-  }
-
-  function goalIsReached() {
-    const correctRobot = robots[level.goal.color]
-    return correctRobot.x === level.goal.x && correctRobot.y === level.goal.y
-  }
-
-  function switchRobot(index: number) {
-    if(index > robots.length) return
-    activeRobotIndex = index
-    selectedRobot = robots[index]
-    otherRobots = robots.filter(r => r.color !== index)
-    robotElems.forEach((r, i) => {
-      r.classList.toggle('active', i === index)
-    })
-  }
-
-  const solver = new Solver(level.board, robots, level.goal)
-  solver.onComplete(result => {
-    console.log("onComplete", result)
-  })
-  solver.solve()
 }
 
 
+
+switchRobot(0)
+
+
+
+
+const btnUp = document.getElementById('btnUp')
+if(btnUp) btnUp.addEventListener('click', e => moveActiveRobot(goNorth))
+const btnDown = document.getElementById('btnDown')
+if(btnDown) btnDown.addEventListener('click', e => moveActiveRobot(goSouth))
+const btnLeft = document.getElementById('btnLeft')
+if(btnLeft) btnLeft.addEventListener('click', e => moveActiveRobot(goWest))
+const btnRight = document.getElementById('btnRight')
+if(btnRight) btnRight.addEventListener('click', e => moveActiveRobot(goEast))
+
+if(!btnReset) throw Error("reset button not found")
+btnReset.addEventListener('click', reset)
+
+
+
+function moveActiveRobot(moveFunction: (board: Board, selectedRobot: Robot, otherRobots: Robot[]) => {pos: Pos, dir: string}|null) {
+  const newPos = moveFunction(level.board, selectedRobot, otherRobots)
+  if(!newPos) return
+  moveRobot(robotElems[activeRobotIndex], newPos.pos)
+  selectedRobot.setPos(newPos.pos)
+  setMoveCounter(moves+1)
+
+  
+  if(goalIsReached()) {
+    const result = getResult()
+    if(!result) {
+      alert("Grattis, du klarade det innan solvern")
+      return;
+    }
+    const score = calculateScore(moves, result.route.length)
+
+    setTimeout(() => {
+      alert("tjohooo!! Score: " + '⭐'.repeat(score))
+    }, 400);
+  }
+
+}
+
+function moveRobot(robot: HTMLElement, newPos: Pos) {
+  robot.style.transform = `translate(${newPos.x*38+10}px, ${newPos.y*38+10}px)`
+}
+
+function switchRobot(index: number) {
+  if(index > robots.length) return
+  activeRobotIndex = index
+  selectedRobot = robots[index]
+  otherRobots = robots.filter(r => r.color !== index)
+  robotElems.forEach((r, i) => {
+    r.classList.toggle('active', i === index)
+  })
+}
 
 
 function createHTMLBoard(level: Level): string {
@@ -194,11 +222,11 @@ function createHTMLBoard(level: Level): string {
     if(walls & Wall.EAST) classes.push('wall-east')
     if(walls & Wall.WEST) classes.push('wall-west')
     if(walls & Wall.SOUTH) classes.push('wall-south')
-
+    
     if(level.goal.x === x && level.goal.y ===y) {
       text = `<div class="goal goal-${level.goal.color}"></div>`;
     }
-
+    
     level.robots.forEach(robot => {
       if(robot.x === x && robot.y ===y) {
         text = `<div class="start start-${robot.color}"></div>`;
@@ -206,8 +234,14 @@ function createHTMLBoard(level: Level): string {
     })
     
     return `<td class='${classes.join(' ')}'>${text}</td>`
-
+    
   }).join('')).join('</tr><tr>') + '</tr></table>'
+}
+
+
+function goalIsReached() {
+  const correctRobot = robots[level.goal.color]
+  return correctRobot.x === level.goal.x && correctRobot.y === level.goal.y
 }
 
 function calculateScore(moves: number, optimalMoves: number) {

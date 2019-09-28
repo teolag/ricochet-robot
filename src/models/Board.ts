@@ -1,4 +1,4 @@
-import * as Slumpa from './Slumpa.js'
+import * as Slumpa from '../libs/Slumpa'
 export enum Wall {
   NORTH = 1 << 0,
   WEST = 1 << 1,
@@ -47,10 +47,6 @@ export class Board {
       this.addWall(x, y, wallType)
       builtWalls++
     }
-  }
-
-  public hasWall(x:number, y:number, wall: Wall) {
-    return (this.tiles[y][x] & wall) !== 0
   }
 
   private addSingleWall(x: number, y: number, wall: Wall) {
