@@ -151,7 +151,7 @@ function keyHandler(e: KeyboardEvent) {
 
 function newGame() {
   
-  level = new Level(12, 12, 4)
+  level = new Level(10, 10, 4)
   solve(level)
   
   const html = createHTMLBoard(level)
