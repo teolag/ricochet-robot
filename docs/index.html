@@ -8,7 +8,7 @@
     <link href="css/style.css" rel="stylesheet" />
   </head>
   <body>
-    <button type="button" class="button" id="btnRestart">New game</button>
+    <button type="button" class="button" id="btnNewGame">New game</button>
     <button type="button" class="button" id="btnReset">Reset</button>
 
     <div id="solverStatus"></div>
@@ -17,10 +17,13 @@
     <div class="board"></div>
 
     <div class="controls">
-      <button id="btnUp" class="control-arrow" type="button">U</button>
-      <button id="btnLeft" class="control-arrow" type="button">V</button>
-      <button id="btnRight" class="control-arrow" type="button">H</button>
-      <button id="btnDown" class="control-arrow" type="button">N</button>
+      <button id="btnUp" class="control-button" type="button"><div class="control-button-arrow"></div></button>
+      <button id="btnLeft" class="control-button" type="button"><div class="control-button-arrow"></div></button>
+      <button id="btnRight" class="control-button" type="button"><div class="control-button-arrow"></div></button>
+      <button id="btnDown" class="control-button" type="button"><div class="control-button-arrow"></div></button>
+    </div>
+    <div class="robot-colors">
+      
     </div>
 
     <script type="module" src="js/main.js"></script>

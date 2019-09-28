@@ -1,1 +1,161 @@
-!function(t){var e={};function s(i){if(e[i])return e[i].exports;var n=e[i]={i:i,l:!1,exports:{}};return t[i].call(n.exports,n,n.exports,s),n.l=!0,n.exports}s.m=t,s.c=e,s.d=function(t,e,i){s.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:i})},s.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},s.t=function(t,e){if(1&e&&(t=s(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var i=Object.create(null);if(s.r(i),Object.defineProperty(i,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var n in t)s.d(i,n,function(e){return t[e]}.bind(null,n));return i},s.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return s.d(e,"a",e),e},s.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},s.p="",s(s.s=6)}([function(t,e,s){"use strict";s.d(e,"b",(function(){return i})),s.d(e,"a",(function(){return r}));var i,n=s(2);!function(t){t[t.NORTH=1]="NORTH",t[t.WEST=2]="WEST",t[t.EAST=4]="EAST",t[t.SOUTH=8]="SOUTH"}(i||(i={}));class r{constructor(t,e){this.h=t,this.w=e,this.tiles=new Array(t).fill(null).map(()=>new Array(e).fill(0)),this.addTopWalls(),this.addBottomWalls(),this.addLeftWalls(),this.addRightWalls()}addWall(t,e,s){if(t<0||t>=this.w)throw Error(`x must be between 0 and ${this.w-1}, was: ${t}`);if(e<0||e>=this.h)throw Error(`y must be between 0 and ${this.h-1}, was: ${e}`);this.addSingleWall(t,e,s);const i=this.getTileBehindTheWall(t,e,s);if(i){const t=this.getOppositeWall(s);this.addSingleWall(i.x,i.y,t)}}addRandomWalls(t){let e=0,s=0;for(;e<t&&s<1e3;){s++;const t=n.b([i.NORTH,i.EAST,i.WEST,i.SOUTH]),r=n.a(0,this.w-1),o=n.a(0,this.h-1);this.tiles[o][r]&t||(this.addWall(r,o,t),e++)}}addSingleWall(t,e,s){const i=this.tiles[e][t];this.tiles[e][t]=i|s}getTileBehindTheWall(t,e,s){return s===i.NORTH&&e>0?{x:t,y:e-1}:s===i.WEST&&t>0?{x:t-1,y:e}:s===i.EAST&&t+1<this.w?{x:t+1,y:e}:s===i.SOUTH&&e+1<this.h?{x:t,y:e+1}:null}getOppositeWall(t){switch(t){case i.NORTH:return i.SOUTH;case i.SOUTH:return i.NORTH;case i.EAST:return i.WEST;case i.WEST:return i.EAST;default:throw Error("Invalid wall "+t)}}addTopWalls(){for(let t=0;t<this.w;t++)this.addSingleWall(t,0,i.NORTH)}addBottomWalls(){for(let t=0;t<this.w;t++)this.addSingleWall(t,this.h-1,i.SOUTH)}addLeftWalls(){for(let t=0;t<this.h;t++)this.addSingleWall(0,t,i.WEST)}addRightWalls(){for(let t=0;t<this.h;t++)this.addSingleWall(this.w-1,t,i.EAST)}}},function(t,e,s){"use strict";s.d(e,"b",(function(){return n})),s.d(e,"c",(function(){return r})),s.d(e,"d",(function(){return o})),s.d(e,"a",(function(){return a}));var i=s(0);function n(t,e,s){const n={x:e.x,y:e.y},r=Math.max(...s.filter(t=>t.x===n.x&&t.y<n.y).map(t=>t.y));for(;n.y>0&&(n.y-1!==r&&!l(t,n.x,n.y,i.b.NORTH));n.y--);return n.y===e.y?null:{pos:n,dir:"upp"}}function r(t,e,s){const n={x:e.x,y:e.y},r=Math.min(...s.filter(t=>t.x===e.x&&t.y>n.y).map(t=>t.y));for(;n.y<t.h&&(n.y+1!==r&&!l(t,e.x,n.y,i.b.SOUTH));n.y++);return n.y===e.y?null:{pos:n,dir:"ner"}}function o(t,e,s){const n={x:e.x,y:e.y},r=Math.max(...s.filter(t=>t.y===n.y&&t.x<n.x).map(t=>t.x));for(;n.x>0&&(n.x-1!==r&&!l(t,n.x,n.y,i.b.WEST));n.x--);return n.x===e.x?null:{pos:n,dir:"vänster"}}function a(t,e,s){const n={x:e.x,y:e.y},r=Math.min(...s.filter(t=>t.y===n.y&&t.x>n.x).map(t=>t.x));for(;n.x<t.w&&(n.x+1!==r&&!l(t,n.x,n.y,i.b.EAST));n.x++);return n.x===e.x?null:{pos:n,dir:"höger"}}function l(t,e,s,i){return 0!=(t.tiles[s][e]&i)}},function(t,e,s){"use strict";let i,n;function r(t,e){if(null==t)throw new Error("Invalid parameters, enter max, or max and min values");if(null==e&&(e=0),t<e)var s=t,i=e;else s=e,i=t;return s+Math.floor(l()*(i+1-s))}function o(t){return t[r(0,t.length-1)]}s.d(e,"a",(function(){return r})),s.d(e,"b",(function(){return o})),s.d(e,"c",(function(){return h})),s.d(e,"d",(function(){return c})),h(Math.floor(Math.random()*Number.MAX_SAFE_INTEGER));var a,l=(a=Math.pow(2,32),function(){return(n=(1664525*n+1013904223)%a)/a});function h(t){i=t,n=t}function c(t){var e,s,i;for(i=t.length;i;i-=1)e=Math.floor(l()*i),s=t[i-1],t[i-1]=t[e],t[e]=s;return t}},function(t,e,s){"use strict";var i;s.d(e,"a",(function(){return i})),function(t){t.PING="PING",t.PONG="PONG",t.SOLVE="SOLVE",t.SOLVE_END="SOLVE_END",t.SOLVE_PROGRESS="SOLVE_PROGRESS"}(i||(i={}))},,,function(t,e,s){"use strict";s.r(e);var i=s(1);const n=1e5,r=t=>null!==t;class o{constructor(t,e,s){this.checkedStates=new Map,this.statesUnchecked=new Set,this.uncheckedStates=[],this.completed=!1,this.running=!1,this.foundRoute=[],this.message="",this.duration=0,this.tile=t=>t.x+t.y*this.board.w,this.getState=t=>t.map(t=>this.tile(t)).join("|"),this.board=t,this.robots=e,this.goal=s,console.log("GOAL",s),this.goalTile=this.tile(this.goal)}solve(){const t=this.getState(this.robots);this.uncheckedStates=[{previous:"",color:0,dir:"",state:t,robots:this.robots.slice()}],this.statesUnchecked=new Set(t);const e=new Date;for(this.running=!0;this.running;)this.progressCallback&&this.checkedStates.size%100==0&&this.progressCallback({checkedStates:this.checkedStates.size}),this.checkNext();this.duration=((new Date).getTime()-e.getTime())/1e3,this.completeCallback&&this.completeCallback(this.getResult())}isCompleted(){return this.isCompleted}getResult(){return{duration:this.duration,statesChecked:this.checkedStates.size,completed:this.completed,running:this.running,route:this.foundRoute,message:this.message}}onComplete(t){this.completeCallback=t}onProgress(t){this.progressCallback=t}checkNext(){const t=this.uncheckedStates.shift();if(void 0===t)return this.message="No more moves to check... I guess this level is impossible",void(this.running=!1);const{state:e,robots:s,previous:i}=t;if(this.statesUnchecked.delete(e),!this.isGoalReached(s))return s.forEach((t,i)=>{const n=this.getNewStates(s,i).filter(t=>!this.checkedStates.has(t.state)).filter(t=>!this.statesUnchecked.has(t.state)).map(t=>Object.assign(Object.assign({},t),{previous:e}));n.length&&(this.uncheckedStates.push(...n),n.forEach(t=>this.statesUnchecked.add(t.state)))}),this.checkedStates.set(e,t),this.checkedStates.size===n?(this.message=`Checked ${n} states. Abort!`,void(this.running=!1)):void 0;this.goalReached(t,i)}isGoalReached(t){return this.tile(t[this.goal.color])===this.goalTile}goalReached(t,e){this.completed=!0,this.running=!1;let s=t;for(;s.previous;){this.foundRoute.unshift(s);const t=this.checkedStates.get(s.previous);if(void 0===t)throw Error(`state ${e} not found`);s=t}this.message=`Level solved in ${this.foundRoute.length} moves`}getNewStates(t,e){const s=t[e],n=t.filter(t=>t.color!==e);return[Object(i.b)(this.board,s,n),Object(i.c)(this.board,s,n),Object(i.d)(this.board,s,n),Object(i.a)(this.board,s,n)].filter(r).map(s=>{const i=t.slice();return i[e]={x:s.pos.x,y:s.pos.y,color:i[e].color},{state:this.getState(i),robots:i,dir:s.dir,color:e}})}}var a=s(3);function l(t){postMessage({type:a.a.SOLVE_END,result:t}),close()}function h(t){postMessage({type:a.a.SOLVE_PROGRESS,progress:t})}self.onmessage=function(t){switch(t.data.type){case a.a.SOLVE:{const{board:e,robots:s,goal:i}=t.data.level,n=new o(e,s,i);n.onComplete(l),n.onProgress(h),n.solve();break}default:throw Error("Worker recieved an unknown message"+t.data.type)}}}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/solver-worker.ts");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./src/Solver.ts":
+/*!***********************!*\
+  !*** ./src/Solver.ts ***!
+  \***********************/
+/*! exports provided: Solver */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Solver\", function() { return Solver; });\n/* harmony import */ var _solver_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./solver-utils */ \"./src/solver-utils.ts\");\n\nconst MAX_CHECKED = 200000;\nconst notNull = (value) => value !== null;\nclass Solver {\n    constructor(board, robots, goal) {\n        this.checkedStates = new Map();\n        this.statesUnchecked = new Set();\n        this.uncheckedStates = [];\n        this.completed = false;\n        this.running = false;\n        this.foundRoute = [];\n        this.message = '';\n        this.duration = 0;\n        this.tile = (pos) => pos.x + pos.y * this.board.w;\n        this.getState = (robots) => robots.map(r => this.tile(r)).join('|');\n        this.board = board;\n        this.robots = robots;\n        this.goal = goal;\n        console.log(\"GOAL\", goal);\n        this.goalTile = this.tile(this.goal);\n    }\n    solve() {\n        const startState = this.getState(this.robots);\n        this.uncheckedStates = [{ previous: '', color: 0, dir: '', state: startState, robots: this.robots.slice() }];\n        this.statesUnchecked = new Set(startState);\n        const start = new Date();\n        this.running = true;\n        while (this.running) {\n            if (this.progressCallback && (this.checkedStates.size % 100 === 0)) {\n                this.progressCallback({ checkedStates: this.checkedStates.size });\n            }\n            this.checkNext();\n        }\n        this.duration = (new Date().getTime() - start.getTime()) / 1000;\n        if (this.completeCallback) {\n            this.completeCallback(this.getResult());\n        }\n    }\n    isCompleted() {\n        return this.isCompleted;\n    }\n    getResult() {\n        return {\n            duration: this.duration,\n            statesChecked: this.checkedStates.size,\n            completed: this.completed,\n            running: this.running,\n            route: this.foundRoute,\n            message: this.message\n        };\n    }\n    onComplete(callback) {\n        this.completeCallback = callback;\n    }\n    onProgress(callback) {\n        this.progressCallback = callback;\n    }\n    checkNext() {\n        const currentState = this.uncheckedStates.shift();\n        if (currentState === undefined) {\n            this.message = `No more moves to check... I guess this level is impossible`;\n            this.running = false;\n            return;\n        }\n        const { state, robots, previous } = currentState;\n        //console.log(\"Checking\", state, robots[currentState.color].getPos())\n        this.statesUnchecked.delete(state);\n        if (this.isGoalReached(robots)) {\n            this.goalReached(currentState, previous);\n            return;\n        }\n        robots.forEach((robot, i) => {\n            const newStates = this.getNewStates(robots, i)\n                .filter(s => !this.checkedStates.has(s.state))\n                .filter(s => !this.statesUnchecked.has(s.state))\n                .map(s => (Object.assign(Object.assign({}, s), { previous: state })));\n            if (newStates.length) {\n                //console.log(\"add\", i, newStates.map(s => s.robots[i].x + ',' + s.robots[i].y).join('  '))\n                this.uncheckedStates.push(...newStates);\n                newStates.forEach(s => this.statesUnchecked.add(s.state));\n            }\n        });\n        this.checkedStates.set(state, currentState);\n        if (this.checkedStates.size === MAX_CHECKED) {\n            this.message = `Checked ${MAX_CHECKED} states. Abort!`;\n            this.running = false;\n            return;\n        }\n    }\n    isGoalReached(robots) {\n        return this.tile(robots[this.goal.color]) === this.goalTile;\n    }\n    goalReached(thisState, previous) {\n        this.completed = true;\n        this.running = false;\n        let state = thisState;\n        while (state.previous) {\n            this.foundRoute.unshift(state);\n            const nextState = this.checkedStates.get(state.previous);\n            if (nextState === undefined)\n                throw Error(`state ${previous} not found`);\n            state = nextState;\n        }\n        this.message = `Level solved in ${this.foundRoute.length} moves`;\n    }\n    getNewStates(robots, robotIndex) {\n        const robot = robots[robotIndex];\n        const otherRobots = robots.filter(r => r.color !== robotIndex);\n        return [\n            Object(_solver_utils__WEBPACK_IMPORTED_MODULE_0__[\"goNorth\"])(this.board, robot, otherRobots),\n            Object(_solver_utils__WEBPACK_IMPORTED_MODULE_0__[\"goSouth\"])(this.board, robot, otherRobots),\n            Object(_solver_utils__WEBPACK_IMPORTED_MODULE_0__[\"goWest\"])(this.board, robot, otherRobots),\n            Object(_solver_utils__WEBPACK_IMPORTED_MODULE_0__[\"goEast\"])(this.board, robot, otherRobots)\n        ].filter(notNull).map(move => {\n            const newRobots = robots.slice();\n            newRobots[robotIndex] = { x: move.pos.x, y: move.pos.y, color: newRobots[robotIndex].color };\n            const state = this.getState(newRobots);\n            return { state, robots: newRobots, dir: move.dir, color: robotIndex };\n        });\n    }\n}\n/*\nconst boardElem = document.querySelector('.board table')\nif(!boardElem) throw Error(\"could not find board\")\nnewPositions.forEach(pos => {\n  boardElem.innerHTML += `<div class='dot' style='left:${pos.x*41+20}px;top:${pos.y*41+20}px'></div>`\n})\nconsole.log(\"new\", newPositions)\n*/\n\n\n//# sourceURL=webpack:///./src/Solver.ts?");
+
+/***/ }),
+
+/***/ "./src/libs/Slumpa.ts":
+/*!****************************!*\
+  !*** ./src/libs/Slumpa.ts ***!
+  \****************************/
+/*! exports provided: randomInt, randomInts, randomFloat, randomFloats, randomBool, randomItems, randomOne, setSeed, setRandomSeed, getSeed, shuffle, shuffleCopy, getHash */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"randomInt\", function() { return randomInt; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"randomInts\", function() { return randomInts; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"randomFloat\", function() { return randomFloat; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"randomFloats\", function() { return randomFloats; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"randomBool\", function() { return randomBool; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"randomItems\", function() { return randomItems; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"randomOne\", function() { return randomOne; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"setSeed\", function() { return setSeed; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"setRandomSeed\", function() { return setRandomSeed; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getSeed\", function() { return getSeed; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"shuffle\", function() { return shuffle; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"shuffleCopy\", function() { return shuffleCopy; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getHash\", function() { return getHash; });\nlet initSeed, seed;\nsetRandomSeed();\nfunction randomInt(a, b) {\n    if (a == undefined) {\n        throw new Error(\"Invalid parameters, enter max, or max and min values\");\n    }\n    if (b == undefined)\n        b = 0;\n    if (a < b)\n        var min = a, max = b;\n    else\n        var min = b, max = a;\n    return min + (Math.floor(rnd() * (max + 1 - min)));\n}\nfunction randomInts(count, a, b) {\n    var ints = [];\n    for (var i = 0; i < count; i++) {\n        ints.push(randomInt(a, b));\n    }\n    return ints;\n}\nfunction randomFloat(a, b) {\n    if (a == undefined) {\n        throw new Error(\"Invalid parameters, enter max, or max and min values\");\n    }\n    if (b == undefined)\n        b = 0;\n    if (a < b)\n        var min = a, max = b;\n    else\n        var min = b, max = a;\n    return min + (rnd() * (max - min));\n}\nfunction randomFloats(c, a, b) {\n    var floats = [];\n    for (var i = 0; i < c; i++) {\n        floats.push(randomFloat(a, b));\n    }\n    return floats;\n}\nfunction randomBool(probability) {\n    if (probability === undefined)\n        probability = 0.5;\n    return rnd() < probability ? true : false;\n}\nfunction randomItems(arr, values, putBack) {\n    if (putBack) {\n        var result = [];\n        for (var i = 0; i < values; i++) {\n            result.push(arr[randomInt(0, arr.length - 1)]);\n        }\n        return result;\n    }\n    else {\n        arr = shuffleCopy(arr);\n        return arr.slice(0, values);\n    }\n}\nfunction randomOne(arr) {\n    return arr[randomInt(0, arr.length - 1)];\n}\nvar rnd = (function () {\n    var a = 1664525, c = 1013904223, m = Math.pow(2, 32);\n    return function () {\n        seed = (a * seed + c) % m;\n        return seed / m;\n    };\n}());\nfunction setSeed(newSeed) {\n    initSeed = newSeed;\n    seed = newSeed;\n}\nfunction setRandomSeed() {\n    setSeed(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));\n}\nfunction getSeed() {\n    return initSeed;\n}\nfunction shuffle(arr) {\n    var j, tmp, i;\n    for (i = arr.length; i; i -= 1) {\n        j = Math.floor(rnd() * i);\n        tmp = arr[i - 1];\n        arr[i - 1] = arr[j];\n        arr[j] = tmp;\n    }\n    return arr;\n}\nfunction shuffleCopy(arr) {\n    return shuffle(arr.slice(0));\n}\nfunction getHash(str) {\n    var hash = 0, i, chr, len;\n    if (str.length === 0)\n        return hash;\n    for (i = 0, len = str.length; i < len; i++) {\n        chr = str.charCodeAt(i);\n        hash = ((hash << 5) - hash) + chr;\n        hash |= 0; // Convert to 32bit integer\n    }\n    return hash;\n}\n;\n\n\n//# sourceURL=webpack:///./src/libs/Slumpa.ts?");
+
+/***/ }),
+
+/***/ "./src/models/Board.ts":
+/*!*****************************!*\
+  !*** ./src/models/Board.ts ***!
+  \*****************************/
+/*! exports provided: Wall, Board */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Wall\", function() { return Wall; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Board\", function() { return Board; });\n/* harmony import */ var _libs_Slumpa__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../libs/Slumpa */ \"./src/libs/Slumpa.ts\");\n\nvar Wall;\n(function (Wall) {\n    Wall[Wall[\"NORTH\"] = 1] = \"NORTH\";\n    Wall[Wall[\"WEST\"] = 2] = \"WEST\";\n    Wall[Wall[\"EAST\"] = 4] = \"EAST\";\n    Wall[Wall[\"SOUTH\"] = 8] = \"SOUTH\";\n})(Wall || (Wall = {}));\nclass Board {\n    constructor(height, width) {\n        this.h = height;\n        this.w = width;\n        this.tiles = new Array(height).fill(null).map(() => new Array(width).fill(0));\n        this.addTopWalls();\n        this.addBottomWalls();\n        this.addLeftWalls();\n        this.addRightWalls();\n    }\n    addWall(x, y, wall) {\n        if (x < 0 || x >= this.w)\n            throw Error(`x must be between 0 and ${this.w - 1}, was: ${x}`);\n        if (y < 0 || y >= this.h)\n            throw Error(`y must be between 0 and ${this.h - 1}, was: ${y}`);\n        this.addSingleWall(x, y, wall);\n        const neighbour = this.getTileBehindTheWall(x, y, wall);\n        if (neighbour) {\n            const oppositeWall = this.getOppositeWall(wall);\n            this.addSingleWall(neighbour.x, neighbour.y, oppositeWall);\n        }\n    }\n    addRandomWalls(wallCount) {\n        let builtWalls = 0;\n        let attempt = 0;\n        while (builtWalls < wallCount && attempt < 1000) {\n            attempt++;\n            const wallType = _libs_Slumpa__WEBPACK_IMPORTED_MODULE_0__[\"randomOne\"]([Wall.NORTH, Wall.EAST, Wall.WEST, Wall.SOUTH]);\n            const x = _libs_Slumpa__WEBPACK_IMPORTED_MODULE_0__[\"randomInt\"](0, this.w - 1);\n            const y = _libs_Slumpa__WEBPACK_IMPORTED_MODULE_0__[\"randomInt\"](0, this.h - 1);\n            const hasWall = this.tiles[y][x] & wallType;\n            if (hasWall)\n                continue;\n            this.addWall(x, y, wallType);\n            builtWalls++;\n        }\n    }\n    addSingleWall(x, y, wall) {\n        const value = this.tiles[y][x];\n        this.tiles[y][x] = value | wall;\n    }\n    getTileBehindTheWall(x, y, wall) {\n        if (wall === Wall.NORTH && y > 0)\n            return { x, y: y - 1 };\n        if (wall === Wall.WEST && x > 0)\n            return { x: x - 1, y };\n        if (wall === Wall.EAST && x + 1 < this.w)\n            return { x: x + 1, y };\n        if (wall === Wall.SOUTH && y + 1 < this.h)\n            return { x, y: y + 1 };\n        return null;\n    }\n    getOppositeWall(wall) {\n        switch (wall) {\n            case Wall.NORTH: return Wall.SOUTH;\n            case Wall.SOUTH: return Wall.NORTH;\n            case Wall.EAST: return Wall.WEST;\n            case Wall.WEST: return Wall.EAST;\n            default: throw Error(\"Invalid wall \" + wall);\n        }\n    }\n    addTopWalls() {\n        for (let x = 0; x < this.w; x++) {\n            this.addSingleWall(x, 0, Wall.NORTH);\n        }\n    }\n    addBottomWalls() {\n        for (let x = 0; x < this.w; x++) {\n            this.addSingleWall(x, this.h - 1, Wall.SOUTH);\n        }\n    }\n    addLeftWalls() {\n        for (let y = 0; y < this.h; y++) {\n            this.addSingleWall(0, y, Wall.WEST);\n        }\n    }\n    addRightWalls() {\n        for (let y = 0; y < this.h; y++) {\n            this.addSingleWall(this.w - 1, y, Wall.EAST);\n        }\n    }\n}\n\n\n//# sourceURL=webpack:///./src/models/Board.ts?");
+
+/***/ }),
+
+/***/ "./src/models/SolverWokerMessages.ts":
+/*!*******************************************!*\
+  !*** ./src/models/SolverWokerMessages.ts ***!
+  \*******************************************/
+/*! exports provided: SolverWorkerMessage */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"SolverWorkerMessage\", function() { return SolverWorkerMessage; });\nvar SolverWorkerMessage;\n(function (SolverWorkerMessage) {\n    SolverWorkerMessage[\"PING\"] = \"PING\";\n    SolverWorkerMessage[\"PONG\"] = \"PONG\";\n    SolverWorkerMessage[\"SOLVE\"] = \"SOLVE\";\n    SolverWorkerMessage[\"SOLVE_END\"] = \"SOLVE_END\";\n    SolverWorkerMessage[\"SOLVE_PROGRESS\"] = \"SOLVE_PROGRESS\";\n})(SolverWorkerMessage || (SolverWorkerMessage = {}));\n\n\n//# sourceURL=webpack:///./src/models/SolverWokerMessages.ts?");
+
+/***/ }),
+
+/***/ "./src/solver-utils.ts":
+/*!*****************************!*\
+  !*** ./src/solver-utils.ts ***!
+  \*****************************/
+/*! exports provided: goNorth, goSouth, goWest, goEast, hasWall */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"goNorth\", function() { return goNorth; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"goSouth\", function() { return goSouth; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"goWest\", function() { return goWest; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"goEast\", function() { return goEast; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"hasWall\", function() { return hasWall; });\n/* harmony import */ var _models_Board__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./models/Board */ \"./src/models/Board.ts\");\n\nfunction goNorth(board, robot, otherRobots) {\n    const pos = { x: robot.x, y: robot.y };\n    const closestRobotY = Math.max(...otherRobots.filter(r => r.x === pos.x && r.y < pos.y).map(r => r.y));\n    for (; pos.y > 0; pos.y--) {\n        if (pos.y - 1 === closestRobotY || hasWall(board, pos.x, pos.y, _models_Board__WEBPACK_IMPORTED_MODULE_0__[\"Wall\"].NORTH))\n            break;\n    }\n    if (pos.y === robot.y)\n        return null;\n    return { pos, dir: 'upp' };\n}\nfunction goSouth(board, robot, otherRobots) {\n    const pos = { x: robot.x, y: robot.y };\n    const closestRobotY = Math.min(...otherRobots.filter(r => r.x === robot.x && r.y > pos.y).map(r => r.y));\n    for (; pos.y < board.h; pos.y++) {\n        if (pos.y + 1 === closestRobotY || hasWall(board, robot.x, pos.y, _models_Board__WEBPACK_IMPORTED_MODULE_0__[\"Wall\"].SOUTH))\n            break;\n    }\n    if (pos.y === robot.y)\n        return null;\n    return { pos, dir: 'ner' };\n}\nfunction goWest(board, robot, otherRobots) {\n    const pos = { x: robot.x, y: robot.y };\n    const closestRobotX = Math.max(...otherRobots.filter(r => r.y === pos.y && r.x < pos.x).map(r => r.x));\n    for (; pos.x > 0; pos.x--) {\n        if (pos.x - 1 === closestRobotX || hasWall(board, pos.x, pos.y, _models_Board__WEBPACK_IMPORTED_MODULE_0__[\"Wall\"].WEST))\n            break;\n    }\n    if (pos.x === robot.x)\n        return null;\n    return { pos, dir: 'vänster' };\n}\nfunction goEast(board, robot, otherRobots) {\n    const pos = { x: robot.x, y: robot.y };\n    const closestRobotX = Math.min(...otherRobots.filter(r => r.y === pos.y && r.x > pos.x).map(r => r.x));\n    for (; pos.x < board.w; pos.x++) {\n        if (pos.x + 1 === closestRobotX || hasWall(board, pos.x, pos.y, _models_Board__WEBPACK_IMPORTED_MODULE_0__[\"Wall\"].EAST))\n            break;\n    }\n    if (pos.x === robot.x)\n        return null;\n    return { pos, dir: 'höger' };\n}\nfunction hasWall(board, x, y, wall) {\n    return (board.tiles[y][x] & wall) !== 0;\n}\n\n\n//# sourceURL=webpack:///./src/solver-utils.ts?");
+
+/***/ }),
+
+/***/ "./src/solver-worker.ts":
+/*!******************************!*\
+  !*** ./src/solver-worker.ts ***!
+  \******************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _Solver__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Solver */ \"./src/Solver.ts\");\n/* harmony import */ var _models_SolverWokerMessages__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./models/SolverWokerMessages */ \"./src/models/SolverWokerMessages.ts\");\n\n\nself.onmessage = processIncomingMessage;\nfunction processIncomingMessage(e) {\n    switch (e.data.type) {\n        case _models_SolverWokerMessages__WEBPACK_IMPORTED_MODULE_1__[\"SolverWorkerMessage\"].SOLVE: {\n            const { board, robots, goal } = e.data.level;\n            const solver = new _Solver__WEBPACK_IMPORTED_MODULE_0__[\"Solver\"](board, robots, goal);\n            solver.onComplete(onComplete);\n            solver.onProgress(onProgress);\n            solver.solve();\n            break;\n        }\n        default: {\n            throw Error(\"Worker recieved an unknown message\" + e.data.type);\n        }\n    }\n}\nfunction onComplete(result) {\n    postMessage({ type: _models_SolverWokerMessages__WEBPACK_IMPORTED_MODULE_1__[\"SolverWorkerMessage\"].SOLVE_END, result });\n    close();\n}\nfunction onProgress(progress) {\n    postMessage({ type: _models_SolverWokerMessages__WEBPACK_IMPORTED_MODULE_1__[\"SolverWorkerMessage\"].SOLVE_PROGRESS, progress });\n}\n\n\n//# sourceURL=webpack:///./src/solver-worker.ts?");
+
+/***/ })
+
+/******/ });

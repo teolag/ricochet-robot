@@ -23,7 +23,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }
-.control-arrow {
+.control-button {
   width: 40px;
   height: 40px;
   line-height: 20px;
@@ -35,13 +35,19 @@ body {
   cursor: pointer;
   outline: none;
 }
-.control-arrow:active {
+.control-button-arrow {
+  border-left: 10px solid white;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  margin-left: 8px;
+}
+.control-button:active {
   background-color: #234567
 }
-#btnUp { grid-column: 2; grid-row: 1; }
-#btnLeft { grid-column: 1; grid-row: 2; }
+#btnUp { grid-column: 2; grid-row: 1; transform: rotate(-90deg) }
+#btnLeft { grid-column: 1; grid-row: 2; transform: rotate(180deg) }
 #btnRight { grid-column: 3; grid-row: 2; }
-#btnDown { grid-column: 2; grid-row: 3; }
+#btnDown { grid-column: 2; grid-row: 3; transform: rotate(90deg) }
 
 
 .board {
@@ -121,7 +127,7 @@ table td.wall-east { border-right-color: inherit }
   height: 18px;
   border-radius: 100%;
   background-color: rebeccapurple;
-  transition: transform 0.3s, box-shadow 0.5s;
+  transition: transform 0.3s, box-shadow 0.5s, opacity 0.5s;
   opacity: 0.4;
   box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 1);
   border: 2px solid rgba(255,255,255,0.3);

@@ -33,7 +33,7 @@ function onWorkerMessage(e: MessageEvent) {
       if(result.completed) {
         setText("Klar!")
       } else {
-        setText('Hittade igen')
+        setText('Hittade ingen')
       }
       break;
     }

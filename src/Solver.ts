@@ -4,7 +4,7 @@ import {Pos} from './models/Pos'
 import { goNorth, goSouth, goWest, goEast } from './solver-utils'
 import { Level } from './models/Level'
 
-const MAX_CHECKED = 100000
+const MAX_CHECKED = 200000
 
 interface Robot {
   x: number

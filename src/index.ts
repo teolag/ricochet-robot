@@ -6,6 +6,16 @@ import { Robot, cloneRobots } from "./models/Robot"
 import {solve, getResult} from "./solver-service"
 import { goNorth, goSouth, goWest, goEast } from "./solver-utils"
 import './service-worker'
+
+
+enum Direction {
+  UP = 'UP',
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT',
+  DOWN = 'DOWN'
+}
+
+
 /*
 
 
@@ -47,82 +57,101 @@ RIMLIGT??
   1 star complete the level  >125%
   2 stars complete within 5 moves or %? 100-125%
   3 stars complete with best route 100%
-
-* Save progress in local storage
-
-*/
-
+  
+  * Save progress in local storage
+  
+  */
+ 
 let level: Level
 let robots: Robot[]
 let activeRobotIndex = 0
 let selectedRobot: Robot
 let otherRobots: Robot[]
 let robotElems: HTMLElement[]
+let moves = 0
+const boardElem = document.querySelector('.board')
+const movesCounter = getElementById('movesCounter')
+const moveQueue: {robotIndex: number, direction: Direction}[] = []
+let processingMoveQueue = false
+startup()
 
 
 
 
+getElementById('btnUp').addEventListener('click', _ => moveActiveRobot(goNorth))
+getElementById('btnDown').addEventListener('click', _ => moveActiveRobot(goSouth))
+getElementById('btnLeft').addEventListener('click', _ => moveActiveRobot(goWest))
+getElementById('btnRight').addEventListener('click', _ => moveActiveRobot(goEast))
+
+getElementById('btnReset').addEventListener('click', reset)
+document.body.addEventListener('keydown', keyHandler)
+
+
+getElementById('btnNewGame').addEventListener('click', () => {
+  ranomizeSeed()
+  newGame()
+})
+
+
+declare global {
+  interface Window { show: any; }
+}
+
+window["show"] = () => {
+  const result = getResult()
+  if(!result) return
+
+  reset()
+  moveQueue.length = 0
+  const dirToDirection = new Map([['upp', Direction.UP], ['ner', Direction.DOWN], ['vänster', Direction.LEFT], ['höger', Direction.RIGHT]])
+  moveQueue.push(...result.route.map(step => {
+    const direction = dirToDirection.get(step.dir)
+    if(!direction) throw Error("Unknown direction:" + step.dir)
+    return {direction, robotIndex: step.color}
+  }))
+  processMoveQueue()
+}
 
 
 
+function startup() {
+  const seed = parseInt(location.hash.substr(1))
+  if(seed) {
+    Slumpa.setSeed(seed)
+    newGame()
+  } else {
+    ranomizeSeed()
+    newGame()
+  }
+}
 
+function setMoveCounter(value: number) {
+  moves = value
+  movesCounter.innerText = value.toString()
+}
 
-
-function newSeed() {
+function ranomizeSeed() {
   const newSeed = Math.floor(Math.random()*1000000)
   location.hash = newSeed.toString()
   Slumpa.setSeed(newSeed)
 }
 
-const seed = parseInt(location.hash.substr(1))
-if(seed) {
-  Slumpa.setSeed(seed)
-} else {
-  newSeed()
-}
-
-const movesCounter = document.getElementById('movesCounter')
-if(!movesCounter) throw Error("moves counter not found")
-let moves = 0
-const setMoveCounter = (value: number) => {
-  moves = value
-  movesCounter.innerText = value.toString()
-}
-
-const boardElem = document.querySelector('.board')
-
-const btnReset = document.getElementById('btnReset')
-
-
-const btnRestart = document.getElementById('btnRestart')
-if(!btnRestart) throw Error("restartbutton not found")
-
-btnRestart.addEventListener('click', () => {
-  newSeed()
-  newGame()
-})
-newGame()
-
-
-
-document.body.addEventListener('keydown', e => {
+function keyHandler(e: KeyboardEvent) {
   switch(e.key) {
-    case 'ArrowUp': moveActiveRobot(goNorth); break;
-    case 'ArrowDown': moveActiveRobot(goSouth); break;
-    case 'ArrowLeft': moveActiveRobot(goWest); break;
-    case 'ArrowRight': moveActiveRobot(goEast); break;
+    case 'ArrowUp': addToMoveQueue(activeRobotIndex, Direction.UP); break;
+    case 'ArrowDown': addToMoveQueue(activeRobotIndex, Direction.DOWN); break;
+    case 'ArrowLeft': addToMoveQueue(activeRobotIndex, Direction.LEFT); break;
+    case 'ArrowRight': addToMoveQueue(activeRobotIndex, Direction.RIGHT); break;
     case '1': switchRobot(0); break 
     case '2': switchRobot(1); break 
     case '3': switchRobot(2); break 
     case '4': switchRobot(3); break 
   }
-})
-
-
+}
 
 function newGame() {
   
-  level = new Level(10, 10, 4)
+  level = new Level(12, 12, 4)
   solve(level)
   
   const html = createHTMLBoard(level)
@@ -143,47 +172,47 @@ function newGame() {
   reset()
 }
 
-reset()
-
 function reset() {
   if(!level) return
   setMoveCounter(0)
   robots = cloneRobots(level.robots)
   robots.forEach((robot, i) => {
-    moveRobot(robotElems[i], robot.getPos())
+    moveRobotElem(robotElems[i], robot.getPos())
   })
   switchRobot(0)
 }
 
 
+function addToMoveQueue(robotIndex: number, direction: Direction) {
+  moveQueue.push({robotIndex, direction})
+  if(processingMoveQueue) return
+  processMoveQueue()
+}
 
-switchRobot(0)
-
-
-
-
-const btnUp = document.getElementById('btnUp')
-if(btnUp) btnUp.addEventListener('click', e => moveActiveRobot(goNorth))
-const btnDown = document.getElementById('btnDown')
-if(btnDown) btnDown.addEventListener('click', e => moveActiveRobot(goSouth))
-const btnLeft = document.getElementById('btnLeft')
-if(btnLeft) btnLeft.addEventListener('click', e => moveActiveRobot(goWest))
-const btnRight = document.getElementById('btnRight')
-if(btnRight) btnRight.addEventListener('click', e => moveActiveRobot(goEast))
-
-if(!btnReset) throw Error("reset button not found")
-btnReset.addEventListener('click', reset)
-
-
+function processMoveQueue() {
+  const nextMove = moveQueue.shift()
+  if(!nextMove) {
+    processingMoveQueue = false
+    return
+  }
+  processingMoveQueue = true
+  switchRobot(nextMove.robotIndex)
+  switch(nextMove.direction) {
+    case Direction.UP: moveActiveRobot(goNorth); break;
+    case Direction.DOWN: moveActiveRobot(goSouth); break;
+    case Direction.LEFT: moveActiveRobot(goWest); break;
+    case Direction.RIGHT: moveActiveRobot(goEast); break;
+  }
+  setTimeout(processMoveQueue, 400)
+}
 
 function moveActiveRobot(moveFunction: (board: Board, selectedRobot: Robot, otherRobots: Robot[]) => {pos: Pos, dir: string}|null) {
   const newPos = moveFunction(level.board, selectedRobot, otherRobots)
   if(!newPos) return
-  moveRobot(robotElems[activeRobotIndex], newPos.pos)
+  moveRobotElem(robotElems[activeRobotIndex], newPos.pos)
   selectedRobot.setPos(newPos.pos)
   setMoveCounter(moves+1)
 
-  
   if(goalIsReached()) {
     const result = getResult()
     if(!result) {
@@ -196,10 +225,9 @@ function moveActiveRobot(moveFunction: (board: Board, selectedRobot: Robot, othe
       alert("tjohooo!! Score: " + '⭐'.repeat(score))
     }, 400);
   }
-
 }
 
-function moveRobot(robot: HTMLElement, newPos: Pos) {
+function moveRobotElem(robot: HTMLElement, newPos: Pos) {
   robot.style.transform = `translate(${newPos.x*38+10}px, ${newPos.y*38+10}px)`
 }
 
@@ -212,7 +240,6 @@ function switchRobot(index: number) {
     r.classList.toggle('active', i === index)
   })
 }
-
 
 function createHTMLBoard(level: Level): string {
   return "<table><tr>" + level.board.tiles.map((row, y) => row.map((walls, x) => {
@@ -238,7 +265,6 @@ function createHTMLBoard(level: Level): string {
   }).join('')).join('</tr><tr>') + '</tr></table>'
 }
 
-
 function goalIsReached() {
   const correctRobot = robots[level.goal.color]
   return correctRobot.x === level.goal.x && correctRobot.y === level.goal.y
@@ -248,4 +274,10 @@ function calculateScore(moves: number, optimalMoves: number) {
   if(moves === optimalMoves) return 3
   if(moves <= 1+Math.floor(optimalMoves*1.3)) return 2
   return 1
+}
+
+function getElementById(id: string) {
+  const elem = document.getElementById(id)
+  if(!elem) throw Error("Could not find element " + id)
+  return elem
 }
