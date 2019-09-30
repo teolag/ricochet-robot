@@ -11,8 +11,8 @@ self.onmessage = processIncomingMessage
 function processIncomingMessage(e: MessageEvent) {
   switch(e.data.type) {
     case SolverWorkerMessage.SOLVE: {
-      const {board, robots, goal} = e.data.level
-      const solver = new Solver(board, robots, goal)
+      const {board, robots, goal, backAgain} = e.data.level
+      const solver = new Solver(board, robots, goal, backAgain)
       solver.onComplete(onComplete)
       solver.onProgress(onProgress)
       solver.solve()

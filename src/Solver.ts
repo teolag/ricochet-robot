@@ -13,6 +13,7 @@ interface Robot {
 
 const notNull = <T>(value: T | null): value is T => value !== null
 interface State {
+  goalVisited: boolean
   moves: number
   previous: string
   state: string
@@ -40,6 +41,7 @@ export class Solver {
   private readonly robots: Robot[]
   private readonly goal: Goal
   private readonly goalTile: number
+  private readonly homeTile: number
   private checkedStates = new Map<string, State>()
   private statesUnchecked = new Set<string>()
   private uncheckedStates: State[] = []
@@ -50,20 +52,23 @@ export class Solver {
   private progressCallback: Function|undefined
   private message = ''
   private duration = 0
+  private backAgain: boolean
 
   private tile = (pos: Pos) => pos.x + pos.y * this.board.w
-  private getState = (robots: Robot[]) => robots.map(r => this.tile(r)).join('|')
+  private getState = (robots: Robot[], goalVisited: boolean) => robots.map(r => this.tile(r)).join('|') + goalVisited
 
-  constructor(board: Board, robots: Robot[], goal: Goal) {
+  constructor(board: Board, robots: Robot[], goal: Goal, backAgain = false) {
     this.board = board
     this.robots = robots
     this.goal = goal
     this.goalTile = this.tile(this.goal)
+    this.homeTile = this.tile(this.robots[this.goal.color])
+    this.backAgain = backAgain
   }
 
   public solve() {
-    const startState = this.getState(this.robots)
-    this.uncheckedStates = [{moves: 0, previous: '', color:0, dir:'', state: startState, robots: this.robots.slice()}]
+    const startState = this.getState(this.robots, false)
+    this.uncheckedStates = [{moves: 0, previous: '', color:0, dir:'', state: startState, robots: this.robots.slice(), goalVisited: false}]
     this.statesUnchecked = new Set(startState)
     const start = new Date()
 
@@ -119,13 +124,21 @@ export class Solver {
       //console.log("Checking", state, robots[currentState.color].getPos())
       this.statesUnchecked.delete(state)
   
+      let goalVisited = currentState.goalVisited
       if(this.isGoalReached(robots)) {
+        if(!this.backAgain) {
+          this.goalReached(currentState, previous)
+          return
+        }
+        goalVisited = true
+      }
+      if(this.backAgain && goalVisited && this.isBackAgain(robots)) {
         this.goalReached(currentState, previous)
         return
       }
       
       robots.forEach((robot, i) => {
-        const newStates = this.getNewStates(robots, i)
+        const newStates = this.getNewStates(robots, i, goalVisited)
         .filter(s => !this.checkedStates.has(s.state))
         .filter(s => !this.statesUnchecked.has(s.state))
         .map(s => ({...s, previous: state, moves: moves+1}))
@@ -149,6 +162,10 @@ export class Solver {
     return this.tile(robots[this.goal.color]) === this.goalTile
   }
 
+  private isBackAgain(robots: Robot[]) {
+    return this.tile(robots[this.goal.color]) === this.homeTile
+  }
+
   private goalReached(thisState: State, previous: string) {
     this.completed = true
     this.running = false
@@ -165,7 +182,7 @@ export class Solver {
   }
 
 
-  private getNewStates (robots: Robot[], robotIndex: number) {
+  private getNewStates (robots: Robot[], robotIndex: number, goalVisited: boolean) {
     const robot = robots[robotIndex]
     const otherRobots = robots.filter(r => r.color !== robotIndex)
 
@@ -177,8 +194,8 @@ export class Solver {
     ].filter(notNull).map(move => {
       const newRobots = robots.slice()
       newRobots[robotIndex] = {x: move.pos.x, y: move.pos.y, color: newRobots[robotIndex].color}
-      const state = this.getState(newRobots)
-      return {state, robots: newRobots, dir: move.dir, color: robotIndex}
+      const state = this.getState(newRobots, goalVisited)
+      return {state, robots: newRobots, dir: move.dir, color: robotIndex, goalVisited}
     })
   }
 

@@ -7,10 +7,12 @@ export class Level {
   public board: Board
   public robots: Robot[]
   public goal: Goal
+  public backAgain: boolean
 
-  constructor(width: number, height: number, robots: number) {
+  constructor(width: number, height: number, robots: number, backAgain = false) {
     this.board = new Board(width, height)
     this.board.addRandomWalls(width*height/5)
+    this.backAgain = backAgain
 
     const availableTiles = []
     for(let x=0; x<this.board.w; x++) {
