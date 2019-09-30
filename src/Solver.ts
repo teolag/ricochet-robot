@@ -2,7 +2,6 @@ import {Board} from './models/Board'
 import {Goal} from './models/Goal'
 import {Pos} from './models/Pos'
 import { goNorth, goSouth, goWest, goEast } from './solver-utils'
-import { Level } from './models/Level'
 
 const MAX_CHECKED = 200000
 
@@ -14,6 +13,7 @@ interface Robot {
 
 const notNull = <T>(value: T | null): value is T => value !== null
 interface State {
+  moves: number
   previous: string
   state: string
   robots: Robot[]
@@ -32,6 +32,7 @@ export interface CompletedData {
 
 export interface ProgressData {
   checkedStates: number
+  currentMovesCount: number
 }
 
 export class Solver {
@@ -57,27 +58,26 @@ export class Solver {
     this.board = board
     this.robots = robots
     this.goal = goal
-    console.log("GOAL", goal)
     this.goalTile = this.tile(this.goal)
   }
 
   public solve() {
     const startState = this.getState(this.robots)
-    this.uncheckedStates = [{previous: '', color:0, dir:'', state: startState, robots: this.robots.slice()}]
+    this.uncheckedStates = [{moves: 0, previous: '', color:0, dir:'', state: startState, robots: this.robots.slice()}]
     this.statesUnchecked = new Set(startState)
     const start = new Date()
 
     this.running = true
     while(this.running) {
-      if(this.progressCallback && (this.checkedStates.size % 100 === 0)) {
-        this.progressCallback({checkedStates: this.checkedStates.size})
-      }
       this.checkNext()
     }
     this.duration = (new Date().getTime() - start.getTime()) / 1000
     if(this.completeCallback) {
       this.completeCallback(this.getResult())
     }
+    this.statesUnchecked.clear()
+    this.uncheckedStates.length = 0
+    this.checkedStates.clear()
   }
 
   public isCompleted() {
@@ -110,7 +110,12 @@ export class Solver {
         this.running = false
         return
       }
-      const {state, robots, previous} = currentState
+
+      if(this.progressCallback && (this.checkedStates.size % 100 === 0)) {
+        this.progressCallback({checkedStates: this.checkedStates.size, currentMovesCount: currentState.moves})
+      }
+
+      const {state, robots, previous, moves} = currentState
       //console.log("Checking", state, robots[currentState.color].getPos())
       this.statesUnchecked.delete(state)
   
@@ -123,7 +128,7 @@ export class Solver {
         const newStates = this.getNewStates(robots, i)
         .filter(s => !this.checkedStates.has(s.state))
         .filter(s => !this.statesUnchecked.has(s.state))
-        .map(s => ({...s, previous: state}))
+        .map(s => ({...s, previous: state, moves: moves+1}))
         if(newStates.length) {
           //console.log("add", i, newStates.map(s => s.robots[i].x + ',' + s.robots[i].y).join('  '))
           this.uncheckedStates.push(...newStates)

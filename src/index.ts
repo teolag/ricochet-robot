@@ -5,6 +5,7 @@ import { Pos } from "./models/Pos"
 import { Robot, cloneRobots } from "./models/Robot"
 import {solve, getResult} from "./solver-service"
 import { goNorth, goSouth, goWest, goEast } from "./solver-utils"
+import { getElementById } from "./utils"
 import './service-worker'
 
 
@@ -274,10 +275,4 @@ function calculateScore(moves: number, optimalMoves: number) {
   if(moves === optimalMoves) return 3
   if(moves <= 1+Math.floor(optimalMoves*1.3)) return 2
   return 1
-}
-
-function getElementById(id: string) {
-  const elem = document.getElementById(id)
-  if(!elem) throw Error("Could not find element " + id)
-  return elem
 }
