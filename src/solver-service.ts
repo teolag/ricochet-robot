@@ -14,6 +14,8 @@ const dialog = getElementById('solverDialog') as HTMLDialogElement
 const setButtonText = (text: string) => solverButton.innerText = text
 solverButton.addEventListener('click', _ => dialog.showModal())
 solverOKButton.addEventListener('click', _ => dialog.close())
+const showSolutionButton = getElementById('showSolutionButton')
+showSolutionButton.addEventListener('click', _ => dialog.close())
 
 
 export function solve(level: Level) {
@@ -21,6 +23,7 @@ export function solve(level: Level) {
     solverWorker.terminate()
   }
   result = null
+  showSolutionButton.hidden = true
   solverWorker = new Worker('js/solver-worker.js');
   solverWorker.onmessage = onWorkerMessage
   solverWorker.postMessage({type: SolverWorkerMessage.SOLVE, level});
@@ -42,6 +45,7 @@ function onWorkerMessage(e: MessageEvent) {
           ${result.statesChecked} states letades igenom på 
           ${result.duration} sekunder
         `
+        showSolutionButton.hidden = false
       } else {
         setButtonText('???')
         solverInfo.innerHTML = `
@@ -50,7 +54,6 @@ function onWorkerMessage(e: MessageEvent) {
           ${result.duration} sekunder
         `
       }
-      
       break;
     }
     case SolverWorkerMessage.SOLVE_PROGRESS: {

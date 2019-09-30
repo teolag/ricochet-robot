@@ -61,7 +61,7 @@ RIMLIGT??
   
   * Save progress in local storage
   
-  */
+*/
  
 let level: Level
 let robots: Robot[]
@@ -87,31 +87,15 @@ getElementById('btnRight').addEventListener('click', _ => moveActiveRobot(goEast
 getElementById('btnReset').addEventListener('click', reset)
 document.body.addEventListener('keydown', keyHandler)
 
+const showSolutionButton = getElementById('showSolutionButton')
+showSolutionButton.addEventListener('click', showSolution)
+
+
 
 getElementById('btnNewGame').addEventListener('click', () => {
   ranomizeSeed()
   newGame()
 })
-
-
-declare global {
-  interface Window { show: any; }
-}
-
-window["show"] = () => {
-  const result = getResult()
-  if(!result) return
-
-  reset()
-  moveQueue.length = 0
-  const dirToDirection = new Map([['upp', Direction.UP], ['ner', Direction.DOWN], ['vänster', Direction.LEFT], ['höger', Direction.RIGHT]])
-  moveQueue.push(...result.route.map(step => {
-    const direction = dirToDirection.get(step.dir)
-    if(!direction) throw Error("Unknown direction:" + step.dir)
-    return {direction, robotIndex: step.color}
-  }))
-  processMoveQueue()
-}
 
 
 
@@ -276,3 +260,19 @@ function calculateScore(moves: number, optimalMoves: number) {
   if(moves <= 1+Math.floor(optimalMoves*1.3)) return 2
   return 1
 }
+
+function showSolution() {
+  const result = getResult()
+  if(!result) return
+
+  reset()
+  moveQueue.length = 0
+  const dirToDirection = new Map([['upp', Direction.UP], ['ner', Direction.DOWN], ['vänster', Direction.LEFT], ['höger', Direction.RIGHT]])
+  moveQueue.push(...result.route.map(step => {
+    const direction = dirToDirection.get(step.dir)
+    if(!direction) throw Error("Unknown direction:" + step.dir)
+    return {direction, robotIndex: step.color}
+  }))
+  processMoveQueue()
+}
+
