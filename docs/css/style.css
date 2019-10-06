@@ -146,3 +146,22 @@ table td.wall-east { border-right-color: inherit }
 .robot-1 {background-color: hsl(140, 50%, 30%)}
 .robot-2 {background-color: hsl(220, 50%, 30%)}
 .robot-3 {background-color: hsl(60, 50%, 30%)}
+
+
+
+
+
+
+
+
+
+
+#canvases {
+  position: relative;
+}
+#backgroundCanvas,
+#robotCanvas {
+  position: absolute;
+  top: 0;
+  left: 0
+}

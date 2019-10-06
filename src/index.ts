@@ -6,6 +6,7 @@ import { Robot, cloneRobots } from "./models/Robot"
 import {solve, getResult} from "./solver-service"
 import { goNorth, goSouth, goWest, goEast } from "./solver-utils"
 import { getElementById } from "./utils"
+// import { GameBoard } from "./models/GameBoard"
 import './service-worker'
 
 
@@ -70,6 +71,7 @@ let selectedRobot: Robot
 let otherRobots: Robot[]
 let robotElems: HTMLElement[]
 let moves = 0
+// let gameBoard: GameBoard
 const boardElem = document.querySelector('.board')
 const movesCounter = getElementById('movesCounter')
 const moveQueue: {robotIndex: number, direction: Direction}[] = []
@@ -138,6 +140,8 @@ function newGame() {
   const backAgain = false
   level = new Level(10, 10, 4, backAgain)
   solve(level)
+
+  // gameBoard = new GameBoard(level.board.tiles, level.robots.map(r => ({x: r.x, y: r.y})), level.goal)
   
   const html = createHTMLBoard(level)
   if(!boardElem) throw Error("could not find board")
@@ -195,6 +199,7 @@ function moveActiveRobot(moveFunction: (board: Board, selectedRobot: Robot, othe
   const newPos = moveFunction(level.board, selectedRobot, otherRobots)
   if(!newPos) return
   moveRobotElem(robotElems[activeRobotIndex], newPos.pos)
+  // gameBoard.moveRobot(activeRobotIndex, newPos.pos)
   selectedRobot.setPos(newPos.pos)
   setMoveCounter(moves+1)
 
