@@ -18,7 +18,7 @@ const showSolutionButton = getElementById('showSolutionButton')
 showSolutionButton.addEventListener('click', _ => dialog.close())
 
 
-export function solve(level: Level) {
+export function solve(level: Level, backAgain = false) {
   if(solverWorker) {
     solverWorker.terminate()
   }
@@ -26,7 +26,7 @@ export function solve(level: Level) {
   showSolutionButton.hidden = true
   solverWorker = new Worker('js/solver-worker.js');
   solverWorker.onmessage = onWorkerMessage
-  solverWorker.postMessage({type: SolverWorkerMessage.SOLVE, level});
+  solverWorker.postMessage({type: SolverWorkerMessage.SOLVE, levelString: level.getLevelString(), backAgain});
 }
 
 export function getResult() {
@@ -38,7 +38,7 @@ function onWorkerMessage(e: MessageEvent) {
   switch(e.data.type) {
     case SolverWorkerMessage.SOLVE_END: {
       result = e.data.result as CompletedData
-      if(result.completed) {
+      if(result.isRouteFound) {
         setButtonText("!!!")
         solverInfo.innerHTML = `
           En lösning på ${result.route.length} drag hittades!<br>
@@ -46,10 +46,18 @@ function onWorkerMessage(e: MessageEvent) {
           ${result.duration} sekunder
         `
         showSolutionButton.hidden = false
-      } else {
+      } else if (result.isAllStatesChecked) {
+        setButtonText('X')
+        solverInfo.innerHTML = `
+          Ingen lösning kunde hittas. Omöjlig!<br>
+          ${result.statesChecked} states letades igenom på 
+          ${result.duration} sekunder
+        `
+      }
+      else {
         setButtonText('???')
         solverInfo.innerHTML = `
-          Ingen lösning kunde hittas.<br>
+          Orkade inte leta klar.<br>
           ${result.statesChecked} states letades igenom på 
           ${result.duration} sekunder
         `

@@ -1,14 +1,13 @@
 import { Pos } from "./Pos"
 
-export type RobotIds = 1 | 2 | 3 | 4 | 5
 
 export class Robot {
-  private id: RobotIds
+  private id: number
   public color: number
   public x: number
   public y: number
 
-  constructor(id: RobotIds, x: number, y: number) {
+  constructor(id: number, x: number, y: number) {
     this.id = id
     this.color = id
     this.x = x

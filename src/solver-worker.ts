@@ -1,5 +1,6 @@
 import { Solver, CompletedData, ProgressData } from "./Solver";
 import { SolverWorkerMessage } from "./models/SolverWokerMessages";
+import { Level } from "./models/Level";
 
 declare function postMessage(message: any): void;
 self.onmessage = processIncomingMessage
@@ -11,8 +12,8 @@ self.onmessage = processIncomingMessage
 function processIncomingMessage(e: MessageEvent) {
   switch(e.data.type) {
     case SolverWorkerMessage.SOLVE: {
-      const {board, robots, goal, backAgain} = e.data.level
-      const solver = new Solver(board, robots, goal, backAgain)
+      const level = new Level(e.data.levelString)
+      const solver = new Solver(level, {backAgain: e.data.backAgain})
       solver.onComplete(onComplete)
       solver.onProgress(onProgress)
       solver.solve()

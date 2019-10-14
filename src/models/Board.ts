@@ -11,7 +11,7 @@ export class Board {
   public tiles: number[][]
   public w: number
   public h: number
-
+  
   constructor(height: number, width: number) {
     this.h = height
     this.w = width
@@ -21,6 +21,18 @@ export class Board {
     this.addLeftWalls()
     this.addRightWalls()
   }
+
+  getTilesString() {
+    return this.tiles.map(row => row.map(tile => tile.toString(16)).join('')).join('')
+  }
+
+  setTiles(tiles: string) {
+    if(tiles.length !== this.w * this.h) throw Error(`Unable to set tiles. tiles.length was ${tiles.length}, expected ${this.w*this.h}`)
+
+    const numbers = tiles.split('').map(t => parseInt(t,16))
+    this.tiles = new Array(this.h).fill(null).map((_, y) => numbers.slice(y*this.w, y*this.w+this.w))
+  }
+  
 
   public addWall(x: number, y: number, wall: Wall) {
     if(x<0 || x>=this.w) throw Error(`x must be between 0 and ${this.w-1}, was: ${x}`)

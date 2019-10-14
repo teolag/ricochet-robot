@@ -10,11 +10,18 @@
   </head>
   <body>
     <button type="button" class="button" id="btnNewGame">New game</button>
-    <button type="button" class="button" id="btnReset">Reset</button>
+    
+    <button type="button" class="button" id="solverButton">SOLVE</button>
+    
+    <div id="board"></div>
 
-    <button type="button" id="solverButton">SOLVE</button>
-
-    <div id="movesCounter">0</div>
+    <div id="activeRoute">
+      <div id="movesCounter">0</div>
+      <div id="movesMade"></div>
+      <button id="resetButton" type="button" class="button">Reset</button>
+      <button id="undoButton" type="button" class="button">Ångra</button>
+    </div>
+    
     
 
     <!--
@@ -25,15 +32,27 @@
     -->
 
     <div class="controls">
-      <button id="btnUp" class="control-button" type="button"><div class="control-button-arrow"></div></button>
-      <button id="btnLeft" class="control-button" type="button"><div class="control-button-arrow"></div></button>
-      <button id="btnRight" class="control-button" type="button"><div class="control-button-arrow"></div></button>
-      <button id="btnDown" class="control-button" type="button"><div class="control-button-arrow"></div></button>
+      <table>
+        <tr>
+          <td></td>
+          <td><button id="btnUp" class="control-move-button" type="button">▲</button></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><button id="btnLeft" class="control-move-button" type="button">▲</button></td>
+          <td></td>
+          <td><button id="btnRight" class="control-move-button" type="button">▲</button></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><button id="btnDown" class="control-move-button" type="button">▲</button></td>
+          <td></td>
+        </tr>
+      </table>
+
+      <div id="colorControls"></div>
     </div>
 
-    <div class="robot-colors">
-      
-    </div>
 
     <dialog id="solverDialog">
       <div id="solverInfo"></div>

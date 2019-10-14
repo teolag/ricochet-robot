@@ -4,6 +4,7 @@ import {Pos} from './models/Pos'
 import { goNorth, goSouth, goWest, goEast } from './solver-utils'
 
 const MAX_CHECKED = 200000
+const STATE_DELIMITER = '|'
 
 interface Robot {
   x: number
@@ -22,12 +23,18 @@ interface State {
   color: number
 }
 
+interface SolverOptions {
+  backAgain?: boolean
+}
+
 export interface CompletedData {
   duration: number
   statesChecked: number
-  completed: boolean
-  running: boolean
+  isRouteFound: boolean
+  isAllStatesChecked: boolean
+  isAborted: boolean
   route: State[]
+  robotsUsed: number[]
   message: string
 }
 
@@ -45,24 +52,32 @@ export class Solver {
   private checkedStates = new Map<string, State>()
   private statesUnchecked = new Set<string>()
   private uncheckedStates: State[] = []
-  private completed = false
+  private routeFound = false
+  private aborted = false
+  private allStatesChecked = false
   private running = false
-  private foundRoute: State[] = []
+  private foundRoute: State[]
   private completeCallback: Function|undefined
   private progressCallback: Function|undefined
   private message = ''
   private duration = 0
   private backAgain: boolean
 
-  private tile = (pos: Pos) => pos.x + pos.y * this.board.w
-  private getState = (robots: Robot[], goalVisited: boolean) => robots.map(r => this.tile(r)).join('|') + goalVisited
+  private pos2num = (pos: Pos) => pos.x + pos.y * this.board.w
+  private getState = (robots: Robot[], goalVisited: boolean) => {
+    const mainRobot = this.pos2num(robots[0])
+    const helpers = robots.slice(1).map(r => this.pos2num(r)).sort().join(STATE_DELIMITER)
+    const hash = mainRobot + (goalVisited ? 'Y':'N') + helpers
+    return hash
+  }
 
-  constructor(board: Board, robots: Robot[], goal: Goal, backAgain = false) {
-    this.board = board
-    this.robots = robots
-    this.goal = goal
-    this.goalTile = this.tile(this.goal)
-    this.homeTile = this.tile(this.robots[this.goal.color])
+  constructor(level, options: SolverOptions = {}) {
+    const {backAgain = false} = options
+    this.board = level.board
+    this.robots = level.robots
+    this.goal = level.goal
+    this.goalTile = this.pos2num(this.goal)
+    this.homeTile = this.pos2num(this.robots[this.goal.color])
     this.backAgain = backAgain
   }
 
@@ -77,25 +92,29 @@ export class Solver {
       this.checkNext()
     }
     this.duration = (new Date().getTime() - start.getTime()) / 1000
+    const result = this.getResult()
     if(this.completeCallback) {
-      this.completeCallback(this.getResult())
+      this.completeCallback(result)
     }
     this.statesUnchecked.clear()
     this.uncheckedStates.length = 0
     this.checkedStates.clear()
+    return result
   }
 
-  public isCompleted() {
-    return this.isCompleted
+  public isRouteFound() {
+    return this.routeFound
   }
 
   public getResult(): CompletedData {
     return {
       duration: this.duration,
       statesChecked: this.checkedStates.size,
-      completed: this.completed,
-      running: this.running,
+      isRouteFound: this.routeFound,
+      isAllStatesChecked: this.allStatesChecked,
+      isAborted: this.aborted,
       route: this.foundRoute,
+      robotsUsed: getUsedRobots(this.foundRoute),
       message: this.message
     }
   }
@@ -112,6 +131,7 @@ export class Solver {
       const currentState = this.uncheckedStates.shift()
       if(currentState === undefined) {
         this.message = `No more moves to check... I guess this level is impossible`
+        this.allStatesChecked = true
         this.running = false
         return
       }
@@ -121,7 +141,7 @@ export class Solver {
       }
 
       const {state, robots, previous, moves} = currentState
-      //console.log("Checking", state, robots[currentState.color].getPos())
+      // console.log("Checking", state, robots[currentState.color])
       this.statesUnchecked.delete(state)
   
       let goalVisited = currentState.goalVisited
@@ -137,15 +157,17 @@ export class Solver {
         return
       }
       
-      robots.forEach((robot, i) => {
+      robots.forEach((_, i) => {
         const newStates = this.getNewStates(robots, i, goalVisited)
         .filter(s => !this.checkedStates.has(s.state))
         .filter(s => !this.statesUnchecked.has(s.state))
         .map(s => ({...s, previous: state, moves: moves+1}))
         if(newStates.length) {
-          //console.log("add", i, newStates.map(s => s.robots[i].x + ',' + s.robots[i].y).join('  '))
-          this.uncheckedStates.push(...newStates)
-          newStates.forEach(s => this.statesUnchecked.add(s.state))
+          // console.log("add", i, newStates.map(s => s.robots[i].x + ',' + s.robots[i].y).join('  '))
+          newStates.forEach(s => {
+            this.uncheckedStates.push(s)
+            this.statesUnchecked.add(s.state)
+          })
         }
       })
       
@@ -153,23 +175,25 @@ export class Solver {
 
       if(this.checkedStates.size === MAX_CHECKED) {
         this.message = `Checked ${MAX_CHECKED} states. Abort!`
+        this.aborted = true
         this.running = false
         return
       }
   }
 
   private isGoalReached(robots: Robot[]) {
-    return this.tile(robots[this.goal.color]) === this.goalTile
+    return this.pos2num(robots[this.goal.color]) === this.goalTile
   }
 
   private isBackAgain(robots: Robot[]) {
-    return this.tile(robots[this.goal.color]) === this.homeTile
+    return this.pos2num(robots[this.goal.color]) === this.homeTile
   }
 
   private goalReached(thisState: State, previous: string) {
-    this.completed = true
+    this.routeFound = true
     this.running = false
     let state = thisState
+    this.foundRoute = []
     
     while(state.previous) {
       this.foundRoute.unshift(state)
@@ -188,9 +212,9 @@ export class Solver {
 
     return [
       goNorth(this.board, robot, otherRobots),
-      goSouth(this.board, robot, otherRobots),
       goWest(this.board, robot, otherRobots),
-      goEast(this.board, robot, otherRobots)
+      goEast(this.board, robot, otherRobots),
+      goSouth(this.board, robot, otherRobots)
     ].filter(notNull).map(move => {
       const newRobots = robots.slice()
       newRobots[robotIndex] = {x: move.pos.x, y: move.pos.y, color: newRobots[robotIndex].color}
@@ -198,32 +222,10 @@ export class Solver {
       return {state, robots: newRobots, dir: move.dir, color: robotIndex, goalVisited}
     })
   }
-
-  
-
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-    const boardElem = document.querySelector('.board table')
-    if(!boardElem) throw Error("could not find board")
-    newPositions.forEach(pos => {
-      boardElem.innerHTML += `<div class='dot' style='left:${pos.x*41+20}px;top:${pos.y*41+20}px'></div>`
-    })
-    console.log("new", newPositions)
-    */
-   
+function getUsedRobots(route: State[]) {
+  if(!route) return []
+  const makeUnique = (arr: any[]) => [...new Set(arr)]
+  return makeUnique(route.map(r => r.color))
+}

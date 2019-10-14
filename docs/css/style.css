@@ -7,12 +7,27 @@ body {
   color: #9ab9ce;
 }
 
+
+/* Button */
 .button {
-  background-color: #234567;
   border: 0;
   padding: 0.3rem 0.5rem;
-  color: inherit;
   font-size: inherit;
+  outline: none;
+}
+.button:not(:disabled) {
+  color: inherit;
+  cursor: pointer;
+  background-color: #234567;
+}
+.button:not(:disabled):hover,
+.button:not(:disabled):focus {
+  background-color: #3a638b;
+}
+
+.button:disabled {
+  color: #6a7b8b;
+  background-color: #2c3238;
 }
 
 
@@ -20,13 +35,16 @@ body {
   position: absolute;
   left: 0;
   bottom: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 }
-.control-button {
+.control-move-button {
   width: 40px;
   height: 40px;
-  line-height: 20px;
+  font-size: 20px;
+  line-height: 30px;
   color: inherit;
   background-color: #222;
   border: 0;
@@ -34,34 +52,29 @@ body {
   text-align: center;
   cursor: pointer;
   outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.control-button-arrow {
-  border-left: 10px solid #9ab9ce;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  margin-left: 8px;
+.control-move-button:active {
+  background-color: rgb(64, 103, 134);
 }
-.control-button:active {
-  background-color: #234567
-}
-#btnUp { grid-column: 2; grid-row: 1; transform: rotate(-90deg) }
-#btnLeft { grid-column: 1; grid-row: 2; transform: rotate(180deg) }
-#btnRight { grid-column: 3; grid-row: 2; }
-#btnDown { grid-column: 2; grid-row: 3; transform: rotate(90deg) }
+#btnUp { transform: rotate(0deg) }
+#btnLeft { transform: rotate(-90deg) }
+#btnRight { transform: rotate(90deg) }
+#btnDown { transform: rotate(180deg) }
 
 
-.board {
+#board {
   position: relative;
   /*opacity: 0.1;*/
 }
 
-table {
+.boardTable {
   border: 2px solid #756856;
   border-collapse: separate;
   border-spacing: 0;
   background-color: #ddd;
 }
-table td { 
+.boardTable td { 
   border: 2px solid transparent;
   width: 38px;
   height: 38px;
@@ -70,10 +83,10 @@ table td {
   padding: 5px;
   box-shadow: 0 0 13px rgba(0,0,0,.41) inset;
 }
-table td.wall-south { border-bottom-color: inherit }
-table td.wall-north { border-top-color: inherit }
-table td.wall-west { border-left-color: inherit }
-table td.wall-east { border-right-color: inherit }
+.boardTable td.wall-south { border-bottom-color: inherit }
+.boardTable td.wall-north { border-top-color: inherit }
+.boardTable td.wall-west { border-left-color: inherit }
+.boardTable td.wall-east { border-right-color: inherit }
 
 .goal {
   width: 100%;
@@ -151,10 +164,7 @@ table td.wall-east { border-right-color: inherit }
 
 
 
-
-
-
-
+/* Canvas renderer... not used */
 
 #canvases {
   position: relative;
@@ -164,4 +174,38 @@ table td.wall-east { border-right-color: inherit }
   position: absolute;
   top: 0;
   left: 0
+}
+
+
+
+
+/* Color Controls */
+
+#colorControls button {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  margin: 0 0.5rem 0.5rem 0;
+  background-color: #333;
+  color: white;
+  opacity: 0.6;
+  cursor: pointer;
+  outline: 0;
+}
+#colorControls button.selected {
+  opacity: 1;
+}
+#colorControls .color0 { background-color: hsl(0, 50%, 30%)}
+#colorControls .color1 { background-color: hsl(140, 50%, 30%)}
+#colorControls .color2 { background-color: hsl(220, 50%, 30%)}
+#colorControls .color3 { background-color: hsl(60, 50%, 30%)}
+
+
+
+/* Active route */
+#movesMade span {
+  font-size: 0.8rem;
+  margin-right: 0.3rem;
+  background-color: #333;
+  padding: 2px 5px;
 }

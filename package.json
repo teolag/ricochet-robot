@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ts-mocha test/**/*.ts",
+    "test:dev": "ts-mocha --watch test/**/*.ts --watch-extensions ts",
     "dev": "webpack --mode development --watch",
     "start": "http-server ./docs",
     "build": "webpack --mode production"
@@ -13,7 +14,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/chai": "^4.2.3",
+    "@types/expect": "^1.20.4",
+    "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.7",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.1",
+    "ts-mocha": "^6.0.0",
     "typescript": "^3.6.3"
   },
   "dependencies": {

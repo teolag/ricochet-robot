@@ -1,24 +1,24 @@
 import { Level } from "./models/Level"
-import { Wall, Board } from "./models/Board"
-import * as Slumpa from "./libs/Slumpa"
-import { Pos } from "./models/Pos"
-import { Robot, cloneRobots } from "./models/Robot"
-import {solve, getResult} from "./solver-service"
-import { goNorth, goSouth, goWest, goEast } from "./solver-utils"
 import { getElementById } from "./utils"
+import * as ColorControls from './components/color-controls'
+import * as Game from './game'
+import * as GameBoard from './game-board'
 // import { GameBoard } from "./models/GameBoard"
 import './service-worker'
+import { Direction } from "./models/Direction"
 
-
-enum Direction {
-  UP = 'UP',
-  LEFT = 'LEFT',
-  RIGHT = 'RIGHT',
-  DOWN = 'DOWN'
-}
 
 
 /*
+
+!!!IMPROVEMENTS!!!
+
+* om två hjälprobotar byter plats är det ett redan besökt state ---- KLAR!
+* om en hjälprobot kommer tillbaka till en plats utan att ha krockat med någon annan är det ett onödigt drag
+
+!!!!!!!!!!!!!!!!!!!!!
+
+
 
 
 1drag = 4^2 = 16
@@ -63,221 +63,74 @@ RIMLIGT??
   * Save progress in local storage
   
 */
- 
+
 let level: Level
-let robots: Robot[]
-let activeRobotIndex = 0
-let selectedRobot: Robot
-let otherRobots: Robot[]
-let robotElems: HTMLElement[]
-let moves = 0
 // let gameBoard: GameBoard
-const boardElem = document.querySelector('.board')
-const movesCounter = getElementById('movesCounter')
-const moveQueue: {robotIndex: number, direction: Direction}[] = []
-let processingMoveQueue = false
+
 startup()
 
 
 
+getElementById('btnUp').addEventListener('click', _ => Game.moveActiveRobot(Direction.UP))
+getElementById('btnLeft').addEventListener('click', _ => Game.moveActiveRobot(Direction.LEFT))
+getElementById('btnRight').addEventListener('click', _ => Game.moveActiveRobot(Direction.RIGHT))
+getElementById('btnDown').addEventListener('click', _ => Game.moveActiveRobot(Direction.DOWN))
 
-getElementById('btnUp').addEventListener('click', _ => moveActiveRobot(goNorth))
-getElementById('btnDown').addEventListener('click', _ => moveActiveRobot(goSouth))
-getElementById('btnLeft').addEventListener('click', _ => moveActiveRobot(goWest))
-getElementById('btnRight').addEventListener('click', _ => moveActiveRobot(goEast))
-
-getElementById('btnReset').addEventListener('click', reset)
 document.body.addEventListener('keydown', keyHandler)
 
 const showSolutionButton = getElementById('showSolutionButton')
-showSolutionButton.addEventListener('click', showSolution)
+showSolutionButton.addEventListener('click', Game.showSolution)
 
 
 
 getElementById('btnNewGame').addEventListener('click', () => {
-  ranomizeSeed()
   newGame()
 })
 
 
 
 function startup() {
-  const seed = parseInt(location.hash.substr(1))
-  if(seed) {
-    Slumpa.setSeed(seed)
-    newGame()
-  } else {
-    ranomizeSeed()
-    newGame()
-  }
+  const seedStr = location.hash.substr(1)
+  newGame(seedStr ? parseInt(seedStr) : undefined)
+  ColorControls.onColorSelect(color => Game.switchRobot(color))
+  GameBoard.onRobotClick(robotClick)
 }
 
-function setMoveCounter(value: number) {
-  moves = value
-  movesCounter.innerText = value.toString()
-}
 
-function ranomizeSeed() {
-  const newSeed = Math.floor(Math.random()*1000000)
-  location.hash = newSeed.toString()
-  Slumpa.setSeed(newSeed)
+function robotClick(robotIndex: number) {
+  Game.switchRobot(robotIndex)
 }
 
 function keyHandler(e: KeyboardEvent) {
+  if(e.key.match(/^\d$/)) {
+    Game.switchRobot(parseInt(e.key)-1)
+  }
+
   switch(e.key) {
-    case 'ArrowUp': addToMoveQueue(activeRobotIndex, Direction.UP); break;
-    case 'ArrowDown': addToMoveQueue(activeRobotIndex, Direction.DOWN); break;
-    case 'ArrowLeft': addToMoveQueue(activeRobotIndex, Direction.LEFT); break;
-    case 'ArrowRight': addToMoveQueue(activeRobotIndex, Direction.RIGHT); break;
-    case '1': switchRobot(0); break 
-    case '2': switchRobot(1); break 
-    case '3': switchRobot(2); break 
-    case '4': switchRobot(3); break 
+    case 'ArrowUp': Game.moveActiveRobot(Direction.UP); break;
+    case 'ArrowLeft': Game.moveActiveRobot(Direction.LEFT); break;
+    case 'ArrowRight': Game.moveActiveRobot(Direction.RIGHT); break;
+    case 'ArrowDown': Game.moveActiveRobot(Direction.DOWN); break;
   }
 }
 
-function newGame() {
-  const backAgain = false
-  level = new Level(10, 10, 4, backAgain)
-  solve(level)
-
+function newGame(seed = Math.floor(Math.random()*1000000)) {
+  location.hash = seed.toString()
+  level = new Level({
+    width: 10,
+    height: 10,
+    robotCount: 3,
+    seed
+  })
+  Game.loadLevel(level)
   // gameBoard = new GameBoard(level.board.tiles, level.robots.map(r => ({x: r.x, y: r.y})), level.goal)
-  
-  const html = createHTMLBoard(level)
-  if(!boardElem) throw Error("could not find board")
-  boardElem.innerHTML = html
-  
-  robotElems = level.robots.map(r => {
-    const elem = document.createElement('div')
-    elem.classList.add('robot', 'robot-'+r.color)
-    elem.innerText = (r.color+1).toString()
-    elem.addEventListener('click', e => switchRobot(r.color))
-    return elem
-  })
-  robotElems.forEach(robotElem => {
-    boardElem.appendChild(robotElem)
-  })
-
-  reset()
 }
 
-function reset() {
-  if(!level) return
-  setMoveCounter(0)
-  robots = cloneRobots(level.robots)
-  robots.forEach((robot, i) => {
-    moveRobotElem(robotElems[i], robot.getPos())
-  })
-  switchRobot(0)
+function loadLevel(levelString) {
+  level = new Level(levelString)
+  Game.loadLevel(level)
 }
 
 
-function addToMoveQueue(robotIndex: number, direction: Direction) {
-  moveQueue.push({robotIndex, direction})
-  if(processingMoveQueue) return
-  processMoveQueue()
-}
 
-function processMoveQueue() {
-  const nextMove = moveQueue.shift()
-  if(!nextMove) {
-    processingMoveQueue = false
-    return
-  }
-  processingMoveQueue = true
-  switchRobot(nextMove.robotIndex)
-  switch(nextMove.direction) {
-    case Direction.UP: moveActiveRobot(goNorth); break;
-    case Direction.DOWN: moveActiveRobot(goSouth); break;
-    case Direction.LEFT: moveActiveRobot(goWest); break;
-    case Direction.RIGHT: moveActiveRobot(goEast); break;
-  }
-  setTimeout(processMoveQueue, 400)
-}
-
-function moveActiveRobot(moveFunction: (board: Board, selectedRobot: Robot, otherRobots: Robot[]) => {pos: Pos, dir: string}|null) {
-  const newPos = moveFunction(level.board, selectedRobot, otherRobots)
-  if(!newPos) return
-  moveRobotElem(robotElems[activeRobotIndex], newPos.pos)
-  // gameBoard.moveRobot(activeRobotIndex, newPos.pos)
-  selectedRobot.setPos(newPos.pos)
-  setMoveCounter(moves+1)
-
-  if(goalIsReached()) {
-    const result = getResult()
-    if(!result) {
-      alert("Grattis, du klarade det innan solvern")
-      return;
-    }
-    const score = calculateScore(moves, result.route.length)
-
-    setTimeout(() => {
-      alert("tjohooo!! Score: " + '⭐'.repeat(score))
-    }, 400);
-  }
-}
-
-function moveRobotElem(robot: HTMLElement, newPos: Pos) {
-  robot.style.transform = `translate(${newPos.x*38+10}px, ${newPos.y*38+10}px)`
-}
-
-function switchRobot(index: number) {
-  if(index > robots.length) return
-  activeRobotIndex = index
-  selectedRobot = robots[index]
-  otherRobots = robots.filter(r => r.color !== index)
-  robotElems.forEach((r, i) => {
-    r.classList.toggle('active', i === index)
-  })
-}
-
-function createHTMLBoard(level: Level): string {
-  return "<table><tr>" + level.board.tiles.map((row, y) => row.map((walls, x) => {
-    let text = ''
-    const classes = []
-    if(walls & Wall.NORTH) classes.push('wall-north')
-    if(walls & Wall.EAST) classes.push('wall-east')
-    if(walls & Wall.WEST) classes.push('wall-west')
-    if(walls & Wall.SOUTH) classes.push('wall-south')
-    
-    if(level.goal.x === x && level.goal.y ===y) {
-      text = `<div class="goal goal-${level.goal.color}"></div>`;
-    }
-    
-    level.robots.forEach(robot => {
-      if(robot.x === x && robot.y ===y) {
-        text = `<div class="start start-${robot.color}"></div>`;
-      }
-    })
-    
-    return `<td class='${classes.join(' ')}'>${text}</td>`
-    
-  }).join('')).join('</tr><tr>') + '</tr></table>'
-}
-
-function goalIsReached() {
-  const correctRobot = robots[level.goal.color]
-  return correctRobot.x === level.goal.x && correctRobot.y === level.goal.y
-}
-
-function calculateScore(moves: number, optimalMoves: number) {
-  if(moves === optimalMoves) return 3
-  if(moves <= 1+Math.floor(optimalMoves*1.3)) return 2
-  return 1
-}
-
-function showSolution() {
-  const result = getResult()
-  if(!result) return
-
-  reset()
-  moveQueue.length = 0
-  const dirToDirection = new Map([['upp', Direction.UP], ['ner', Direction.DOWN], ['vänster', Direction.LEFT], ['höger', Direction.RIGHT]])
-  moveQueue.push(...result.route.map(step => {
-    const direction = dirToDirection.get(step.dir)
-    if(!direction) throw Error("Unknown direction:" + step.dir)
-    return {direction, robotIndex: step.color}
-  }))
-  processMoveQueue()
-}
 
