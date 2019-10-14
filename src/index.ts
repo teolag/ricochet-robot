@@ -78,14 +78,9 @@ getElementById('btnDown').addEventListener('click', _ => Game.moveActiveRobot(Di
 
 document.body.addEventListener('keydown', keyHandler)
 
-const showSolutionButton = getElementById('showSolutionButton')
-showSolutionButton.addEventListener('click', Game.showSolution)
+getElementById('showSolutionButton').addEventListener('click', Game.showSolution)
+getElementById('btnNewGame').addEventListener('click', _ => newGame())
 
-
-
-getElementById('btnNewGame').addEventListener('click', () => {
-  newGame()
-})
 
 
 

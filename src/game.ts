@@ -64,8 +64,12 @@ export function moveRobot(robotIndex: number, direction: Direction) {
 
   if(goalIsReached()) {
     const result = getResult()
-    if(!result) {
+    if(!result || result.isAborted) {
       alert("Grattis, du klarade det innan solvern")
+      return;
+    }
+    if(result && result.isAllStatesChecked) {
+      alert("Öööö... du klarade en omöjlig bana?!")
       return;
     }
     const score = calculateScore(ActiveRoute.getMovesCount(), result.route.length)
@@ -137,6 +141,6 @@ export function showSolution() {
     if(!direction) throw Error("Unknown direction:" + step.dir)
     return {direction, robotIndex: step.color}
   }))
-  processMoveQueue()
+  setTimeout(processMoveQueue, 400)
 }
 

@@ -8,12 +8,10 @@ let result: CompletedData|null
 let progress: ProgressData|null
 
 const solverButton = getElementById('solverButton')
-const solverOKButton = getElementById('solverOKButton')
 const solverInfo = getElementById('solverInfo')
 const dialog = getElementById('solverDialog') as HTMLDialogElement
 const setButtonText = (text: string) => solverButton.innerText = text
 solverButton.addEventListener('click', _ => dialog.showModal())
-solverOKButton.addEventListener('click', _ => dialog.close())
 const showSolutionButton = getElementById('showSolutionButton')
 showSolutionButton.addEventListener('click', _ => dialog.close())
 

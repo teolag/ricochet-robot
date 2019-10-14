@@ -55,9 +55,13 @@
 
 
     <dialog id="solverDialog">
-      <div id="solverInfo"></div>
-      <button id="showSolutionButton" type="button">Visa</button>
-      <button id="solverOKButton" type="button">OK</button>
+      <form method="dialog">
+        <div id="solverInfo"></div>
+        <div class="dialog-actions">
+          <button class="button" id="showSolutionButton">Visa</button>
+          <button class="button">Stäng</button>
+        </div>
+      </form>
     </dialog>
 
     <script type="module" src="js/main.js"></script>

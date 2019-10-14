@@ -8,6 +8,22 @@ body {
 }
 
 
+/* Dialog */
+
+dialog {
+  color: #aaa;
+  background-color: #333;
+  border: 0;
+}
+dialog::backdrop {
+  background-color: rgba(0,0,0,0.7)
+}
+.dialog-actions {
+  margin-top: 1rem;
+  text-align: right
+}
+
+
 /* Button */
 .button {
   border: 0;
