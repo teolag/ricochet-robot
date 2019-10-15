@@ -3,11 +3,20 @@ import { getElementById } from "./utils"
 import { Wall } from "./models/Board"
 import { Robot } from "./models/Robot"
 import { Pos } from "./models/Pos"
+import * as Game from "./game"
+import { Direction } from "./models/Direction"
+
+const TOUCH_MOVE_LENGTH = 40
 
 const boardElem = getElementById('board')
 
 let robotClickCallback
 let robotElems: HTMLDivElement[]
+
+let touchingIndex = null
+let touchStart: Pos
+document.addEventListener('touchend', _ => touchingIndex=null)
+document.addEventListener('touchmove', touchMove)
 
 
 export function loadLevel(level: Level) {
@@ -19,6 +28,7 @@ export function loadLevel(level: Level) {
     elem.classList.add('robot', 'robot-'+r.color)
     elem.innerText = (r.color+1).toString()
     elem.addEventListener('click', _ => robotClick(r.color))
+    elem.addEventListener('touchstart', e => robotTouch(e, r.color))
     return elem
   })
   robotElems.forEach(robotElem => {
@@ -29,7 +39,6 @@ export function loadLevel(level: Level) {
 }
 
 export function setRobotsPositions(robots: Robot[]) {
-  console.log("move robost", robots)
   robots.forEach((robot, i) => {
     moveRobot(i, robot.getPos())
   })
@@ -52,6 +61,7 @@ function moveRobotElem(robot: HTMLElement, newPos: Pos) {
 
 
 function robotClick(robotIndex) {
+  console.log("robotclick")
   if(robotClickCallback) {
     robotClickCallback(robotIndex)
   }
@@ -59,6 +69,30 @@ function robotClick(robotIndex) {
 
 export function onRobotClick(callback) {
   robotClickCallback = callback
+}
+
+function robotTouch(e, robotIndex) {
+  e.preventDefault()
+  touchingIndex = robotIndex
+  touchStart = {x: e.touches[0].screenX, y: e.touches[0].screenY}
+  if(robotClickCallback) {
+    robotClickCallback(robotIndex)
+  }
+}
+
+function touchMove(e) {
+  if(touchingIndex===null) return
+  const touchNow = {x: e.touches[0].screenX, y: e.touches[0].screenY}
+  const diff = {x: touchStart.x - touchNow.x, y: touchStart.y - touchNow.y}
+  if(Math.abs(diff.x)>TOUCH_MOVE_LENGTH && Math.abs(diff.y)<TOUCH_MOVE_LENGTH/2) {
+    Game.moveActiveRobot(diff.x>0 ? Direction.LEFT : Direction.RIGHT)
+    touchingIndex = null
+    touchStart = null
+  } else if(Math.abs(diff.y)>TOUCH_MOVE_LENGTH && Math.abs(diff.x)<TOUCH_MOVE_LENGTH/2) {
+    Game.moveActiveRobot(diff.y>0 ? Direction.UP : Direction.DOWN)
+    touchingIndex = null
+    touchStart = null
+  }
 }
 
 
