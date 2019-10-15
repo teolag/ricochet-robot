@@ -9,13 +9,18 @@
     <link href="css/style.css" rel="stylesheet" />
   </head>
   <body>
-    <button type="button" class="button" id="btnNewGame">New game</button>
+    <header>
+      <button type="button" class="button" id="btnNewGame">New game</button>
 
-    <button type="button" class="icon-button" id="solverButton">
-      <svg><use xlink:href="icons.svg#icon-spinner"></use></svg>
-    </button>
+
+      <button type="button" class="icon-button" id="solverButton">
+        <svg><use xlink:href="icons.svg#icon-spinner"></use></svg>
+      </button>
+    </header>
     
-    <div id="board"></div>
+    <div style="text-align: center;">
+      <div id="board"></div>
+    </div>
 
     <div id="activeRoute">
       <div id="movesCounter">0</div>

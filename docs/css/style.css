@@ -5,6 +5,15 @@ html {
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #9ab9ce;
+  padding: 0;
+  margin: 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 
@@ -91,17 +100,10 @@ dialog::backdrop {
 #btnDown { transform: rotate(180deg) }
 
 
-#board {
-  position: relative;
-  /*opacity: 0.1;*/
-}
 
+/* Solver Button */
 
 #solverButton {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  margin: 0;
   font-size: 0;
   fill: #3a638b;
 }
@@ -113,6 +115,13 @@ dialog::backdrop {
   to{transform: rotate(360deg);}
 }
 
+
+#board {
+  position: relative;
+  display: inline-block;
+}
+
+/* Table */
 .boardTable {
   border: 2px solid #756856;
   border-collapse: separate;
@@ -248,9 +257,14 @@ dialog::backdrop {
 
 
 /* Active route */
+#movesMade {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 #movesMade span {
   font-size: 0.8rem;
-  margin-right: 0.3rem;
+  margin: 0.2rem;
   background-color: #333;
   padding: 2px 5px;
 }

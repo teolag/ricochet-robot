@@ -21,6 +21,7 @@ export function solve(level: Level, backAgain = false) {
     solverWorker.terminate()
   }
   result = null
+  setSolverButtonIcon('spinner')
   solverButton.classList.add("rotate")
   showSolutionButton.hidden = true
   solverWorker = new Worker('js/solver-worker.js');
@@ -40,7 +41,6 @@ function onWorkerMessage(e: MessageEvent) {
       solverButton.classList.remove("rotate")
       
       if(result.isRouteFound) {
-        //setButtonText("!!!")
         setSolverButtonIcon('check')
         solverInfo.innerHTML = `
           En lösning på ${result.route.length} drag hittades!<br>
@@ -49,7 +49,7 @@ function onWorkerMessage(e: MessageEvent) {
         `
         showSolutionButton.hidden = false
       } else if (result.isAllStatesChecked) {
-        //setButtonText('X')
+        setSolverButtonIcon('impossible')
         solverInfo.innerHTML = `
           Ingen lösning kunde hittas. Omöjlig!<br>
           ${result.statesChecked} states letades igenom på 
@@ -57,7 +57,7 @@ function onWorkerMessage(e: MessageEvent) {
         `
       }
       else {
-        //setButtonText('???')
+        setSolverButtonIcon('info')
         solverInfo.innerHTML = `
           Orkade inte leta klar.<br>
           ${result.statesChecked} states letades igenom på 

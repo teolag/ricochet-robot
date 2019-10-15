@@ -114,7 +114,7 @@ function newGame(seed = Math.floor(Math.random()*1000000)) {
   level = new Level({
     width: 10,
     height: 10,
-    robotCount: 5,
+    robotCount: 4,
     seed
   })
   Game.loadLevel(level)
