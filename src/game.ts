@@ -52,7 +52,7 @@ export function moveActiveRobot(direction: Direction) {
 }
 export function moveRobot(robotIndex: number, direction: Direction) {
   const moveFunction = getMoveFunction(direction)
-  const otherRobots = robots.filter(r => r.color !== activeRobotIndex)
+  const otherRobots = robots.filter(r => r.color !== robotIndex)
   const newPos = moveFunction(level.board, robots[robotIndex], otherRobots)
   if(!newPos) return
 
