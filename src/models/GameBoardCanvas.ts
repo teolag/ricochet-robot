@@ -62,7 +62,6 @@ export class GameBoard {
       this.robots[index].x = startX + (endX - startX) * percent
       this.robots[index].y = startY + (endY - startY) * percent
       this.drawRobot(this.robotContext, index, this.robots[index])
-      console.log(this.robots[index].y, diff)
 
       if(percent<1) {
         requestAnimationFrame(tic)

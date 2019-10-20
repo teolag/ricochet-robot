@@ -61,7 +61,6 @@ function moveRobotElem(robot: HTMLElement, newPos: Pos) {
 
 
 function robotClick(robotIndex) {
-  console.log("robotclick")
   if(robotClickCallback) {
     robotClickCallback(robotIndex)
   }

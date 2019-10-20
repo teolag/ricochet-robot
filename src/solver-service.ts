@@ -2,6 +2,7 @@ import {SolverWorkerMessage} from './models/SolverWokerMessages'
 import { CompletedData, ProgressData } from './Solver';
 import { Level } from './models/Level';
 import { getElementById } from './utils';
+const colorNames = ['röd', 'grön', 'blå', 'gul']
 
 let solverWorker: Worker
 let result: CompletedData|null
@@ -42,8 +43,10 @@ function onWorkerMessage(e: MessageEvent) {
       
       if(result.isRouteFound) {
         setSolverButtonIcon('check')
+        const usedRobots = result.robotsUsed.map(r => colorNames[r]).join(', ')
         solverInfo.innerHTML = `
           En lösning på ${result.route.length} drag hittades!<br>
+          Använde robotarna: ${usedRobots}<br>
           ${result.statesChecked} states letades igenom på 
           ${result.duration} sekunder
         `

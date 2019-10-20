@@ -141,7 +141,7 @@ export class Solver {
       }
 
       const {state, robots, previous, moves} = currentState
-      // console.log("Checking", state, robots[currentState.color])
+      // console.debug("Checking", state, robots[currentState.color])
       this.statesUnchecked.delete(state)
   
       let goalVisited = currentState.goalVisited
@@ -163,7 +163,7 @@ export class Solver {
         .filter(s => !this.statesUnchecked.has(s.state))
         .map(s => ({...s, previous: state, moves: moves+1}))
         if(newStates.length) {
-          // console.log("add", i, newStates.map(s => s.robots[i].x + ',' + s.robots[i].y).join('  '))
+          // console.debug("add", i, newStates.map(s => s.robots[i].x + ',' + s.robots[i].y).join('  '))
           newStates.forEach(s => {
             this.uncheckedStates.push(s)
             this.statesUnchecked.add(s.state)

@@ -31,7 +31,7 @@ if ('serviceWorker' in navigator) {
 			});
 		})
 		.catch(function(err) {
-			console.log("Service worker registration failed : ", err);
+			console.log("SW: Service worker registration failed : ", err);
 		})
 	;
 

@@ -32,7 +32,6 @@ export function resetLevel() {
 }
 
 export function resetRobots() {
-  console.log("Reset robots")
   robots = cloneRobots(level.robots)
   setRobotsPostitions(robots)
 }
@@ -52,7 +51,6 @@ export function moveActiveRobot(direction: Direction) {
   addToMoveQueue(activeRobotIndex, direction)
 }
 export function moveRobot(robotIndex: number, direction: Direction) {
-  console.log("move robot", robotIndex, direction)
   const moveFunction = getMoveFunction(direction)
   const otherRobots = robots.filter(r => r.color !== activeRobotIndex)
   const newPos = moveFunction(level.board, robots[robotIndex], otherRobots)
