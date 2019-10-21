@@ -1,0 +1,21 @@
+.button {
+  border: 0;
+  padding: 0.3rem 0.5rem;
+  font-size: inherit;
+  outline: none;
+}
+.button:not(:disabled) {
+  color: inherit;
+  cursor: pointer;
+  background-color: #234567;
+}
+.button:not(:disabled):hover,
+.button:not(:disabled):focus {
+  background-color: #3a638b;
+  color: white;
+}
+
+.button:disabled {
+  color: #6a7b8b;
+  background-color: #2c3238;
+}

@@ -7,6 +7,7 @@ import { Direction } from "./models/Direction"
 import { goNorth, goWest, goEast, goSouth } from "./solver-utils"
 import * as ActiveRoute from './active-route'
 import * as ColorControls from './components/color-controls'
+import { openModal } from "./components/dialog"
 
 let level: Level
 let robots: Robot[]
@@ -61,19 +62,18 @@ export function moveRobot(robotIndex: number, direction: Direction) {
   ActiveRoute.addMove(robotIndex, direction, cloneRobots(robots))
 
   if(goalIsReached()) {
-    const result = getResult()
-    if(!result || result.isAborted) {
-      alert("Grattis, du klarade det innan solvern")
-      return;
-    }
-    if(result && result.isAllStatesChecked) {
-      alert("Öööö... du klarade en omöjlig bana?!")
-      return;
-    }
-    const score = calculateScore(ActiveRoute.getMovesCount(), result.route.length)
-
     setTimeout(() => {
-      alert("tjohooo!! Score: " + '⭐'.repeat(score))
+      const result = getResult()
+      if(!result || result.isAborted) {
+        openModal("Grattis, du klarade det innan solvern")
+        return;
+      }
+      if(result && result.isAllStatesChecked) {
+        openModal("Öööö... du klarade en omöjlig bana?!")
+        return;
+      }
+      const score = calculateScore(ActiveRoute.getMovesCount(), result.route.length)
+      openModal("tjohooo!! Score: " + '⭐'.repeat(score))
     }, 400);
   }
 }
