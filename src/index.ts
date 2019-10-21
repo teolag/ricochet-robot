@@ -102,6 +102,8 @@ function keyHandler(e: KeyboardEvent) {
   }
 
   switch(e.key) {
+    case 'F2': newGame(); break;
+    case 'Escape': Game.resetLevel(); break;
     case 'ArrowUp': Game.moveActiveRobot(Direction.UP); break;
     case 'ArrowLeft': Game.moveActiveRobot(Direction.LEFT); break;
     case 'ArrowRight': Game.moveActiveRobot(Direction.RIGHT); break;
