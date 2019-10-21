@@ -73,7 +73,8 @@ export function moveRobot(robotIndex: number, direction: Direction) {
         return;
       }
       const score = calculateScore(ActiveRoute.getMovesCount(), result.route.length)
-      openModal("tjohooo!! Score: " + '⭐'.repeat(score))
+      const scoreText = [,'Bättre kan du', 'Bra gjort!', 'Perfekt!']
+      openModal(scoreText[score] +'<br>' + '⭐'.repeat(score))
     }, 400);
   }
 }
