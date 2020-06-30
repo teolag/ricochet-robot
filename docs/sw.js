@@ -19,18 +19,18 @@ const RUNTIME = 'runtime';
 
 // A list of local resources we always want to be cached.
 const PRECACHE_URLS = [
-  './',
-  'favicon.ico',
-  'favicon-192x192.png',
-  'favicon-512x512.png',
-  'icons.svg',
-  'index.html',
-  'manifest.json',
-  'js/main.js',
-  'js/solver-worker.js',
-  'css/style.css',
-  'css/dialog.css',
-  'css/button.css',
+  // './',
+  // 'favicon.ico',
+  // 'favicon-192x192.png',
+  // 'favicon-512x512.png',
+  // 'icons.svg',
+  // 'index.html',
+  // 'manifest.json',
+  // 'js/main.js',
+  // 'js/solver-worker.js',
+  // 'css/style.css',
+  // 'css/dialog.css',
+  // 'css/button.css',
 ];
 
 // The install handler takes care of precaching the resources we always need.
@@ -50,7 +50,7 @@ self.addEventListener('activate', event => {
       return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
     }).then(cachesToDelete => {
       return Promise.all(cachesToDelete.map(cacheToDelete => {
-        console.log("SW delete cache " + cacheToDelete)
+        console.debug("SW: Delete cache " + cacheToDelete)
         return caches.delete(cacheToDelete);
       }));
     }).then(() => self.clients.claim())
@@ -62,27 +62,21 @@ self.addEventListener('activate', event => {
 // from the network before returning it to the page.
 self.addEventListener('fetch', event => {
   // Skip cross-origin requests, like those for Google Analytics.
-  if (event.request.url.startsWith(self.location.origin)) {
-    event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        if (cachedResponse) {
-          console.log("SW get from cache: " + event.request.url)
-          return cachedResponse;
-        }
-        console.log("SW fetch from server: " + event.request.url)
-        return fetch(event.request)
+  if (!event.request.url.startsWith(self.location.origin)) return
+  return event.respondWith(getFromCacheOrFetch(event.request))
+})
 
-        /*
-        return caches.open(RUNTIME).then(cache => {
-          return fetch(event.request).then(response => {
-            // Put a copy of the response in the runtime cache.
-            return cache.put(event.request, response.clone()).then(() => {
-              return response;
-            });
-          });
-        });
-        */
-      })
-    );
+async function getFromCacheOrFetch(request) {
+  const cachedResponse = await caches.match(request)
+  if (cachedResponse) {
+    console.debug("SW: Get file from cache", request.url)
+    return cachedResponse
   }
-});
+
+  console.debug("SW: Fetch file from server", request.url)
+  const runtimeCache = await caches.open(RUNTIME)
+  const response = await fetch(request)
+  // Put a copy of the response in the runtime cache.
+  await runtimeCache.put(request, response.clone())
+  return response
+}
