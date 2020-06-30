@@ -71,7 +71,6 @@ export function onRobotClick(callback) {
 }
 
 function robotTouch(e: TouchEvent, robotIndex: number) {
-  e.preventDefault()
   touchingIndex = robotIndex
   touchStart = {x: e.touches[0].screenX, y: e.touches[0].screenY}
   if(robotClickCallback) {
