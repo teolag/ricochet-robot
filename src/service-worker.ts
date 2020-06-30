@@ -63,18 +63,3 @@ if ('serviceWorker' in navigator) {
 		console.log("SW: Message form SW:", e.data);
 	}
 }
-
-
-window.addEventListener('beforeinstallprompt', (e: Event) => {
-	e.preventDefault();
-	const deferredPrompt = e;
-
-	/*
-	const installButton = document.getElementById("install-button")
-	installButton.hidden = false
-	installButton.addEventListener("click", () => {
-		deferredPrompt.prompt()
-	})
-	*/
-	
-});

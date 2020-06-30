@@ -4,3 +4,7 @@ export function getElementById<T=HTMLElement>(id: string): T {
   if(!elem) throw Error("Could not find element " + id)
   return elem as any as T
 }
+
+export function getButton(id: string) {
+  return getElementById<HTMLButtonElement>(id)
+}

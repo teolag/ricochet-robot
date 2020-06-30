@@ -1,12 +1,12 @@
-import { getElementById } from "./utils"
+import { getElementById, getButton } from "./utils"
 import { Direction } from "./models/Direction"
 import { Robot } from "./models/Robot"
 import * as Game from "./game"
 
 const route: {robotIndex: number, direction: Direction, robots: Robot[]}[] = []
 const movesCounter = getElementById('movesCounter')
-const undoButton = getElementById<HTMLButtonElement>('undoButton')
-const resetButton = getElementById<HTMLButtonElement>('resetButton')
+const undoButton = getButton('btnUndo')
+const resetButton = getButton('btnReset')
 const movesMade = getElementById('movesMade')
 undoButton.addEventListener('click', undoLastMove)
 resetButton.addEventListener('click', reset)

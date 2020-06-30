@@ -1,19 +1,19 @@
 import {SolverWorkerMessage} from './models/SolverWokerMessages'
 import { CompletedData, ProgressData } from './Solver';
 import { Level } from './models/Level';
-import { getElementById } from './utils';
+import { getElementById, getButton } from './utils';
 const colorNames = ['röd', 'grön', 'blå', 'gul']
 
 let solverWorker: Worker
 let result: CompletedData|null
 let progress: ProgressData|null
 
-const solverButton = getElementById('solverButton')
+const solverButton = getButton('btnSolver')
 const solverInfo = getElementById('solverInfo')
-const dialog = getElementById('solverDialog') as HTMLDialogElement
+const dialog = getElementById<HTMLDialogElement>('solverDialog')
 const setSolverButtonIcon = (icon: string) => solverButton.children[0].children[0].setAttribute('xlink:href', `icons.svg#icon-${icon}`)
 solverButton.addEventListener('click', _ => dialog.showModal())
-const showSolutionButton = getElementById('showSolutionButton')
+const showSolutionButton = getButton('btnShowSolution')
 showSolutionButton.addEventListener('click', _ => dialog.close())
 
 

@@ -1,5 +1,6 @@
 import {Pos} from './Pos'
 import {Goal} from './Goal'
+import { getElementById } from '../utils'
 
 
 const tileSize = 40
@@ -22,10 +23,10 @@ export class GameBoard {
     this.starts = starts
     this.robots = starts.map(s => ({x: s.x, y:s.y}))
     this.goal = goal
-    this.backgroundCanvas = document.getElementById("backgroundCanvas") as HTMLCanvasElement
+    this.backgroundCanvas = getElementById<HTMLCanvasElement>("backgroundCanvas")
     this.backgroundCanvas.width = this.tiles[0].length * tileSize + 2*margin
     this.backgroundCanvas.height = this.tiles.length * tileSize + 2*margin
-    this.robotCanvas = document.getElementById("robotCanvas") as HTMLCanvasElement
+    this.robotCanvas = getElementById<HTMLCanvasElement>("robotCanvas")
     this.robotCanvas.width = this.tiles[0].length * tileSize + 2*margin
     this.robotCanvas.height = this.tiles.length * tileSize + 2*margin
     const backgroundContext = this.backgroundCanvas.getContext('2d')

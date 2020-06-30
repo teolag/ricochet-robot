@@ -1,5 +1,5 @@
 import { Level } from "./models/Level"
-import { getElementById } from "./utils"
+import { getButton } from "./utils"
 import * as ColorControls from './components/color-controls'
 import * as Game from './game'
 import * as GameBoard from './game-board'
@@ -71,15 +71,15 @@ startup()
 
 
 
-getElementById('btnUp').addEventListener('click', _ => Game.moveActiveRobot(Direction.UP))
-getElementById('btnLeft').addEventListener('click', _ => Game.moveActiveRobot(Direction.LEFT))
-getElementById('btnRight').addEventListener('click', _ => Game.moveActiveRobot(Direction.RIGHT))
-getElementById('btnDown').addEventListener('click', _ => Game.moveActiveRobot(Direction.DOWN))
+getButton('btnUp').addEventListener('click', _ => Game.moveActiveRobot(Direction.UP))
+getButton('btnLeft').addEventListener('click', _ => Game.moveActiveRobot(Direction.LEFT))
+getButton('btnRight').addEventListener('click', _ => Game.moveActiveRobot(Direction.RIGHT))
+getButton('btnDown').addEventListener('click', _ => Game.moveActiveRobot(Direction.DOWN))
 
 document.body.addEventListener('keydown', keyHandler)
 
-getElementById('showSolutionButton').addEventListener('click', Game.showSolution)
-getElementById('btnNewGame').addEventListener('click', _ => newGame())
+getButton('btnShowSolution').addEventListener('click', Game.showSolution)
+getButton('btnNewGame').addEventListener('click', _ => newGame())
 
 
 
@@ -131,3 +131,12 @@ function loadLevel(levelString) {
 
 
 
+
+
+
+window.addEventListener('beforeinstallprompt', (beforeInstallEvent: BeforeInstallPromptEvent) => {
+	beforeInstallEvent.preventDefault();
+	const installButton = document.getElementById("btnInstall")
+	installButton.hidden = false
+	installButton.onclick = () => beforeInstallEvent.prompt()
+});
