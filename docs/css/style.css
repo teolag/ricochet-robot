@@ -74,10 +74,10 @@ header {
 
 /* Solver Button */
 
-#solverButton {
+#btnSolver {
   font-size: 0;
 }
-#solverButton.rotate {
+#btnSolver.rotate {
   animation: rotate 1s linear infinite;
 }
 @keyframes rotate {
