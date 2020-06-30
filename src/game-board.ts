@@ -28,7 +28,7 @@ export function loadLevel(level: Level) {
     elem.classList.add('robot', 'robot-'+r.color)
     elem.innerText = (r.color+1).toString()
     elem.addEventListener('click', _ => robotClick(r.color))
-    elem.addEventListener('touchstart', e => robotTouch(e, r.color))
+    elem.addEventListener('touchstart', e => robotTouch(e, r.color), {passive: true})
     return elem
   })
   robotElems.forEach(robotElem => {
@@ -60,7 +60,7 @@ function moveRobotElem(robot: HTMLElement, newPos: Pos) {
 }
 
 
-function robotClick(robotIndex) {
+function robotClick(robotIndex: number) {
   if(robotClickCallback) {
     robotClickCallback(robotIndex)
   }
@@ -70,7 +70,7 @@ export function onRobotClick(callback) {
   robotClickCallback = callback
 }
 
-function robotTouch(e, robotIndex) {
+function robotTouch(e: TouchEvent, robotIndex: number) {
   e.preventDefault()
   touchingIndex = robotIndex
   touchStart = {x: e.touches[0].screenX, y: e.touches[0].screenY}
@@ -79,7 +79,7 @@ function robotTouch(e, robotIndex) {
   }
 }
 
-function touchMove(e) {
+function touchMove(e: TouchEvent) {
   if(touchingIndex===null) return
   const touchNow = {x: e.touches[0].screenX, y: e.touches[0].screenY}
   const diff = {x: touchStart.x - touchNow.x, y: touchStart.y - touchNow.y}
