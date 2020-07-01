@@ -16,7 +16,7 @@ let robotElems: HTMLDivElement[]
 let touchingIndex = null
 let touchStart: Pos
 document.addEventListener('touchend', _ => touchingIndex=null)
-document.addEventListener('touchmove', touchMove)
+document.addEventListener('touchmove', touchMove, {passive: true})
 
 
 export function loadLevel(level: Level) {
