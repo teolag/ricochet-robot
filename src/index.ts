@@ -123,13 +123,6 @@ function newGame(seed = Math.floor(Math.random()*1000000)) {
   // gameBoard = new GameBoard(level.board.tiles, level.robots.map(r => ({x: r.x, y: r.y})), level.goal)
 }
 
-function loadLevel(levelString) {
-  level = new Level(levelString)
-  Game.loadLevel(level)
-}
-
-
-
 
 
 
