@@ -4,7 +4,7 @@ import * as ColorControls from './components/color-controls'
 import * as Game from './game'
 import * as GameBoard from './game-board'
 import { Direction } from "./models/Direction"
-import { registerServiceWorker } from "./service-worker"
+import { registerServiceWorker } from "./service-worker-utils"
 
 
 
