@@ -36,7 +36,6 @@ export interface CompletedData {
   isAborted: boolean
   route: State[]
   robotsUsed: number[]
-  message: string
 }
 
 export interface ProgressData {
@@ -60,7 +59,6 @@ export class Solver {
   private foundRoute: State[]
   private completeCallback: Function|undefined
   private progressCallback: Function|undefined
-  private message = ''
   private duration = 0
   private backAgain: boolean
 
@@ -84,7 +82,7 @@ export class Solver {
 
   public solve() {
     const startState = this.getState(this.robots, false)
-    this.uncheckedStates = [{moves: 0, previous: '', color:0, dir:null, state: startState, robots: this.robots.slice(), goalVisited: false}]
+    this.uncheckedStates = [{moves: 0, previous: '', color:0, dir: null, state: startState, robots: this.robots.slice(), goalVisited: false}]
     this.statesUnchecked = new Set(startState)
     const start = new Date()
 
@@ -116,7 +114,6 @@ export class Solver {
       isAborted: this.aborted,
       route: this.foundRoute,
       robotsUsed: getUsedRobots(this.foundRoute),
-      message: this.message
     }
   }
 
@@ -131,7 +128,6 @@ export class Solver {
   private checkNext() {
       const currentState = this.uncheckedStates.shift()
       if(currentState === undefined) {
-        this.message = `No more moves to check... I guess this level is impossible`
         this.allStatesChecked = true
         this.running = false
         return
@@ -142,7 +138,7 @@ export class Solver {
       }
 
       const {state, robots, previous, moves} = currentState
-      // console.debug("Checking", state, robots[currentState.color])
+      console.debug("Checking", state, robots[currentState.color], currentState.dir, currentState.previous)
       this.statesUnchecked.delete(state)
   
       let goalVisited = currentState.goalVisited
@@ -175,7 +171,6 @@ export class Solver {
       this.checkedStates.set(state, currentState)
 
       if(this.checkedStates.size === MAX_CHECKED) {
-        this.message = `Checked ${MAX_CHECKED} states. Abort!`
         this.aborted = true
         this.running = false
         return
@@ -202,8 +197,6 @@ export class Solver {
       if(nextState === undefined) throw Error(`state ${previous} not found`)
       state = nextState
     }
-
-    this.message = `Level solved in ${this.foundRoute.length} moves`
   }
 
 
