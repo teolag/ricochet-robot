@@ -138,7 +138,7 @@ export class Solver {
       }
 
       const {state, robots, previous, moves} = currentState
-      console.debug("Checking", state, robots[currentState.color], currentState.dir, currentState.previous)
+      // console.debug("Checking", state, robots[currentState.color], currentState.dir, currentState.previous)
       this.statesUnchecked.delete(state)
   
       let goalVisited = currentState.goalVisited
