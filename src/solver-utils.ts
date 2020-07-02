@@ -1,5 +1,6 @@
 import { Board, Wall } from "./models/Board"
 import { Pos } from "./models/Pos"
+import { Direction } from "./models/Direction"
 
 export function goNorth (board: Board, robot: Pos, otherRobots: Pos[]) {
   const pos = {x: robot.x, y: robot.y}
@@ -8,7 +9,7 @@ export function goNorth (board: Board, robot: Pos, otherRobots: Pos[]) {
     if(pos.y-1 === closestRobotY || hasWall(board, pos.x, pos.y, Wall.NORTH)) break
   }
   if(pos.y === robot.y) return null
-  return {pos, dir: 'upp'}
+  return {pos, dir: Direction.UP}
 }
 
 export function goSouth (board: Board, robot: Pos, otherRobots: Pos[]) {
@@ -18,7 +19,7 @@ export function goSouth (board: Board, robot: Pos, otherRobots: Pos[]) {
     if(pos.y+1 === closestRobotY || hasWall(board, robot.x, pos.y, Wall.SOUTH)) break
   }
   if(pos.y===robot.y) return null
-  return {pos, dir: 'ner'}
+  return {pos, dir: Direction.DOWN}
 }
 
 export function goWest (board: Board, robot: Pos, otherRobots: Pos[]) {
@@ -28,7 +29,7 @@ export function goWest (board: Board, robot: Pos, otherRobots: Pos[]) {
     if(pos.x-1 === closestRobotX || hasWall(board, pos.x, pos.y, Wall.WEST)) break
   }
   if(pos.x===robot.x) return null
-  return {pos, dir: 'vänster'}
+  return {pos, dir: Direction.LEFT}
 }
 
 export function goEast (board: Board, robot: Pos, otherRobots: Pos[]) {
@@ -38,7 +39,7 @@ export function goEast (board: Board, robot: Pos, otherRobots: Pos[]) {
     if(pos.x+1 === closestRobotX || hasWall(board, pos.x, pos.y, Wall.EAST)) break
   }
   if(pos.x===robot.x) return null
-  return {pos, dir: 'höger'}
+  return {pos, dir: Direction.RIGHT}
 }
 
 export function hasWall(board: Board, x:number, y:number, wall: Wall) {

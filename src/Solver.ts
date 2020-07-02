@@ -2,6 +2,7 @@ import {Board} from './models/Board'
 import {Goal} from './models/Goal'
 import {Pos} from './models/Pos'
 import { goNorth, goSouth, goWest, goEast } from './solver-utils'
+import { Direction } from './models/Direction'
 
 const MAX_CHECKED = 200000
 const STATE_DELIMITER = '|'
@@ -19,7 +20,7 @@ interface State {
   previous: string
   state: string
   robots: Robot[]
-  dir: string
+  dir: Direction
   color: number
 }
 
@@ -83,7 +84,7 @@ export class Solver {
 
   public solve() {
     const startState = this.getState(this.robots, false)
-    this.uncheckedStates = [{moves: 0, previous: '', color:0, dir:'', state: startState, robots: this.robots.slice(), goalVisited: false}]
+    this.uncheckedStates = [{moves: 0, previous: '', color:0, dir:null, state: startState, robots: this.robots.slice(), goalVisited: false}]
     this.statesUnchecked = new Set(startState)
     const start = new Date()
 

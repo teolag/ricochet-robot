@@ -134,12 +134,7 @@ export function showSolution() {
 
   resetLevel()
   moveQueue.length = 0
-  const dirToDirection = new Map([['upp', Direction.UP], ['ner', Direction.DOWN], ['vänster', Direction.LEFT], ['höger', Direction.RIGHT]])
-  moveQueue.push(...result.route.map(step => {
-    const direction = dirToDirection.get(step.dir)
-    if(!direction) throw Error("Unknown direction:" + step.dir)
-    return {direction, robotIndex: step.color}
-  }))
+  moveQueue.push(...result.route.map(step => ({direction: step.dir, robotIndex: step.color})))
   setTimeout(processMoveQueue, 400)
 }
 

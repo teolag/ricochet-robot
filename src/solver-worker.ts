@@ -9,18 +9,18 @@ self.onmessage = processIncomingMessage
 
 
 
-function processIncomingMessage(e: MessageEvent) {
-  switch(e.data.type) {
+function processIncomingMessage(event: MessageEvent) {
+  switch(event.data.type) {
     case SolverWorkerMessage.SOLVE: {
-      const level = new Level(e.data.levelString)
-      const solver = new Solver(level, {backAgain: e.data.backAgain})
+      const level = new Level(event.data.levelString)
+      const solver = new Solver(level, {backAgain: event.data.backAgain})
       solver.onComplete(onComplete)
       solver.onProgress(onProgress)
       solver.solve()
       break;
     }
     default: {
-      throw Error("Worker recieved an unknown message" + e.data.type)
+      throw Error("Worker recieved an unknown message" + event.data.type)
     }
   }
 }
