@@ -4,7 +4,7 @@ import {Pos} from './models/Pos'
 import { goNorth, goSouth, goWest, goEast } from './solver-utils'
 import { Direction } from './models/Direction'
 
-const MAX_CHECKED = 200000
+const MAX_CHECKED = 300000
 const STATE_DELIMITER = '|'
 
 interface Robot {
@@ -144,13 +144,13 @@ export class Solver {
       let goalVisited = currentState.goalVisited
       if(this.isGoalReached(robots)) {
         if(!this.backAgain) {
-          this.goalReached(currentState, previous)
+          this.goalReached(currentState)
           return
         }
         goalVisited = true
       }
       if(this.backAgain && goalVisited && this.isBackAgain(robots)) {
-        this.goalReached(currentState, previous)
+        this.goalReached(currentState)
         return
       }
       
@@ -185,7 +185,7 @@ export class Solver {
     return this.pos2num(robots[this.goal.color]) === this.homeTile
   }
 
-  private goalReached(thisState: State, previous: string) {
+  private goalReached(thisState: State) {
     this.routeFound = true
     this.running = false
     let state = thisState
@@ -194,7 +194,7 @@ export class Solver {
     while(state.previous) {
       this.foundRoute.unshift(state)
       const nextState = this.checkedStates.get(state.previous)
-      if(nextState === undefined) throw Error(`state ${previous} not found`)
+      if(nextState === undefined) throw Error(`state ${state.previous} not found`)
       state = nextState
     }
   }
