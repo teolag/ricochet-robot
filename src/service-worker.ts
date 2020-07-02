@@ -1,64 +1,62 @@
-// Service Worker stuff
-if ('serviceWorker' in navigator) {
-	console.debug("SW: Register service worker");
-	navigator.serviceWorker.register('sw.js')
-		.then(function(registration) {
-			console.debug("SW: Service worker registered");
+export async function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) {
+    console.warn("Service worker not available")
+    return
+  }
 
-			// no service worker active, first visit
-			if (!navigator.serviceWorker.controller) {
-				console.debug("SW: First visit");
-				//return;
-			}
+  
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', e => {
+    const serviceWorkerContainer = e.target as ServiceWorkerContainer
+    if(!serviceWorkerContainer.controller) {
+      console.debug("Client: NO Controller =(")
+      return
+    }
+    if (refreshing) return
+    refreshing = true
+    console.debug("Client: RELOAD")
+    location.reload()
+  })
 
-			if (registration.waiting) {
-				console.debug("SW: New worker ready");
-				updateReady(registration.waiting);
-				return;
-			}
+  navigator.serviceWorker.onmessage = function(e) {
+    console.debug("Client: Message form Client:", e.data);
+  }
 
-			if (registration.installing) {
-				console.debug("SW: New worker installing");
-				trackInstalling(registration.installing);
-				return;
-			}
+  console.debug("Client: Register service worker")
+  const registration = await navigator.serviceWorker.register('sw.js')
 
-			registration.addEventListener('updatefound', function(e) {
-				console.debug("SW: New worker found, track installation", e);
-				if(registration.installing) {
-					trackInstalling(registration.installing);
-				}
-			});
-		})
-		.catch(function(err) {
-			console.debug("SW: Service worker registration failed : ", err);
-		})
-	;
+  console.debug("Client: Service worker registered")
+  
+  if (!navigator.serviceWorker.controller) {
+    // no service worker active, first visit
+    console.debug("Client: First visit?")
+    return
+  }
 
-	let refreshing = false;
-	navigator.serviceWorker.addEventListener('controllerchange', function() {
-		console.debug("SW: Refresh page!", refreshing);
-		if (refreshing) return;
-		const reload = confirm("New version available! Do you want to reload?")
-		if(reload) window.location.reload();
-		refreshing = true;
-	});
+  if (registration.waiting) {
+    console.debug("Client: New worker ready to be installed");
+    updateReady(registration.waiting);
+  } else if (registration.installing) {
+    console.debug("Client: New worker is beeing installed");
+    trackInstalling(registration.installing);
+  } else {
+    registration.onupdatefound = e => {
+      console.debug("Client: New worker found, track installation");
+      trackInstalling(registration.installing);
+    }
+  }
+}
 
-	var trackInstalling = function(worker: ServiceWorker) {
-		worker.addEventListener('statechange', function() {
-			console.debug("SW: Installation state changed", worker.state);
-			if (worker.state === 'installed') {
-				updateReady(worker);
-			}
-		});
-	};
+function trackInstalling(worker: ServiceWorker) {
+  worker.onstatechange = () => {
+    console.debug("Client: State changed", worker.state);
+    if (worker.state === 'installed') {
+      updateReady(worker);
+    }
+  }
+}
 
-	var updateReady = function(worker: ServiceWorker) {
-		console.debug("SW: Update ready!");
-		worker.postMessage({action: 'skipWaiting'});
-	};
-
-	navigator.serviceWorker.onmessage = function(e) {
-		console.debug("SW: Message form SW:", e.data);
-	}
+function updateReady(worker: ServiceWorker) {
+  console.debug("Client: Update ready, send skip soooon!");
+  setTimeout(() => worker.postMessage({action: 'skipWaiting'}), 1000)
 }

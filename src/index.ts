@@ -3,9 +3,8 @@ import { getButton } from "./utils"
 import * as ColorControls from './components/color-controls'
 import * as Game from './game'
 import * as GameBoard from './game-board'
-// import { GameBoard } from "./models/GameBoard"
-import './service-worker'
 import { Direction } from "./models/Direction"
+import { registerServiceWorker } from "./service-worker"
 
 
 
@@ -67,6 +66,7 @@ RIMLIGT??
 let level: Level
 // let gameBoard: GameBoard
 
+registerServiceWorker()
 startup()
 
 
@@ -124,12 +124,9 @@ function newGame(seed = Math.floor(Math.random()*1000000)) {
 }
 
 
-
-
-
 window.addEventListener('beforeinstallprompt', (beforeInstallEvent: BeforeInstallPromptEvent) => {
-	beforeInstallEvent.preventDefault();
-	const installButton = document.getElementById("btnInstall")
-	installButton.hidden = false
-	installButton.onclick = () => beforeInstallEvent.prompt()
+  beforeInstallEvent.preventDefault();
+  const installButton = document.getElementById("btnInstall")
+  installButton.hidden = false
+  installButton.onclick = () => beforeInstallEvent.prompt()
 });
