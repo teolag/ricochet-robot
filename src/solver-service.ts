@@ -64,7 +64,7 @@ function onWorkerMessage(e: MessageEvent) {
         solverInfo.innerHTML = `
           Orkade inte leta klar.<br>
           ${result.statesChecked} states letades igenom på 
-          ${result.duration} sekunder
+          ${result.duration} sekunder. Om en lösning finns är den på minst ${result.minMoves}
         `
       }
       break;

@@ -36,6 +36,7 @@ export interface CompletedData {
   isAborted: boolean
   route: State[]
   robotsUsed: number[]
+  minMoves: number
 }
 
 export interface ProgressData {
@@ -60,6 +61,7 @@ export class Solver {
   private completeCallback: Function|undefined
   private progressCallback: Function|undefined
   private duration = 0
+  private minMoves: number
   private backAgain: boolean
 
   private pos2num = (pos: Pos) => pos.x + pos.y * this.board.w
@@ -114,6 +116,7 @@ export class Solver {
       isAborted: this.aborted,
       route: this.foundRoute,
       robotsUsed: getUsedRobots(this.foundRoute),
+      minMoves: this.minMoves
     }
   }
 
@@ -171,6 +174,7 @@ export class Solver {
       this.checkedStates.set(state, currentState)
 
       if(this.checkedStates.size === MAX_CHECKED) {
+        this.minMoves = currentState.moves
         this.aborted = true
         this.running = false
         return
