@@ -9,6 +9,19 @@ import { registerServiceWorker } from "./service-worker-utils"
 
 
 /*
+Rules
+https://www.youtube.com/watch?v=OQOMmftaWAQ
+https://images.zmangames.com/filer_public/c0/b4/c0b482f1-ad3e-4e5d-ae48-0c11aa7c317a/en-ricochet_robot-rules.pdf
+
+https://wiki.ubc.ca/Course:CPSC:Artificial_Intelligence/States_and_Searching
+
+https://www.youtube.com/watch?v=fvuK0Us4xC4
+  - Pre-compute stops. Var kan man åka från varje cell om det inte står en robot ivägen
+  - Robot Equivalent. Hjälprobotarna kan byta plats med varandra utan att det påverkar
+  - Arrays, not Sets. Hjälper det i JS?
+  - Less objects. ?
+
+
 
 !!!IMPROVEMENTS!!!
 
@@ -37,7 +50,7 @@ RIMLIGT??
 
 * move robots with keyboard
   - wasd of arrow-keys to move
-  - 1-x to switch robot
+  - 1,2,3,... to switch robot
 
 * move robots with touch
   - swipe on robots to move
