@@ -8,6 +8,7 @@ const LEVEL_STRING_DELIMITER = '|'
 export interface GenerateOptions {
   width: number
   height: number
+  wallsCount: number
   seed?: number
   robotCount: number
 }
@@ -51,10 +52,10 @@ export class Level {
 }
 
 
-function generateLevelData({width, height, seed, robotCount}: GenerateOptions) {
+function generateLevelData({width, height, wallsCount, seed, robotCount}: GenerateOptions) {
   Slumpa.setSeed(seed)
   const board = new Board(height, width)
-  board.addRandomWalls(width*height/5)
+  board.addRandomWalls(wallsCount)
 
   const availableTiles = []
   for(let x=0; x<board.w; x++) {

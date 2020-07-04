@@ -8,7 +8,7 @@ const level_normal_10x10 = '10|3111111115200004a80c20000011052004200424200000800
 
 describe("generate a level", () => {
   const seed = 66
-  const level = new Level({width: 10, height: 8, robotCount: 3, seed})
+  const level = new Level({width: 10, height: 8, wallsCount: 20, robotCount: 3, seed})
 
   it("correct board size", () => {
     expect(level.board.w).to.be.equal(10)
