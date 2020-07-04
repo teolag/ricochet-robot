@@ -25,10 +25,10 @@ export function loadLevel(level: Level) {
   
   robotElems = level.robots.map(r => {
     const elem = document.createElement('div')
-    elem.classList.add('robot', 'robot-'+r.color)
-    elem.innerText = (r.color+1).toString()
-    elem.addEventListener('click', _ => robotClick(r.color))
-    elem.addEventListener('touchstart', e => robotTouch(e, r.color), {passive: true})
+    elem.classList.add('robot', 'robot-'+r.idx)
+    elem.innerText = (r.idx+1).toString()
+    elem.addEventListener('click', _ => robotClick(r.idx))
+    elem.addEventListener('touchstart', e => robotTouch(e, r.idx), {passive: true})
     return elem
   })
   robotElems.forEach(robotElem => {
@@ -109,7 +109,7 @@ function createHTMLBoard(level: Level): string {
     
     level.robots.forEach(robot => {
       if(robot.x === x && robot.y ===y) {
-        text = `<div class="start start-${robot.color}"></div>`;
+        text = `<div class="start start-${robot.idx}"></div>`;
       }
     })
     

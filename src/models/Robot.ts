@@ -2,14 +2,12 @@ import { Pos } from "./Pos"
 
 
 export class Robot {
-  private id: number
-  public color: number
+  public idx: number
   public x: number
   public y: number
 
-  constructor(id: number, x: number, y: number) {
-    this.id = id
-    this.color = id
+  constructor(idx: number, x: number, y: number) {
+    this.idx = idx
     this.x = x
     this.y = y
   }
@@ -24,7 +22,7 @@ export class Robot {
   } 
 
   clone() {
-    return new Robot(this.id, this.x, this.y)
+    return new Robot(this.idx, this.x, this.y)
   }
 }
 

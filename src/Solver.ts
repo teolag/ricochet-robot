@@ -10,7 +10,7 @@ const STATE_DELIMITER = '|'
 interface Robot {
   x: number
   y: number
-  color: number
+  idx: number
 }
 
 const notNull = <T>(value: T | null): value is T => value !== null
@@ -84,7 +84,7 @@ export class Solver {
 
   public solve() {
     const startState = this.getState(this.robots, false)
-    this.uncheckedStates = [{moves: 0, previous: '', color:0, dir: null, state: startState, robots: this.robots.slice(), goalVisited: false}]
+    this.uncheckedStates = [{moves: 0, previous: '', color: 0, dir: null, state: startState, robots: this.robots.slice(), goalVisited: false}]
     this.statesUnchecked = new Set(startState)
     const start = new Date()
 
@@ -206,7 +206,7 @@ export class Solver {
 
   private getNewStates (robots: Robot[], robotIndex: number, goalVisited: boolean) {
     const robot = robots[robotIndex]
-    const otherRobots = robots.filter(r => r.color !== robotIndex)
+    const otherRobots = robots.filter(r => r.idx !== robotIndex)
 
     return [
       goNorth(this.board, robot, otherRobots),
@@ -215,7 +215,7 @@ export class Solver {
       goSouth(this.board, robot, otherRobots)
     ].filter(notNull).map(move => {
       const newRobots = robots.slice()
-      newRobots[robotIndex] = {x: move.pos.x, y: move.pos.y, color: newRobots[robotIndex].color}
+      newRobots[robotIndex] = {x: move.pos.x, y: move.pos.y, idx: newRobots[robotIndex].idx}
       const state = this.getState(newRobots, goalVisited)
       return {state, robots: newRobots, dir: move.dir, color: robotIndex, goalVisited}
     })

@@ -8,17 +8,19 @@ import { goNorth, goWest, goEast, goSouth } from "./solver-utils"
 import * as ActiveRoute from './active-route'
 import * as ColorControls from './components/color-controls'
 import { openModal } from "./components/dialog"
+import { CompletedData } from "./Solver"
 
 let level: Level
 let robots: Robot[]
 let activeRobotIndex = 0
 const moveQueue: {robotIndex: number, direction: Direction}[] = []
 let processingMoveQueue = false
+const backAgain = true
+let goalVisited = false
 
 
 
 export function loadLevel(loadedlevel: Level) {
-  const backAgain = false
   level = loadedlevel
   solve(level, backAgain) 
   ColorControls.createButtons(level.robots.length)
@@ -29,10 +31,11 @@ export function loadLevel(loadedlevel: Level) {
 export function resetLevel() {
   resetRobots()
   switchRobot(0)
+  goalVisited = false
   ActiveRoute.reset()
 }
 
-export function resetRobots() {
+function resetRobots() {
   robots = cloneRobots(level.robots)
   setRobotsPostitions(robots)
 }
@@ -53,7 +56,7 @@ export function moveActiveRobot(direction: Direction) {
 }
 export function moveRobot(robotIndex: number, direction: Direction) {
   const moveFunction = getMoveFunction(direction)
-  const otherRobots = robots.filter(r => r.color !== robotIndex)
+  const otherRobots = robots.filter(r => r.idx !== robotIndex)
   const newPos = moveFunction(level.board, robots[robotIndex], otherRobots)
   if(!newPos) return
 
@@ -62,21 +65,38 @@ export function moveRobot(robotIndex: number, direction: Direction) {
   ActiveRoute.addMove(robotIndex, direction, cloneRobots(robots))
 
   if(goalIsReached()) {
+    if(backAgain) {
+      goalVisited = true
+    } else {
+      setTimeout(() => {
+        const result = getResult()
+        const resultText = getResultText(result)
+        openModal(resultText)
+      }, 400);
+    }
+  }
+  if(goalVisited && isHome()) {
     setTimeout(() => {
       const result = getResult()
-      if(!result || result.isAborted) {
-        openModal("Grattis, du klarade det innan solvern")
-        return;
-      }
-      if(result && result.isAllStatesChecked) {
-        openModal("Öööö... du klarade en omöjlig bana?!")
-        return;
-      }
-      const score = calculateScore(ActiveRoute.getMovesCount(), result.route.length)
-      const scoreText = [,'Bättre kan du', 'Bra gjort!', 'Perfekt!']
-      openModal(scoreText[score] +'<br>' + '⭐'.repeat(score))
+      const resultText = getResultText(result)
+      openModal(resultText)
     }, 400);
   }
+}
+
+function getResultText(result: CompletedData) {
+  if(!result) {
+    return `Grattis, du klarade det på ${ActiveRoute.getMovesCount()} drag innan solvern hittade en lösning`
+  }
+  if(result && result.isAborted) {
+    return `Solvern gav upp, men du klarade det på ${ActiveRoute.getMovesCount()} drag!`
+  }
+  if(result && result.isAllStatesChecked) {
+    return "Öööö... du klarade en omöjlig bana?!"
+  }
+  const score = calculateScore(ActiveRoute.getMovesCount(), result.route.length)
+  const scoreText = [,'Bättre kan du', 'Bra gjort!', 'Perfekt!']
+  return scoreText[score] +'<br>' + '⭐'.repeat(score)
 }
 
 export function switchRobot(index: number) {
@@ -99,6 +119,12 @@ function getMoveFunction(direction: Direction) {
 function goalIsReached() {
   const correctRobot = robots[level.goal.color]
   return correctRobot.x === level.goal.x && correctRobot.y === level.goal.y
+}
+
+function isHome() {
+  const correctRobot = robots[level.goal.color]
+  const correctStart = level.robots[level.goal.color]
+  return correctRobot.x === correctStart.x && correctRobot.y === correctStart.y
 }
 
 function calculateScore(moves: number, optimalMoves: number) {

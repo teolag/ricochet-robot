@@ -9,13 +9,16 @@ const undoButton = getButton('btnUndo')
 const resetButton = getButton('btnReset')
 const movesMade = getElementById('movesMade')
 undoButton.addEventListener('click', undoLastMove)
-resetButton.addEventListener('click', reset)
+resetButton.addEventListener('click', resetButtonClick)
 
+
+export function resetButtonClick() {
+  Game.resetLevel()
+}
 
 export function reset() {
   route.length = 0
   updateUI()
-  Game.resetRobots()
 }
 
 export function addMove(robotIndex: number, direction: Direction, robots: Robot[]) {

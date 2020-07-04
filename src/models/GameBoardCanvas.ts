@@ -4,7 +4,7 @@ import { getElementById } from '../utils'
 
 
 const tileSize = 40
-const colors = ['red', 'blue', 'green', '#aa0', 'purple']
+const colors = ['red', 'green', 'blue', '#aa0', 'purple']
 const margin = 5
 
 export class GameBoard {

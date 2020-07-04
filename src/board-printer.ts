@@ -2,6 +2,25 @@ import {createCanvas} from 'canvas'
 import { Level } from './models/Level'
 import { Wall } from './models/Board'
 
+const smallStyle = {
+  cellSize: 10,
+  cellGap: 1,
+  imagePadding: 0,
+  wallThickness: 2,
+  robotRadius: 3,
+  goalPadding: 2,
+  goalThickness: 1
+}
+
+const style = {
+  cellSize: 25,
+  cellGap: 5,
+  imagePadding: 10,
+  wallThickness: 5,
+  robotRadius: 8,
+  goalPadding: 4,
+  goalThickness: 4
+}
 
 
 const level = new Level({
@@ -12,6 +31,8 @@ const level = new Level({
   seed: 587658
 })
 
+const {cellGap, cellSize, imagePadding, robotRadius, wallThickness, goalPadding, goalThickness} = smallStyle
+const robotColors = ['red', 'green', 'blue', '#aa0', 'purple']
 
 const width = level.board.w
 const height = level.board.h
@@ -20,30 +41,25 @@ const verticalWalls = level.board.tiles.map(row => row.slice(0,-1).reduce((str, 
 const horizontalWalls = level.board.tiles.slice(0,-1).map(row => row.reduce((str, cell) => str + (cell & Wall.SOUTH ? 1 : 0), "")).join('').split('').map(v => v === "1")
 
 
-const cellSize = 40
-const cellGap = 3
 const cellColor = "white"
-const gapColor = "#ddd"
+const gapColor = "#eee"
 
-const picPadding = 10
-const picWidth = picPadding * 2 + width * (cellGap + cellSize) + cellGap
-const picHeight = picPadding * 2 + height * (cellGap + cellSize) + cellGap
+const imageWidth = imagePadding * 2 + width * (cellGap + cellSize) + cellGap
+const imageHeight = imagePadding * 2 + height * (cellGap + cellSize) + cellGap
 
-const wallThickness = 5
 const wallColor = "#666"
 
-
-const canvas = createCanvas(picWidth, picHeight)
+const canvas = createCanvas(imageWidth, imageHeight)
 const ctx = canvas.getContext('2d')
 
 
 // Background
 ctx.fillStyle="#999"
-ctx.fillRect(0, 0, picWidth, picHeight)
+ctx.fillRect(0, 0, imageWidth, imageHeight)
 
 
 ctx.save()
-ctx.translate(picPadding, picPadding)
+ctx.translate(imagePadding, imagePadding)
 
 ctx.fillStyle = gapColor
 ctx.fillRect(0,0,width * (cellSize + cellGap) + cellGap,height * (cellSize + cellGap) + cellGap)
@@ -81,6 +97,36 @@ ctx.strokeStyle = wallColor
 ctx.lineWidth = wallThickness
 ctx.strokeRect(cellGap/2, cellGap/2,width*(cellSize+cellGap), height*(cellSize+cellGap))
 
+
+
+// Robots
+level.robots.forEach(robot => {
+  ctx.beginPath()
+  const x = robot.x * (cellGap+cellSize) + cellGap + cellSize/2
+  const y = robot.y * (cellGap+cellSize) + cellGap + cellSize/2
+  ctx.arc(x,y,robotRadius, 0, 2*Math.PI)
+  ctx.fillStyle = robotColors[robot.idx]
+  ctx.fill()
+  ctx.closePath()
+})
+
+
+// Goal
+ctx.save()
+ctx.strokeStyle = robotColors[level.goal.color]
+ctx.lineWidth = goalThickness
+ctx.translate(level.goal.x*(cellGap+cellSize)+cellGap, level.goal.y*(cellGap+cellSize)+cellGap)
+ctx.beginPath()
+ctx.moveTo(goalPadding, goalPadding)
+ctx.lineTo(cellSize - goalPadding, cellSize - goalPadding)
+ctx.moveTo(cellSize - goalPadding, goalPadding)
+ctx.lineTo(goalPadding, cellSize - goalPadding)
+ctx.stroke()
+ctx.restore()
+
+
+
+
 ctx.restore()
 
 
@@ -89,28 +135,3 @@ const out = fs.createWriteStream(__dirname + '/test.png')
 const stream = canvas.createPNGStream()
 stream.pipe(out)
 out.on('finish', () =>  console.log('The PNG file was created.'))
-
-
-
-
-
-
-
-
-
-
-function pack(values: string) {
-  var chunks = values.match(/.{1,16}/g), packed = ''
-  for (var i=0; i < chunks.length; i++) {
-      packed += String.fromCharCode(parseInt(chunks[i], 2));
-  }
-  return packed;
-}
-
-function unpack(packed: string) {
-  var values = '';
-  for (var i=0; i < packed.length; i++) {
-      values += packed.charCodeAt(i).toString(2);
-  }
-  return values;
-}
