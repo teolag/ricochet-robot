@@ -40,6 +40,14 @@ describe("load a level", () => {
     expect(level.robots[1].x).to.be.equal(4)
     expect(level.robots[1].y).to.be.equal(2)
   })
+  
+  it("level string vs options", () => {
+    const levelA = new Level({seed: 876, width:3, height:2, robotCount:2, wallsCount:6})
+    const levelB = new Level("3|fbdfff|0|1|5")
+    
+    expect(levelA.board.getTilesString()).to.equal(levelB.board.getTilesString())
+    expect(levelA.robots.length).to.equal(levelB.robots.length)
+  })
 })
 
 describe("solve", () => {

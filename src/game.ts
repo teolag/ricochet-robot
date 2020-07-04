@@ -15,14 +15,15 @@ let robots: Robot[]
 let activeRobotIndex = 0
 const moveQueue: {robotIndex: number, direction: Direction}[] = []
 let processingMoveQueue = false
-const backAgain = true
+let _backAgain = true
 let goalVisited = false
 
 
 
-export function loadLevel(loadedlevel: Level) {
+export function startGame(loadedlevel: Level, backAgain: boolean) {
+  _backAgain = backAgain
   level = loadedlevel
-  solve(level, backAgain) 
+  solve(level, _backAgain) 
   ColorControls.createButtons(level.robots.length)
   GameBoard.loadLevel(level)
   resetLevel()
@@ -65,7 +66,7 @@ export function moveRobot(robotIndex: number, direction: Direction) {
   ActiveRoute.addMove(robotIndex, direction, cloneRobots(robots))
 
   if(goalIsReached()) {
-    if(backAgain) {
+    if(_backAgain) {
       goalVisited = true
     } else {
       setTimeout(() => {

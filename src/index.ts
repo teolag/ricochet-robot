@@ -5,6 +5,7 @@ import * as Game from './game'
 import * as GameBoard from './game-board'
 import { Direction } from "./models/Direction"
 import { registerServiceWorker } from "./service-worker-utils"
+import { GameOptions } from "./models/GameOptions"
 
 
 
@@ -92,14 +93,13 @@ getButton('btnDown').addEventListener('click', _ => Game.moveActiveRobot(Directi
 document.body.addEventListener('keydown', keyHandler)
 
 getButton('btnShowSolution').addEventListener('click', Game.showSolution)
-getButton('btnNewGame').addEventListener('click', _ => newGame())
-
-
+getButton('btnNewGame').addEventListener('click', _ => newGame({}))
 
 
 function startup() {
-  const seedStr = location.hash.substr(1)
-  newGame(seedStr ? parseInt(seedStr) : undefined)
+  const queryString = location.search
+  const options = queryStringToGameOptions(queryString)
+  newGame(options)
   ColorControls.onColorSelect(color => Game.switchRobot(color))
   GameBoard.onRobotClick(robotClick)
 }
@@ -115,7 +115,7 @@ function keyHandler(e: KeyboardEvent) {
   }
 
   switch(e.key) {
-    case 'F2': newGame(); break;
+    case 'F2': newGame({}); break;
     case 'Escape': Game.resetLevel(); break;
     case 'ArrowUp': Game.moveActiveRobot(Direction.UP); break;
     case 'ArrowLeft': Game.moveActiveRobot(Direction.LEFT); break;
@@ -124,16 +124,20 @@ function keyHandler(e: KeyboardEvent) {
   }
 }
 
-function newGame(seed = Math.floor(Math.random()*1000000)) {
-  location.hash = seed.toString()
-  level = new Level({
+function newGame(opts: Partial<GameOptions>) {
+  const defaults: GameOptions = {
+    seed: Math.floor(Math.random()*1000000),
+    backAgain: false,
     width: 10,
     height: 10,
     wallsCount: 20,
     robotCount: 4,
-    seed
-  })
-  Game.loadLevel(level)
+  }
+  const options: GameOptions = Object.assign({}, defaults, opts);
+  const query = gameOptionsToQueryString(options)
+  history.replaceState(null, "title", '/?'+query)
+  level = new Level(options)
+  Game.startGame(level, options.backAgain)
   // gameBoard = new GameBoard(level.board.tiles, level.robots.map(r => ({x: r.x, y: r.y})), level.goal)
 }
 
@@ -144,3 +148,42 @@ window.addEventListener('beforeinstallprompt', (beforeInstallEvent: BeforeInstal
   installButton.hidden = false
   installButton.onclick = () => beforeInstallEvent.prompt()
 });
+
+
+
+function gameOptionsToQueryString(options: GameOptions): string {
+  const query = new URLSearchParams({
+    width: options.width.toString(),
+    height: options.height.toString(),
+    seed: options.seed.toString(),
+    robotCount: options.robotCount.toString(),
+    wallsCount: options.wallsCount.toString(),
+    backAgain: options.backAgain ? 'true' : 'false'
+  })
+  return query.toString()
+}
+
+function queryStringToGameOptions(queryString: string): GameOptions {
+  const queryParams = new URLSearchParams(queryString)
+  
+  const seedStr = queryParams.get('seed')
+  const seed = seedStr && parseInt(seedStr)
+  
+  const widthStr = queryParams.get('width')
+  const width = widthStr && parseInt(widthStr)
+  
+  const heightStr = queryParams.get('height')
+  const height = heightStr && parseInt(heightStr)
+  
+  const wallsCountStr = queryParams.get('wallsCount')
+  const wallsCount = wallsCountStr && parseInt(wallsCountStr)
+  
+  const robotCountStr = queryParams.get('robotCount')
+  const robotCount = robotCountStr && parseInt(robotCountStr)
+  
+  const backAgainStr = queryParams.get('backAgain')
+  const backAgain = backAgainStr === 'true'
+  
+  return {seed, wallsCount, robotCount, width, backAgain, height}
+  
+}
