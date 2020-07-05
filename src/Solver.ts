@@ -17,11 +17,11 @@ const notNull = <T>(value: T | null): value is T => value !== null
 interface State {
   goalVisited: boolean
   moves: number
-  previous: string
+  previous?: string
   state: string
   robots: Robot[]
-  dir: Direction
-  color: number
+  dir?: Direction
+  color?: number
 }
 
 interface SolverOptions {
@@ -49,10 +49,10 @@ export class Solver {
   private readonly robots: Robot[]
   private readonly goal: Goal
   private readonly goalTile: number
-  private readonly homeTile: number
-  private checkedStates = new Map<string, State>()
-  private statesUnchecked = new Set<string>()
-  private uncheckedStates: State[] = []
+  private readonly mainHomeTile: number
+  private checkedStates = new Set<string>()
+  private stateQueue: string[] = []
+  private states = new Map<string, State>()
   private routeFound = false
   private aborted = false
   private allStatesChecked = false
@@ -78,14 +78,14 @@ export class Solver {
     this.robots = level.robots
     this.goal = level.goal
     this.goalTile = this.pos2num(this.goal)
-    this.homeTile = this.pos2num(this.robots[this.goal.color])
+    this.mainHomeTile = this.pos2num(this.robots[this.goal.color])
     this.backAgain = backAgain
   }
 
   public solve() {
     const startState = this.getState(this.robots, false)
-    this.uncheckedStates = [{moves: 0, previous: '', color: 0, dir: null, state: startState, robots: this.robots.slice(), goalVisited: false}]
-    this.statesUnchecked = new Set(startState)
+    this.stateQueue.push(startState)
+    this.states.set(startState, {moves: 0, state: startState, robots: this.robots.slice(), goalVisited: false})
     const start = new Date()
 
     this.running = true
@@ -97,8 +97,8 @@ export class Solver {
     if(this.completeCallback) {
       this.completeCallback(result)
     }
-    this.statesUnchecked.clear()
-    this.uncheckedStates.length = 0
+    this.stateQueue.length = 0
+    this.states.clear()
     this.checkedStates.clear()
     return result
   }
@@ -129,67 +129,63 @@ export class Solver {
   }
 
   private checkNext() {
-      const currentState = this.uncheckedStates.shift()
-      if(currentState === undefined) {
+      const nextStateHash = this.stateQueue.shift()
+      
+      if(nextStateHash === undefined) {
         this.allStatesChecked = true
+        this.running = false
+        return
+      }
+      
+      const state = this.states.get(nextStateHash)
+
+      if(this.checkedStates.size === MAX_CHECKED) {
+        this.minMoves = state.moves
+        this.aborted = true
         this.running = false
         return
       }
 
       if(this.progressCallback && (this.checkedStates.size % 100 === 0)) {
-        this.progressCallback({checkedStates: this.checkedStates.size, currentMovesCount: currentState.moves})
+        this.progressCallback({checkedStates: this.checkedStates.size, currentMovesCount: state.moves})
       }
 
-      const {state, robots, previous, moves} = currentState
-      // console.debug("Checking", state, robots[currentState.color], currentState.dir, currentState.previous)
-      this.statesUnchecked.delete(state)
-  
-      let goalVisited = currentState.goalVisited
-      if(this.isGoalReached(robots)) {
-        if(!this.backAgain) {
-          this.goalReached(currentState)
-          return
-        }
-        goalVisited = true
-      }
-      if(this.backAgain && goalVisited && this.isBackAgain(robots)) {
-        this.goalReached(currentState)
-        return
-      }
-      
-      robots.forEach((_, i) => {
-        const newStates = this.getNewStates(robots, i, goalVisited)
-        .filter(s => !this.checkedStates.has(s.state))
-        .filter(s => !this.statesUnchecked.has(s.state))
-        .map(s => ({...s, previous: state, moves: moves+1}))
-        if(newStates.length) {
-          // console.debug("add", i, newStates.map(s => s.robots[i].x + ',' + s.robots[i].y).join('  '))
-          newStates.forEach(s => {
-            this.uncheckedStates.push(s)
-            this.statesUnchecked.add(s.state)
-          })
-        }
+      // console.debug("Checking", state, robots[nextStateHash.color], nextStateHash.dir, nextStateHash.previous)
+      state.robots.forEach((_, idx) => {
+        this.getNewStates(state, idx)
+        .filter(newState => !this.states.has(newState.state))
+        .forEach(newState => {
+          this.checkIfShortestRouteFound(newState)
+          this.stateQueue.push(newState.state)
+          this.states.set(newState.state, newState)
+        })
       })
-      
-      this.checkedStates.set(state, currentState)
 
-      if(this.checkedStates.size === MAX_CHECKED) {
-        this.minMoves = currentState.moves
-        this.aborted = true
-        this.running = false
-        return
+      this.checkedStates.add(nextStateHash)
+  }
+
+  private checkIfShortestRouteFound(state: State) {
+    if(state.color !== this.goal.color) return
+    const goalRobot = state.robots[this.goal.color]
+    if(this.isAtGoal(goalRobot)) {
+      if(!this.backAgain) {
+        this.shortestRouteFound(state)
       }
+      state.goalVisited = true
+    } else if(this.backAgain && state.goalVisited && this.isAtHome(goalRobot)) {
+      this.shortestRouteFound(state)
+    }
   }
 
-  private isGoalReached(robots: Robot[]) {
-    return this.pos2num(robots[this.goal.color]) === this.goalTile
+  private isAtGoal(mainRobot: Robot) {
+    return this.pos2num(mainRobot) === this.goalTile
   }
 
-  private isBackAgain(robots: Robot[]) {
-    return this.pos2num(robots[this.goal.color]) === this.homeTile
+  private isAtHome(mainRobot: Robot) {
+    return this.pos2num(mainRobot) === this.mainHomeTile
   }
 
-  private goalReached(thisState: State) {
+  private shortestRouteFound(thisState: State) {
     this.routeFound = true
     this.running = false
     let state = thisState
@@ -197,16 +193,16 @@ export class Solver {
     
     while(state.previous) {
       this.foundRoute.unshift(state)
-      const nextState = this.checkedStates.get(state.previous)
+      const nextState = this.states.get(state.previous)
       if(nextState === undefined) throw Error(`state ${state.previous} not found`)
       state = nextState
     }
   }
 
 
-  private getNewStates (robots: Robot[], robotIndex: number, goalVisited: boolean) {
-    const robot = robots[robotIndex]
-    const otherRobots = robots.filter(r => r.idx !== robotIndex)
+  private getNewStates (state: State, robotIndex: number): State[] {
+    const robot = state.robots[robotIndex]
+    const otherRobots = state.robots.filter(r => r.idx !== robotIndex)
 
     return [
       goNorth(this.board, robot, otherRobots),
@@ -214,10 +210,10 @@ export class Solver {
       goEast(this.board, robot, otherRobots),
       goSouth(this.board, robot, otherRobots)
     ].filter(notNull).map(move => {
-      const newRobots = robots.slice()
+      const newRobots = state.robots.slice()
       newRobots[robotIndex] = {x: move.pos.x, y: move.pos.y, idx: newRobots[robotIndex].idx}
-      const state = this.getState(newRobots, goalVisited)
-      return {state, robots: newRobots, dir: move.dir, color: robotIndex, goalVisited}
+      const stateHash = this.getState(newRobots, state.goalVisited)
+      return {state: stateHash, previous: state.state, robots: newRobots, dir: move.dir, color: robotIndex, goalVisited: state.goalVisited, moves: state.moves+1}
     })
   }
 }

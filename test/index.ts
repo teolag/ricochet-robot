@@ -57,7 +57,7 @@ describe("solve", () => {
     const result = solver.solve()
     expect(result.isRouteFound).to.be.true
     expect(result.route).to.be.an('array').of.length(2)
-    expect(result.statesChecked).to.be.equal(5)
+    expect(result.statesChecked).to.be.equal(2)
   })
 
   it("level_impossible_3x3", () => {
@@ -72,11 +72,24 @@ describe("solve", () => {
 })
 
 describe("get hints", () => {
-  const level = new Level(level_normal_10x10)
-  const solver = new Solver(level)
-  const result = solver.solve()
-  expect(result.isRouteFound).to.be.true
-  expect(result.route).to.be.an('array')
-  expect(result.robotsUsed).to.be.an('array').of.length(3)
-  expect(result.statesChecked).to.equal(7160)
+  it('robots used', () => {
+    const level = new Level(level_normal_10x10)
+    const solver = new Solver(level)
+    const result = solver.solve()
+    expect(result.isRouteFound).to.be.true
+    expect(result.route).to.be.an('array')
+    expect(result.robotsUsed).to.be.an('array').of.length(3)
+    expect(result.statesChecked).to.equal(3586)
+  })
+})
+
+
+describe("Performance", () => {
+  it.skip("Solve a difficult level in about 10s", function () {
+    this.timeout(20000)
+    const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 422367})
+    const solver = new Solver(level)
+    const result = solver.solve()
+    console.log("Solver result", result)
+  })
 })
