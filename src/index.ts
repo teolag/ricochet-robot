@@ -133,7 +133,7 @@ function newGame(opts: Partial<GameOptions>) {
     wallsCount: 20,
     robotCount: 4,
   }
-  const options: GameOptions = Object.assign({}, defaults, opts);
+  const options: GameOptions = Object.assign({}, defaults, opts)
   const query = gameOptionsToQueryString(options)
   history.replaceState(null, "title", '/?'+query)
   level = new Level(options)
@@ -163,27 +163,28 @@ function gameOptionsToQueryString(options: GameOptions): string {
   return query.toString()
 }
 
-function queryStringToGameOptions(queryString: string): GameOptions {
+function queryStringToGameOptions(queryString: string): Partial<GameOptions> {
   const queryParams = new URLSearchParams(queryString)
+  const options: Partial<GameOptions> = {}
   
   const seedStr = queryParams.get('seed')
-  const seed = seedStr && parseInt(seedStr)
+  if(seedStr) options.seed = parseInt(seedStr)
   
   const widthStr = queryParams.get('width')
-  const width = widthStr && parseInt(widthStr)
+  if(widthStr) options.width = parseInt(widthStr)
   
   const heightStr = queryParams.get('height')
-  const height = heightStr && parseInt(heightStr)
+  if(heightStr) options.height = parseInt(heightStr)
   
   const wallsCountStr = queryParams.get('wallsCount')
-  const wallsCount = wallsCountStr && parseInt(wallsCountStr)
+  if(wallsCountStr) options.wallsCount = parseInt(wallsCountStr)
   
   const robotCountStr = queryParams.get('robotCount')
-  const robotCount = robotCountStr && parseInt(robotCountStr)
+  if(robotCountStr) options.robotCount = parseInt(robotCountStr)
   
   const backAgainStr = queryParams.get('backAgain')
-  const backAgain = backAgainStr === 'true'
+  if(backAgainStr) options.backAgain = backAgainStr === 'true'
   
-  return {seed, wallsCount, robotCount, width, backAgain, height}
+  return options
   
 }
