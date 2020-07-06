@@ -25,7 +25,7 @@ describe("solve", () => {
 })
 
 describe("Performance", () => {
-  it.only("Solve a 10 steps level in about 2.5s", function () {
+  it.skip("Solve a 10 steps level in about 2.5s", function () {
     this.timeout(20000)
     const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 422367})
     const solver = new Solver(level)
@@ -41,7 +41,6 @@ describe("Performance", () => {
     this.timeout(200000)
     const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 661950})
     const solver = new Solver(level, {abortAfter: 1000000, backAgain: true})
-    let now = new Date().getTime()
     solver.onProgress((data => {console.log("Progress", data)}), 10000)
     const result = solver.solve()
     console.log("Solver result", result)

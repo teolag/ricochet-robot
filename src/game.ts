@@ -4,7 +4,7 @@ import { solve, getResult } from "./solver-service"
 import { Pos } from "./models/Pos"
 import * as GameBoard from "./game-board"
 import { Direction } from "./models/Direction"
-import { goNorth, goWest, goEast, goSouth } from "./solver-utils"
+import { goUp, goLeft, goRight, goDown } from "./solver-utils"
 import * as ActiveRoute from './active-route'
 import * as ColorControls from './components/color-controls'
 import { openModal } from "./components/dialog"
@@ -47,6 +47,10 @@ export function setRobotsPostitions(robots: Robot[]) {
   })
 }
 
+export function setGoalVisited(visited: boolean) {
+  goalVisited = visited
+}
+
 export function setRobotPosition(robotIndex: number, newPos: Pos) {
   robots[robotIndex].setPos(newPos)
   GameBoard.moveRobot(robotIndex, newPos)
@@ -63,20 +67,13 @@ export function moveRobot(robotIndex: number, direction: Direction) {
 
   setRobotPosition(robotIndex, newPos.pos)
   // gameBoard.moveRobot(activeRobotIndex, newPos.pos)
-  ActiveRoute.addMove(robotIndex, direction, cloneRobots(robots))
 
-  if(goalIsReached()) {
-    if(_backAgain) {
-      goalVisited = true
-    } else {
-      setTimeout(() => {
-        const result = getResult()
-        const resultText = getResultText(result)
-        openModal(resultText)
-      }, 400);
-    }
-  }
-  if(goalVisited && isHome()) {
+  const landedOnGoal = goalIsReached()
+  if(landedOnGoal) goalVisited = true
+  ActiveRoute.addMove(robotIndex, direction, cloneRobots(robots), goalVisited)
+
+  const gameCompleted = (landedOnGoal && !_backAgain) || (_backAgain && goalVisited && isHome())
+  if(gameCompleted) {
     setTimeout(() => {
       const result = getResult()
       const resultText = getResultText(result)
@@ -86,18 +83,19 @@ export function moveRobot(robotIndex: number, direction: Direction) {
 }
 
 function getResultText(result: CompletedData) {
+  const moves = ActiveRoute.getMovesCount()
   if(!result) {
-    return `Grattis, du klarade det på ${ActiveRoute.getMovesCount()} drag innan solvern hittade en lösning`
+    return `Grattis, du klarade det på ${moves} drag innan solvern hittade en lösning`
   }
   if(result && result.isAborted) {
-    return `Solvern gav upp, men du klarade det på ${ActiveRoute.getMovesCount()} drag!`
+    return `Solvern gav upp, men du klarade det på ${moves} drag!`
   }
   if(result && result.isAllStatesChecked) {
     return "Öööö... du klarade en omöjlig bana?!"
   }
-  const score = calculateScore(ActiveRoute.getMovesCount(), result.route.length)
-  const scoreText = [,'Bättre kan du', 'Bra gjort!', 'Perfekt!']
-  return scoreText[score] +'<br>' + '⭐'.repeat(score)
+  const score = calculateScore(moves, result.route.length)
+  const scoreText = ["FUUUSK!", 'Bättre kan du', 'Bra gjort!', 'Perfekt!']
+  return `${moves} drag. ${scoreText[score]} <br>${'⭐'.repeat(score)}`
 }
 
 export function switchRobot(index: number) {
@@ -109,10 +107,10 @@ export function switchRobot(index: number) {
 
 function getMoveFunction(direction: Direction) {
   switch(direction) {
-    case Direction.UP: return goNorth
-    case Direction.LEFT: return goWest
-    case Direction.RIGHT: return goEast
-    case Direction.DOWN: return goSouth
+    case Direction.UP: return goUp
+    case Direction.LEFT: return goLeft
+    case Direction.RIGHT: return goRight
+    case Direction.DOWN: return goDown
   }
 }
 
@@ -129,6 +127,7 @@ function isHome() {
 }
 
 function calculateScore(moves: number, optimalMoves: number) {
+  if(moves < optimalMoves) return 0
   if(moves === optimalMoves) return 3
   if(moves <= 1+Math.floor(optimalMoves*1.3)) return 2
   return 1

@@ -1,9 +1,9 @@
 import {Board} from './models/Board'
 import {Goal} from './models/Goal'
 import {Pos} from './models/Pos'
-import { goNorth, goSouth, goWest, goEast } from './solver-utils'
+import { goUp, goDown, goLeft, goRight } from './solver-utils'
 import { Direction } from './models/Direction'
-import Timer from './libs/Timer'
+import * as Timer from './libs/Timer'
 
 const STATE_DELIMITER = '|'
 
@@ -18,7 +18,7 @@ interface State {
   goalVisited: boolean
   moves: number
   previous?: string
-  state: string
+  hash: string
   robots: Robot[]
   lastMoveDirection: Direction
   lastMoveRobotIdx: number
@@ -27,6 +27,15 @@ interface State {
 interface SolverOptions {
   backAgain?: boolean
   abortAfter?: number
+}
+
+interface Move {
+  pos: {
+    x:number
+    y:number
+  }
+  dir: Direction
+  robotIdx: number
 }
 
 export interface CompletedData {
@@ -70,7 +79,7 @@ export class Solver {
   private abortAfter: number
 
   private pos2num = (pos: Pos) => pos.x + pos.y * this.board.w
-  private getState = (robots: Robot[], goalVisited: boolean) => {
+  private getStateHash = (robots: Robot[], goalVisited: boolean) => {
     const mainRobot = this.pos2num(robots[0])
     const helpers = robots.slice(1).map(r => this.pos2num(r)).sort().join(STATE_DELIMITER)
     const hash = mainRobot + (goalVisited ? 'Y':'N') + helpers
@@ -78,7 +87,7 @@ export class Solver {
   }
 
   constructor(level, options: SolverOptions = {}) {
-    const {backAgain = false, abortAfter = 500000} = options
+    const {backAgain = false, abortAfter = 1e6} = options
     this.board = level.board
     this.robots = level.robots
     this.goal = level.goal
@@ -89,14 +98,16 @@ export class Solver {
   }
 
   public solve() {
-    const startState = this.getState(this.robots, false)
+    const startState = this.getStateHash(this.robots, false)
     this.statesQueue.push(startState)
-    this.states.set(startState, {moves: 0, state: startState, lastMoveDirection: null, lastMoveRobotIdx: null, robots: this.robots.slice(), goalVisited: false})
+    this.states.set(startState, {moves: 0, hash: startState, lastMoveDirection: null, lastMoveRobotIdx: null, robots: this.robots.slice(), goalVisited: false})
     const start = new Date()
 
     this.running = true
     while(this.running) {
-      Timer.time('check-next', () => this.checkNext())
+      Timer.startTimer('check-next')
+      this.checkNext()
+      Timer.pauseTimer('check-next')
     }
     this.duration = (new Date().getTime() - start.getTime()) / 1000
     const result = this.getResult()
@@ -136,15 +147,19 @@ export class Solver {
   }
 
   private checkNext() {
-    const nextStateHash = Timer.time('get-next-state-hash', () => this.statesQueue[this.currentStateIndex])
-
-    if(nextStateHash === undefined) {
+    if(this.currentStateIndex+1 > this.statesQueue.length) {
       this.allStatesChecked = true
       this.running = false
       return
     }
-    
-    const state = Timer.time('get-next-state', () => this.states.get(nextStateHash))
+
+    Timer.startTimer('get-next-state-hash')
+    const nextStateHash = this.statesQueue[this.currentStateIndex]
+    Timer.pauseTimer('get-next-state-hash')
+
+    Timer.startTimer('get-next-state') 
+    const state = this.states.get(nextStateHash)
+    Timer.pauseTimer('get-next-state') 
 
     if(this.currentStateIndex === this.abortAfter) {
       this.minMoves = state.moves
@@ -158,28 +173,22 @@ export class Solver {
     }
 
     // console.debug("Checking", state, robots[nextStateHash.color], nextStateHash.dir, nextStateHash.previous)
-    state.robots.forEach((_, idx) => {
-      Timer.time('get-new-states', () => this.getNewStates(state, idx))
-        .filter(newState => Timer.time('has-state', () => !this.states.has(newState.state)))
-        .forEach(newState => {
-          Timer.time('check-win', () => this.checkIfShortestRouteFound(newState))
-          Timer.time('add-states', () => {
-            this.statesQueue.push(newState.state)
-            this.states.set(newState.state, newState)
-          })
-        })
-    })
+    
+    Timer.startTimer('process-state')
+    this.processState(state)
+    Timer.pauseTimer('process-state')
+
     this.currentStateIndex++
   }
 
-  private checkIfShortestRouteFound(state: State) {
+  private checkIfShortestRouteFound(state: State): void {
     if(state.lastMoveRobotIdx !== this.goal.robotIdx) return
     const goalRobot = state.robots[this.goal.robotIdx]
     if(this.isAtGoal(goalRobot)) {
+      state.goalVisited = true
       if(!this.backAgain) {
         this.shortestRouteFound(state)
       }
-      state.goalVisited = true
     } else if(this.backAgain && state.goalVisited && this.isAtHome(goalRobot)) {
       this.shortestRouteFound(state)
     }
@@ -193,10 +202,10 @@ export class Solver {
     return this.pos2num(mainRobot) === this.mainHomeTile
   }
 
-  private shortestRouteFound(thisState: State) {
+  private shortestRouteFound(endState: State) {
     this.routeFound = true
     this.running = false
-    let state = thisState
+    let state = endState
     this.foundRoute = []
     
     while(state.previous) {
@@ -208,31 +217,48 @@ export class Solver {
   }
 
 
-  private getNewStates (state: State, robotIndex: number): State[] {
+  private processState (state: State) {
     // TODO:  make faster!!
     // pre-calculate all stops for every tile (exl. helper robots)?
-    const robot = state.robots[robotIndex]
-    const otherRobots = state.robots.filter(r => r.idx !== robotIndex)
 
-    return [
-      goNorth(this.board, robot, otherRobots),
-      goWest(this.board, robot, otherRobots),
-      goEast(this.board, robot, otherRobots),
-      goSouth(this.board, robot, otherRobots)
-    ].filter(notNull).map(move => {
+    // Find available moves
+    const moves: Move[] = []
+    for(const robot of state.robots) {
+      const otherRobots = state.robots.filter(r => r.idx !== robot.idx)
+      
+      const n = goUp(this.board, robot, otherRobots)
+      if(n) moves.push({...n, robotIdx: robot.idx})
+
+      const w = goLeft(this.board, robot, otherRobots)
+      if(w) moves.push({...w, robotIdx: robot.idx})
+
+      const e = goRight(this.board, robot, otherRobots)
+      if(e) moves.push({...e, robotIdx: robot.idx})
+
+      const s = goDown(this.board, robot, otherRobots)
+      if(s) moves.push({...s, robotIdx: robot.idx})
+    }
+
+    for(let move of moves) {
       const newRobots = state.robots.slice()
-      newRobots[robotIndex] = {x: move.pos.x, y: move.pos.y, idx: newRobots[robotIndex].idx}
-      const stateHash = this.getState(newRobots, state.goalVisited)
-      return {
-        state: stateHash,
-        previous: state.state,
+      newRobots[move.robotIdx] = {x: move.pos.x, y: move.pos.y, idx: move.robotIdx}
+      const stateHash = this.getStateHash(newRobots, state.goalVisited)
+      if(this.states.has(stateHash)) continue
+
+      const newState: State = {
+        hash: stateHash,
+        previous: state.hash,
         robots: newRobots,
         lastMoveDirection: move.dir,
-        lastMoveRobotIdx: robotIndex,
+        lastMoveRobotIdx: move.robotIdx,
         goalVisited: state.goalVisited,
         moves: state.moves+1
       }
-    })
+
+      this.checkIfShortestRouteFound(newState)
+      this.statesQueue.push(newState.hash)
+      this.states.set(newState.hash, newState)
+    }
   }
 }
 
@@ -241,6 +267,3 @@ function getUsedRobots(route: State[]): number[] {
   const makeUnique = (arr: any[]) => [...new Set(arr)]
   return makeUnique(route.map(route => route.lastMoveRobotIdx)).sort()
 }
-
-
-

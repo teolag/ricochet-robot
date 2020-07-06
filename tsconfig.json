@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es2016",
+    "target": "es2018",
     "module": "commonjs",
-    "lib": ["es2016", "dom", "webworker"],
+    "lib": ["es2019", "dom", "webworker"],
     "sourceMap": true,
     "outDir": "./docs/js"
   }

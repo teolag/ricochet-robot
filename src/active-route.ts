@@ -3,7 +3,14 @@ import { Direction } from "./models/Direction"
 import { Robot } from "./models/Robot"
 import * as Game from "./game"
 
-const route: {robotIndex: number, direction: Direction, robots: Robot[]}[] = []
+interface Move {
+  robotIndex: number,
+  direction: Direction,
+  robots: Robot[],
+  goalVisited: boolean
+}
+
+const route: Move[] = []
 const movesCounter = getElementById('movesCounter')
 const undoButton = getButton('btnUndo')
 const resetButton = getButton('btnReset')
@@ -21,8 +28,8 @@ export function reset() {
   updateUI()
 }
 
-export function addMove(robotIndex: number, direction: Direction, robots: Robot[]) {
-  route.push({direction, robotIndex, robots})
+export function addMove(robotIndex: number, direction: Direction, robots: Robot[], goalVisited: boolean) {
+  route.push({direction, robotIndex, robots, goalVisited})
   updateUI()
 }
 
@@ -32,13 +39,15 @@ export function getMovesCount() {
 
 function undoLastMove() {
   if(route.length === 1) {
-    reset()
+    Game.resetLevel()
     return
   }
 
   route.pop()
   updateUI()
-  const lastRobots = route[route.length-1].robots
+  const lastMove = route[route.length-1]
+  const lastRobots = lastMove.robots
+  Game.setGoalVisited(lastMove.goalVisited)
   Game.setRobotsPostitions(lastRobots)
 }
 
