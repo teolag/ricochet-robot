@@ -71,7 +71,7 @@ function generateLevelData({width, height, wallsCount, seed, robotCount}: Genera
   })
   
   const tile = randomTiles.pop()
-  const color = 0//Math.floor(Math.random()*robots)
-  const goal = new Goal(tile.x, tile.y, color)
+  const robotIndex = 0//Math.floor(Math.random()*robots)
+  const goal = new Goal(tile.x, tile.y, robotIndex)
   return {goal, robots, board}
 }

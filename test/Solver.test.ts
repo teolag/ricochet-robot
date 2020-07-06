@@ -25,17 +25,16 @@ describe("solve", () => {
 })
 
 describe("Performance", () => {
-  it.skip("Solve a 11 steps level in about 2.5s", function () {
+  it.only("Solve a 10 steps level in about 2.5s", function () {
     this.timeout(20000)
     const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 422367})
     const solver = new Solver(level)
-    let now = new Date().getTime()
-    solver.onProgress((data => {
-      console.log("Progress", new Date().getTime() - now, data)
-      now = new Date().getTime()
-    }), 10000)
+    solver.onProgress((data => {console.log("Progress", data)}), 10000)
     const result = solver.solve()
     console.log("Solver result", result)
+    expect(result.isRouteFound).to.be.true
+    expect(result.statesChecked).to.equal(122231)
+    expect(result.route.length).to.equal(10)
   })
 
   it.skip("Try to solve a too difficult there-and-back-again level", function () {
@@ -43,10 +42,7 @@ describe("Performance", () => {
     const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 661950})
     const solver = new Solver(level, {abortAfter: 1000000, backAgain: true})
     let now = new Date().getTime()
-    solver.onProgress((data => {
-      console.log("Progress", new Date().getTime() - now, data)
-      now = new Date().getTime()
-    }), 30000)
+    solver.onProgress((data => {console.log("Progress", data)}), 10000)
     const result = solver.solve()
     console.log("Solver result", result)
   })

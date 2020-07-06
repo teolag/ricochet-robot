@@ -144,7 +144,7 @@ export class GameBoard {
 
   private drawGoal(ctx: CanvasRenderingContext2D) {
     ctx.save()
-    ctx.strokeStyle = colors[this.goal.color]
+    ctx.strokeStyle = colors[this.goal.robotIdx]
     ctx.lineWidth = 5
     ctx.translate(this.goal.x*tileSize, this.goal.y*tileSize)
     ctx.beginPath()

@@ -1,1 +1,221 @@
-!function(t){var e={};function s(o){if(e[o])return e[o].exports;var r=e[o]={i:o,l:!1,exports:{}};return t[o].call(r.exports,r,r.exports,s),r.l=!0,r.exports}s.m=t,s.c=e,s.d=function(t,e,o){s.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:o})},s.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},s.t=function(t,e){if(1&e&&(t=s(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var o=Object.create(null);if(s.r(o),Object.defineProperty(o,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var r in t)s.d(o,r,function(e){return t[e]}.bind(null,r));return o},s.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return s.d(e,"a",e),e},s.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},s.p="",s(s.s=17)}([function(t,e,s){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Board=e.Wall=void 0;const o=s(2);var r;!function(t){t[t.NORTH=1]="NORTH",t[t.WEST=2]="WEST",t[t.EAST=4]="EAST",t[t.SOUTH=8]="SOUTH"}(r=e.Wall||(e.Wall={}));e.Board=class{constructor(t,e){this.h=t,this.w=e,this.tiles=new Array(t).fill(null).map(()=>new Array(e).fill(0)),this.addTopWalls(),this.addBottomWalls(),this.addLeftWalls(),this.addRightWalls()}getTilesString(){return this.tiles.map(t=>t.map(t=>t.toString(16)).join("")).join("")}setTiles(t){if(t.length!==this.w*this.h)throw Error(`Unable to set tiles. tiles.length was ${t.length}, expected ${this.w*this.h}`);const e=t.split("").map(t=>parseInt(t,16));this.tiles=new Array(this.h).fill(null).map((t,s)=>e.slice(s*this.w,s*this.w+this.w))}addWall(t,e,s){if(t<0||t>=this.w)throw Error(`x must be between 0 and ${this.w-1}, was: ${t}`);if(e<0||e>=this.h)throw Error(`y must be between 0 and ${this.h-1}, was: ${e}`);this.addSingleWall(t,e,s);const o=this.getTileBehindTheWall(t,e,s);if(o){const t=this.getOppositeWall(s);this.addSingleWall(o.x,o.y,t)}}addRandomWalls(t){let e=0,s=0;for(;e<t&&s<1e3;){s++;const t=o.randomOne([r.NORTH,r.EAST,r.WEST,r.SOUTH]),i=o.randomInt(0,this.w-1),n=o.randomInt(0,this.h-1);this.tiles[n][i]&t||(this.addWall(i,n,t),e++)}}addSingleWall(t,e,s){const o=this.tiles[e][t];this.tiles[e][t]=o|s}getTileBehindTheWall(t,e,s){return s===r.NORTH&&e>0?{x:t,y:e-1}:s===r.WEST&&t>0?{x:t-1,y:e}:s===r.EAST&&t+1<this.w?{x:t+1,y:e}:s===r.SOUTH&&e+1<this.h?{x:t,y:e+1}:null}getOppositeWall(t){switch(t){case r.NORTH:return r.SOUTH;case r.SOUTH:return r.NORTH;case r.EAST:return r.WEST;case r.WEST:return r.EAST;default:throw Error("Invalid wall "+t)}}addTopWalls(){for(let t=0;t<this.w;t++)this.addSingleWall(t,0,r.NORTH)}addBottomWalls(){for(let t=0;t<this.w;t++)this.addSingleWall(t,this.h-1,r.SOUTH)}addLeftWalls(){for(let t=0;t<this.h;t++)this.addSingleWall(0,t,r.WEST)}addRightWalls(){for(let t=0;t<this.h;t++)this.addSingleWall(this.w-1,t,r.EAST)}}},function(t,e,s){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Direction=void 0,function(t){t.UP="UP",t.LEFT="LEFT",t.RIGHT="RIGHT",t.DOWN="DOWN"}(e.Direction||(e.Direction={}))},function(t,e,s){"use strict";let o,r;function i(t,e){if(null==t)throw new Error("Invalid parameters, enter max, or max and min values");if(null==e&&(e=0),t<e)var s=t,o=e;else s=e,o=t;return s+Math.floor(l()*(o+1-s))}function n(t,e){if(null==t)throw new Error("Invalid parameters, enter max, or max and min values");if(null==e&&(e=0),t<e)var s=t,o=e;else s=e,o=t;return s+l()*(o-s)}Object.defineProperty(e,"__esModule",{value:!0}),e.getHash=e.shuffleCopy=e.shuffle=e.getSeed=e.setRandomSeed=e.setSeed=e.randomOne=e.randomItems=e.randomBool=e.randomFloats=e.randomFloat=e.randomInts=e.randomInt=void 0,u(),e.randomInt=i,e.randomInts=function(t,e,s){for(var o=[],r=0;r<t;r++)o.push(i(e,s));return o},e.randomFloat=n,e.randomFloats=function(t,e,s){for(var o=[],r=0;r<t;r++)o.push(n(e,s));return o},e.randomBool=function(t){return void 0===t&&(t=.5),l()<t},e.randomItems=function(t,e,s){if(s){for(var o=[],r=0;r<e;r++)o.push(t[i(0,t.length-1)]);return o}return(t=d(t)).slice(0,e)},e.randomOne=function(t){return t[i(0,t.length-1)]};var a,l=(a=Math.pow(2,32),function(){return r=(1664525*r+1013904223)%a,r/a});function h(t){o=t,r=t}function u(){h(Math.floor(Math.random()*Number.MAX_SAFE_INTEGER))}function c(t){var e,s,o;for(o=t.length;o;o-=1)e=Math.floor(l()*o),s=t[o-1],t[o-1]=t[e],t[e]=s;return t}function d(t){return c(t.slice(0))}e.setSeed=h,e.setRandomSeed=u,e.getSeed=function(){return o},e.shuffle=c,e.shuffleCopy=d,e.getHash=function(t){var e,s,o=0;if(0===t.length)return o;for(e=0,s=t.length;e<s;e++)o=(o<<5)-o+t.charCodeAt(e),o|=0;return o}},,function(t,e,s){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.cloneRobots=e.Robot=void 0;class o{constructor(t,e,s){this.idx=t,this.x=e,this.y=s}getPos(){return{x:this.x,y:this.y}}setPos(t){this.x=t.x,this.y=t.y}clone(){return new o(this.idx,this.x,this.y)}}e.Robot=o,e.cloneRobots=function(t){return t.map(t=>t.clone())}},function(t,e,s){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Level=void 0;const o=s(0),r=s(4),i=s(6),n=s(2);e.Level=class{constructor(t){if("string"==typeof t){const e=t,[s,n,a,...l]=e.split("|"),h=parseInt(s),u=n.length/h,c=parseInt(a);this.goal=new i.Goal(c%h,Math.floor(c/h),0),this.robots=l.map(Number).map((t,e)=>new r.Robot(e,t%h,Math.floor(t/h))),this.board=new o.Board(u,h),this.board.setTiles(n)}else{const{board:e,robots:s,goal:a}=function({width:t,height:e,wallsCount:s,seed:a,robotCount:l}){n.setSeed(a);const h=new o.Board(e,t);h.addRandomWalls(s);const u=[];for(let t=0;t<h.w;t++)for(let e=0;e<h.h;e++)u.push({x:t,y:e});const c=n.shuffle(u),d=new Array(l).fill(null).map((t,e)=>{const s=c.pop();return new r.Robot(e,s.x,s.y)}),f=c.pop();return{goal:new i.Goal(f.x,f.y,0),robots:d,board:h}}(t);this.board=e,this.robots=s,this.goal=a}}pos2num(t){return t.x+t.y*this.board.w}getLevelString(){const t=this.pos2num(this.goal),e=this.board.getTilesString(),s=this.robots.map(t=>this.pos2num(t)).join("|");return`${this.board.w}|${e}|${t}|${s}`}}},function(t,e,s){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Goal=void 0;e.Goal=class{constructor(t,e,s){this.x=t,this.y=e,this.color=s}}},,function(t,e,s){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.SolverWorkerMessage=void 0,function(t){t.PING="PING",t.PONG="PONG",t.SOLVE="SOLVE",t.SOLVE_END="SOLVE_END",t.SOLVE_PROGRESS="SOLVE_PROGRESS"}(e.SolverWorkerMessage||(e.SolverWorkerMessage={}))},function(t,e,s){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.hasWall=e.goEast=e.goWest=e.goSouth=e.goNorth=void 0;const o=s(0),r=s(1);function i(t,e,s,o){return 0!=(t.tiles[s][e]&o)}e.goNorth=function(t,e,s){const n={x:e.x,y:e.y},a=Math.max(...s.filter(t=>t.x===n.x&&t.y<n.y).map(t=>t.y));for(;n.y>0&&(n.y-1!==a&&!i(t,n.x,n.y,o.Wall.NORTH));n.y--);return n.y===e.y?null:{pos:n,dir:r.Direction.UP}},e.goSouth=function(t,e,s){const n={x:e.x,y:e.y},a=Math.min(...s.filter(t=>t.x===e.x&&t.y>n.y).map(t=>t.y));for(;n.y<t.h&&(n.y+1!==a&&!i(t,e.x,n.y,o.Wall.SOUTH));n.y++);return n.y===e.y?null:{pos:n,dir:r.Direction.DOWN}},e.goWest=function(t,e,s){const n={x:e.x,y:e.y},a=Math.max(...s.filter(t=>t.y===n.y&&t.x<n.x).map(t=>t.x));for(;n.x>0&&(n.x-1!==a&&!i(t,n.x,n.y,o.Wall.WEST));n.x--);return n.x===e.x?null:{pos:n,dir:r.Direction.LEFT}},e.goEast=function(t,e,s){const n={x:e.x,y:e.y},a=Math.min(...s.filter(t=>t.y===n.y&&t.x>n.x).map(t=>t.x));for(;n.x<t.w&&(n.x+1!==a&&!i(t,n.x,n.y,o.Wall.EAST));n.x++);return n.x===e.x?null:{pos:n,dir:r.Direction.RIGHT}},e.hasWall=i},,,,,,,,function(t,e,s){"use strict";Object.defineProperty(e,"__esModule",{value:!0});const o=s(18),r=s(8),i=s(5);function n(t){postMessage({type:r.SolverWorkerMessage.SOLVE_END,result:t}),close()}function a(t){postMessage({type:r.SolverWorkerMessage.SOLVE_PROGRESS,progress:t})}self.onmessage=function(t){switch(t.data.type){case r.SolverWorkerMessage.SOLVE:{const e=new i.Level(t.data.levelString),s=new o.Solver(e,{backAgain:t.data.backAgain});s.onComplete(n),s.onProgress(a),s.solve();break}default:throw Error("Worker recieved an unknown message"+t.data.type)}}},function(t,e,s){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.Solver=void 0;const o=s(9),r=t=>null!==t;function i(t){if(!t)return[];return e=t.map(t=>t.color),[...new Set(e)];var e}e.Solver=class{constructor(t,e={}){this.checkedStates=new Set,this.statesQueue=[],this.states=new Map,this.routeFound=!1,this.aborted=!1,this.allStatesChecked=!1,this.running=!1,this.progressRatio=1e3,this.duration=0,this.nextIndex=0,this.pos2num=t=>t.x+t.y*this.board.w,this.getState=(t,e)=>this.pos2num(t[0])+(e?"Y":"N")+t.slice(1).map(t=>this.pos2num(t)).sort().join("|");const{backAgain:s=!1,abortAfter:o=5e5}=e;this.board=t.board,this.robots=t.robots,this.goal=t.goal,this.goalTile=this.pos2num(this.goal),this.mainHomeTile=this.pos2num(this.robots[this.goal.color]),this.backAgain=s,this.abortAfter=o}solve(){const t=this.getState(this.robots,!1);this.statesQueue.push(t),this.states.set(t,{moves:0,state:t,robots:this.robots.slice(),goalVisited:!1});const e=new Date;for(this.running=!0;this.running;)n.time("check-next",()=>{this.checkNext()});this.duration=((new Date).getTime()-e.getTime())/1e3;const s=this.getResult();return this.completeCallback&&this.completeCallback(s),this.statesQueue.length=0,this.states.clear(),this.checkedStates.clear(),s}isRouteFound(){return this.routeFound}getResult(){return{duration:this.duration,statesChecked:this.checkedStates.size,isRouteFound:this.routeFound,isAllStatesChecked:this.allStatesChecked,isAborted:this.aborted,route:this.foundRoute,robotsUsed:i(this.foundRoute),minMoves:this.minMoves,timers:n.getTotals()}}onComplete(t){this.completeCallback=t}onProgress(t,e=1e3){this.progressRatio=e,this.progressCallback=t}checkNext(){const t=this.statesQueue[this.nextIndex++];if(void 0===t)return this.allStatesChecked=!0,void(this.running=!1);const e=this.states.get(t);if(this.checkedStates.size===this.abortAfter)return this.minMoves=e.moves,this.aborted=!0,void(this.running=!1);this.progressCallback&&this.checkedStates.size%this.progressRatio==0&&this.progressCallback({checkedStates:this.checkedStates.size,currentMovesCount:e.moves,timers:n.getAndClear()}),e.robots.forEach((t,s)=>{let o;n.time("get-new-states",()=>{o=this.getNewStates(e,s)}),o.filter(t=>{let e;return n.time("has-state",()=>{e=!this.states.has(t.state)}),e}).forEach(t=>{this.checkIfShortestRouteFound(t),this.statesQueue.push(t.state),this.states.set(t.state,t)})}),this.checkedStates.add(t)}checkIfShortestRouteFound(t){if(t.color!==this.goal.color)return;const e=t.robots[this.goal.color];this.isAtGoal(e)?(this.backAgain||this.shortestRouteFound(t),t.goalVisited=!0):this.backAgain&&t.goalVisited&&this.isAtHome(e)&&this.shortestRouteFound(t)}isAtGoal(t){return this.pos2num(t)===this.goalTile}isAtHome(t){return this.pos2num(t)===this.mainHomeTile}shortestRouteFound(t){this.routeFound=!0,this.running=!1;let e=t;for(this.foundRoute=[];e.previous;){this.foundRoute.unshift(e);const t=this.states.get(e.previous);if(void 0===t)throw Error(`state ${e.previous} not found`);e=t}}getNewStates(t,e){const s=t.robots[e],i=t.robots.filter(t=>t.idx!==e);return[o.goNorth(this.board,s,i),o.goWest(this.board,s,i),o.goEast(this.board,s,i),o.goSouth(this.board,s,i)].filter(r).map(s=>{const o=t.robots.slice();o[e]={x:s.pos.x,y:s.pos.y,idx:o[e].idx};return{state:this.getState(o,t.goalVisited),previous:t.state,robots:o,dir:s.dir,color:e,goalVisited:t.goalVisited,moves:t.moves+1}})}};const n=function(){const t={};return{time:function(e,s){const o=(new Date).getTime();s();const r=(new Date).getTime();t[e]=(t[e]||0)+r-o,e.startsWith("total-")||(t["total-"+e]=(t["total-"+e]||0)+r-o)},getAndClear:function(){const e={};return Object.entries(t).forEach(([s,o])=>{s.startsWith("total-")||(e[s]=o,t[s]=0)}),e},getTotals:function(){const e={};return Object.entries(t).forEach(([t,s])=>{t.startsWith("total-")&&(e[t]=s)}),e}}}()}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/solver-worker.ts");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./src/Solver.ts":
+/*!***********************!*\
+  !*** ./src/Solver.ts ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.Solver = void 0;\nconst solver_utils_1 = __webpack_require__(/*! ./solver-utils */ \"./src/solver-utils.ts\");\nconst Timer_1 = __webpack_require__(/*! ./libs/Timer */ \"./src/libs/Timer.ts\");\nconst STATE_DELIMITER = '|';\nconst notNull = (value) => value !== null;\nclass Solver {\n    constructor(level, options = {}) {\n        this.currentStateIndex = 0;\n        this.statesQueue = [];\n        this.states = new Map();\n        this.routeFound = false;\n        this.aborted = false;\n        this.allStatesChecked = false;\n        this.running = false;\n        this.progressRatio = 1000;\n        this.duration = 0;\n        this.pos2num = (pos) => pos.x + pos.y * this.board.w;\n        this.getState = (robots, goalVisited) => {\n            const mainRobot = this.pos2num(robots[0]);\n            const helpers = robots.slice(1).map(r => this.pos2num(r)).sort().join(STATE_DELIMITER);\n            const hash = mainRobot + (goalVisited ? 'Y' : 'N') + helpers;\n            return hash;\n        };\n        const { backAgain = false, abortAfter = 500000 } = options;\n        this.board = level.board;\n        this.robots = level.robots;\n        this.goal = level.goal;\n        this.goalTile = this.pos2num(this.goal);\n        this.mainHomeTile = this.pos2num(this.robots[this.goal.robotIdx]);\n        this.backAgain = backAgain;\n        this.abortAfter = abortAfter;\n    }\n    solve() {\n        const startState = this.getState(this.robots, false);\n        this.statesQueue.push(startState);\n        this.states.set(startState, { moves: 0, state: startState, lastMoveDirection: null, lastMoveRobotIdx: null, robots: this.robots.slice(), goalVisited: false });\n        const start = new Date();\n        this.running = true;\n        while (this.running) {\n            Timer_1.default.time('check-next', () => this.checkNext());\n        }\n        this.duration = (new Date().getTime() - start.getTime()) / 1000;\n        const result = this.getResult();\n        if (this.completeCallback) {\n            this.completeCallback(result);\n        }\n        this.statesQueue.length = 0;\n        this.states.clear();\n        return result;\n    }\n    isRouteFound() {\n        return this.routeFound;\n    }\n    getResult() {\n        return {\n            duration: this.duration,\n            statesChecked: this.currentStateIndex,\n            isRouteFound: this.routeFound,\n            isAllStatesChecked: this.allStatesChecked,\n            isAborted: this.aborted,\n            route: this.foundRoute,\n            robotsUsed: getUsedRobots(this.foundRoute),\n            minMoves: this.minMoves,\n            timers: Timer_1.default.getTotals()\n        };\n    }\n    onComplete(callback) {\n        this.completeCallback = callback;\n    }\n    onProgress(callback, sendProgressEvery = 1000) {\n        this.progressRatio = sendProgressEvery;\n        this.progressCallback = callback;\n    }\n    checkNext() {\n        const nextStateHash = Timer_1.default.time('get-next-state-hash', () => this.statesQueue[this.currentStateIndex]);\n        if (nextStateHash === undefined) {\n            this.allStatesChecked = true;\n            this.running = false;\n            return;\n        }\n        const state = Timer_1.default.time('get-next-state', () => this.states.get(nextStateHash));\n        if (this.currentStateIndex === this.abortAfter) {\n            this.minMoves = state.moves;\n            this.aborted = true;\n            this.running = false;\n            return;\n        }\n        if (this.progressCallback && (this.currentStateIndex % this.progressRatio === 0)) {\n            this.progressCallback({ checkedStates: this.currentStateIndex, currentMovesCount: state.moves, timers: Timer_1.default.getAndClear() });\n        }\n        // console.debug(\"Checking\", state, robots[nextStateHash.color], nextStateHash.dir, nextStateHash.previous)\n        state.robots.forEach((_, idx) => {\n            Timer_1.default.time('get-new-states', () => this.getNewStates(state, idx))\n                .filter(newState => Timer_1.default.time('has-state', () => !this.states.has(newState.state)))\n                .forEach(newState => {\n                Timer_1.default.time('check-win', () => this.checkIfShortestRouteFound(newState));\n                Timer_1.default.time('add-states', () => {\n                    this.statesQueue.push(newState.state);\n                    this.states.set(newState.state, newState);\n                });\n            });\n        });\n        this.currentStateIndex++;\n    }\n    checkIfShortestRouteFound(state) {\n        if (state.lastMoveRobotIdx !== this.goal.robotIdx)\n            return;\n        const goalRobot = state.robots[this.goal.robotIdx];\n        if (this.isAtGoal(goalRobot)) {\n            if (!this.backAgain) {\n                this.shortestRouteFound(state);\n            }\n            state.goalVisited = true;\n        }\n        else if (this.backAgain && state.goalVisited && this.isAtHome(goalRobot)) {\n            this.shortestRouteFound(state);\n        }\n    }\n    isAtGoal(mainRobot) {\n        return this.pos2num(mainRobot) === this.goalTile;\n    }\n    isAtHome(mainRobot) {\n        return this.pos2num(mainRobot) === this.mainHomeTile;\n    }\n    shortestRouteFound(thisState) {\n        this.routeFound = true;\n        this.running = false;\n        let state = thisState;\n        this.foundRoute = [];\n        while (state.previous) {\n            this.foundRoute.unshift(state);\n            const nextState = this.states.get(state.previous);\n            if (nextState === undefined)\n                throw Error(`state ${state.previous} not found`);\n            state = nextState;\n        }\n    }\n    getNewStates(state, robotIndex) {\n        // TODO:  make faster!!\n        // pre-calculate all stops for every tile (exl. helper robots)?\n        const robot = state.robots[robotIndex];\n        const otherRobots = state.robots.filter(r => r.idx !== robotIndex);\n        return [\n            solver_utils_1.goNorth(this.board, robot, otherRobots),\n            solver_utils_1.goWest(this.board, robot, otherRobots),\n            solver_utils_1.goEast(this.board, robot, otherRobots),\n            solver_utils_1.goSouth(this.board, robot, otherRobots)\n        ].filter(notNull).map(move => {\n            const newRobots = state.robots.slice();\n            newRobots[robotIndex] = { x: move.pos.x, y: move.pos.y, idx: newRobots[robotIndex].idx };\n            const stateHash = this.getState(newRobots, state.goalVisited);\n            return {\n                state: stateHash,\n                previous: state.state,\n                robots: newRobots,\n                lastMoveDirection: move.dir,\n                lastMoveRobotIdx: robotIndex,\n                goalVisited: state.goalVisited,\n                moves: state.moves + 1\n            };\n        });\n    }\n}\nexports.Solver = Solver;\nfunction getUsedRobots(route) {\n    if (!route)\n        return [];\n    const makeUnique = (arr) => [...new Set(arr)];\n    return makeUnique(route.map(route => route.lastMoveRobotIdx)).sort();\n}\n\n\n//# sourceURL=webpack:///./src/Solver.ts?");
+
+/***/ }),
+
+/***/ "./src/libs/Slumpa.ts":
+/*!****************************!*\
+  !*** ./src/libs/Slumpa.ts ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.getHash = exports.shuffleCopy = exports.shuffle = exports.getSeed = exports.setRandomSeed = exports.setSeed = exports.randomOne = exports.randomItems = exports.randomBool = exports.randomFloats = exports.randomFloat = exports.randomInts = exports.randomInt = void 0;\nlet initSeed, seed;\nsetRandomSeed();\nfunction randomInt(a, b) {\n    if (a == undefined) {\n        throw new Error(\"Invalid parameters, enter max, or max and min values\");\n    }\n    if (b == undefined)\n        b = 0;\n    if (a < b)\n        var min = a, max = b;\n    else\n        var min = b, max = a;\n    return min + (Math.floor(rnd() * (max + 1 - min)));\n}\nexports.randomInt = randomInt;\nfunction randomInts(count, a, b) {\n    var ints = [];\n    for (var i = 0; i < count; i++) {\n        ints.push(randomInt(a, b));\n    }\n    return ints;\n}\nexports.randomInts = randomInts;\nfunction randomFloat(a, b) {\n    if (a == undefined) {\n        throw new Error(\"Invalid parameters, enter max, or max and min values\");\n    }\n    if (b == undefined)\n        b = 0;\n    if (a < b)\n        var min = a, max = b;\n    else\n        var min = b, max = a;\n    return min + (rnd() * (max - min));\n}\nexports.randomFloat = randomFloat;\nfunction randomFloats(c, a, b) {\n    var floats = [];\n    for (var i = 0; i < c; i++) {\n        floats.push(randomFloat(a, b));\n    }\n    return floats;\n}\nexports.randomFloats = randomFloats;\nfunction randomBool(probability) {\n    if (probability === undefined)\n        probability = 0.5;\n    return rnd() < probability ? true : false;\n}\nexports.randomBool = randomBool;\nfunction randomItems(arr, values, putBack) {\n    if (putBack) {\n        var result = [];\n        for (var i = 0; i < values; i++) {\n            result.push(arr[randomInt(0, arr.length - 1)]);\n        }\n        return result;\n    }\n    else {\n        arr = shuffleCopy(arr);\n        return arr.slice(0, values);\n    }\n}\nexports.randomItems = randomItems;\nfunction randomOne(arr) {\n    return arr[randomInt(0, arr.length - 1)];\n}\nexports.randomOne = randomOne;\nvar rnd = (function () {\n    var a = 1664525, c = 1013904223, m = Math.pow(2, 32);\n    return function () {\n        seed = (a * seed + c) % m;\n        return seed / m;\n    };\n}());\nfunction setSeed(newSeed) {\n    initSeed = newSeed;\n    seed = newSeed;\n}\nexports.setSeed = setSeed;\nfunction setRandomSeed() {\n    setSeed(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));\n}\nexports.setRandomSeed = setRandomSeed;\nfunction getSeed() {\n    return initSeed;\n}\nexports.getSeed = getSeed;\nfunction shuffle(arr) {\n    var j, tmp, i;\n    for (i = arr.length; i; i -= 1) {\n        j = Math.floor(rnd() * i);\n        tmp = arr[i - 1];\n        arr[i - 1] = arr[j];\n        arr[j] = tmp;\n    }\n    return arr;\n}\nexports.shuffle = shuffle;\nfunction shuffleCopy(arr) {\n    return shuffle(arr.slice(0));\n}\nexports.shuffleCopy = shuffleCopy;\nfunction getHash(str) {\n    var hash = 0, i, chr, len;\n    if (str.length === 0)\n        return hash;\n    for (i = 0, len = str.length; i < len; i++) {\n        chr = str.charCodeAt(i);\n        hash = ((hash << 5) - hash) + chr;\n        hash |= 0; // Convert to 32bit integer\n    }\n    return hash;\n}\nexports.getHash = getHash;\n;\n\n\n//# sourceURL=webpack:///./src/libs/Slumpa.ts?");
+
+/***/ }),
+
+/***/ "./src/libs/Timer.ts":
+/*!***************************!*\
+  !*** ./src/libs/Timer.ts ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.default = (function () {\n    const results = {};\n    function time(name, fn) {\n        const start = new Date().getTime();\n        const resp = fn();\n        const end = new Date().getTime();\n        results[name] = (results[name] || 0) + end - start;\n        if (!name.startsWith('total-')) {\n            results['total-' + name] = (results['total-' + name] || 0) + end - start;\n        }\n        return resp;\n    }\n    function getAndClear() {\n        const out = {};\n        Object.entries(results).forEach(([key, value]) => {\n            if (key.startsWith('total-'))\n                return;\n            out[key] = value;\n            results[key] = 0;\n        });\n        return out;\n    }\n    function getTotals() {\n        const out = {};\n        Object.entries(results).forEach(([key, value]) => {\n            if (!key.startsWith('total-'))\n                return;\n            out[key] = value;\n        });\n        return out;\n    }\n    return {\n        time, getAndClear, getTotals\n    };\n}());\n\n\n//# sourceURL=webpack:///./src/libs/Timer.ts?");
+
+/***/ }),
+
+/***/ "./src/models/Board.ts":
+/*!*****************************!*\
+  !*** ./src/models/Board.ts ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.Board = exports.Wall = void 0;\nconst Slumpa = __webpack_require__(/*! ../libs/Slumpa */ \"./src/libs/Slumpa.ts\");\nvar Wall;\n(function (Wall) {\n    Wall[Wall[\"NORTH\"] = 1] = \"NORTH\";\n    Wall[Wall[\"WEST\"] = 2] = \"WEST\";\n    Wall[Wall[\"EAST\"] = 4] = \"EAST\";\n    Wall[Wall[\"SOUTH\"] = 8] = \"SOUTH\";\n})(Wall = exports.Wall || (exports.Wall = {}));\nclass Board {\n    constructor(height, width) {\n        this.h = height;\n        this.w = width;\n        this.tiles = new Array(height).fill(null).map(() => new Array(width).fill(0));\n        this.addTopWalls();\n        this.addBottomWalls();\n        this.addLeftWalls();\n        this.addRightWalls();\n    }\n    getTilesString() {\n        return this.tiles.map(row => row.map(tile => tile.toString(16)).join('')).join('');\n    }\n    setTiles(tiles) {\n        if (tiles.length !== this.w * this.h)\n            throw Error(`Unable to set tiles. tiles.length was ${tiles.length}, expected ${this.w * this.h}`);\n        const numbers = tiles.split('').map(t => parseInt(t, 16));\n        this.tiles = new Array(this.h).fill(null).map((_, y) => numbers.slice(y * this.w, y * this.w + this.w));\n    }\n    addWall(x, y, wall) {\n        if (x < 0 || x >= this.w)\n            throw Error(`x must be between 0 and ${this.w - 1}, was: ${x}`);\n        if (y < 0 || y >= this.h)\n            throw Error(`y must be between 0 and ${this.h - 1}, was: ${y}`);\n        this.addSingleWall(x, y, wall);\n        const neighbour = this.getTileBehindTheWall(x, y, wall);\n        if (neighbour) {\n            const oppositeWall = this.getOppositeWall(wall);\n            this.addSingleWall(neighbour.x, neighbour.y, oppositeWall);\n        }\n    }\n    addRandomWalls(wallCount) {\n        let builtWalls = 0;\n        let attempt = 0;\n        while (builtWalls < wallCount && attempt < 1000) {\n            attempt++;\n            const wallType = Slumpa.randomOne([Wall.NORTH, Wall.EAST, Wall.WEST, Wall.SOUTH]);\n            const x = Slumpa.randomInt(0, this.w - 1);\n            const y = Slumpa.randomInt(0, this.h - 1);\n            const hasWall = this.tiles[y][x] & wallType;\n            if (hasWall)\n                continue;\n            this.addWall(x, y, wallType);\n            builtWalls++;\n        }\n    }\n    addSingleWall(x, y, wall) {\n        const value = this.tiles[y][x];\n        this.tiles[y][x] = value | wall;\n    }\n    getTileBehindTheWall(x, y, wall) {\n        if (wall === Wall.NORTH && y > 0)\n            return { x, y: y - 1 };\n        if (wall === Wall.WEST && x > 0)\n            return { x: x - 1, y };\n        if (wall === Wall.EAST && x + 1 < this.w)\n            return { x: x + 1, y };\n        if (wall === Wall.SOUTH && y + 1 < this.h)\n            return { x, y: y + 1 };\n        return null;\n    }\n    getOppositeWall(wall) {\n        switch (wall) {\n            case Wall.NORTH: return Wall.SOUTH;\n            case Wall.SOUTH: return Wall.NORTH;\n            case Wall.EAST: return Wall.WEST;\n            case Wall.WEST: return Wall.EAST;\n            default: throw Error(\"Invalid wall \" + wall);\n        }\n    }\n    addTopWalls() {\n        for (let x = 0; x < this.w; x++) {\n            this.addSingleWall(x, 0, Wall.NORTH);\n        }\n    }\n    addBottomWalls() {\n        for (let x = 0; x < this.w; x++) {\n            this.addSingleWall(x, this.h - 1, Wall.SOUTH);\n        }\n    }\n    addLeftWalls() {\n        for (let y = 0; y < this.h; y++) {\n            this.addSingleWall(0, y, Wall.WEST);\n        }\n    }\n    addRightWalls() {\n        for (let y = 0; y < this.h; y++) {\n            this.addSingleWall(this.w - 1, y, Wall.EAST);\n        }\n    }\n}\nexports.Board = Board;\n\n\n//# sourceURL=webpack:///./src/models/Board.ts?");
+
+/***/ }),
+
+/***/ "./src/models/Direction.ts":
+/*!*********************************!*\
+  !*** ./src/models/Direction.ts ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.Direction = void 0;\nvar Direction;\n(function (Direction) {\n    Direction[\"UP\"] = \"UP\";\n    Direction[\"LEFT\"] = \"LEFT\";\n    Direction[\"RIGHT\"] = \"RIGHT\";\n    Direction[\"DOWN\"] = \"DOWN\";\n})(Direction = exports.Direction || (exports.Direction = {}));\n\n\n//# sourceURL=webpack:///./src/models/Direction.ts?");
+
+/***/ }),
+
+/***/ "./src/models/Goal.ts":
+/*!****************************!*\
+  !*** ./src/models/Goal.ts ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.Goal = void 0;\nclass Goal {\n    constructor(x, y, robotIdx) {\n        this.x = x;\n        this.y = y;\n        this.robotIdx = robotIdx;\n    }\n}\nexports.Goal = Goal;\n\n\n//# sourceURL=webpack:///./src/models/Goal.ts?");
+
+/***/ }),
+
+/***/ "./src/models/Level.ts":
+/*!*****************************!*\
+  !*** ./src/models/Level.ts ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.Level = void 0;\nconst Board_1 = __webpack_require__(/*! ./Board */ \"./src/models/Board.ts\");\nconst Robot_1 = __webpack_require__(/*! ./Robot */ \"./src/models/Robot.ts\");\nconst Goal_1 = __webpack_require__(/*! ./Goal */ \"./src/models/Goal.ts\");\nconst Slumpa = __webpack_require__(/*! ../libs/Slumpa */ \"./src/libs/Slumpa.ts\");\nconst LEVEL_STRING_DELIMITER = '|';\nclass Level {\n    constructor(input) {\n        if (typeof input === \"string\") {\n            const levelString = input;\n            const [widthStr, tiles, goalStr, ...robotsStr] = levelString.split(LEVEL_STRING_DELIMITER);\n            const width = parseInt(widthStr);\n            const height = tiles.length / width;\n            const goal = parseInt(goalStr);\n            this.goal = new Goal_1.Goal(goal % width, Math.floor(goal / width), 0);\n            this.robots = robotsStr.map(Number).map((r, i) => new Robot_1.Robot(i, r % width, Math.floor(r / width)));\n            this.board = new Board_1.Board(height, width);\n            this.board.setTiles(tiles);\n        }\n        else {\n            const { board, robots, goal } = generateLevelData(input);\n            this.board = board;\n            this.robots = robots;\n            this.goal = goal;\n        }\n    }\n    pos2num(pos) {\n        return pos.x + pos.y * this.board.w;\n    }\n    getLevelString() {\n        const goalStr = this.pos2num(this.goal);\n        const tiles = this.board.getTilesString();\n        const robotsStr = this.robots.map(r => this.pos2num(r)).join(LEVEL_STRING_DELIMITER);\n        return `${this.board.w}|${tiles}|${goalStr}|${robotsStr}`;\n    }\n}\nexports.Level = Level;\nfunction generateLevelData({ width, height, wallsCount, seed, robotCount }) {\n    Slumpa.setSeed(seed);\n    const board = new Board_1.Board(height, width);\n    board.addRandomWalls(wallsCount);\n    const availableTiles = [];\n    for (let x = 0; x < board.w; x++) {\n        for (let y = 0; y < board.h; y++) {\n            availableTiles.push({ x, y });\n        }\n    }\n    const randomTiles = Slumpa.shuffle(availableTiles);\n    const robots = new Array(robotCount).fill(null).map((_, i) => {\n        const tile = randomTiles.pop();\n        return new Robot_1.Robot(i, tile.x, tile.y);\n    });\n    const tile = randomTiles.pop();\n    const robotIndex = 0; //Math.floor(Math.random()*robots)\n    const goal = new Goal_1.Goal(tile.x, tile.y, robotIndex);\n    return { goal, robots, board };\n}\n\n\n//# sourceURL=webpack:///./src/models/Level.ts?");
+
+/***/ }),
+
+/***/ "./src/models/Robot.ts":
+/*!*****************************!*\
+  !*** ./src/models/Robot.ts ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.cloneRobots = exports.Robot = void 0;\nclass Robot {\n    constructor(idx, x, y) {\n        this.idx = idx;\n        this.x = x;\n        this.y = y;\n    }\n    getPos() {\n        return { x: this.x, y: this.y };\n    }\n    setPos(pos) {\n        this.x = pos.x;\n        this.y = pos.y;\n    }\n    clone() {\n        return new Robot(this.idx, this.x, this.y);\n    }\n}\nexports.Robot = Robot;\nfunction cloneRobots(robots) {\n    return robots.map(r => r.clone());\n}\nexports.cloneRobots = cloneRobots;\n\n\n//# sourceURL=webpack:///./src/models/Robot.ts?");
+
+/***/ }),
+
+/***/ "./src/models/SolverWokerMessages.ts":
+/*!*******************************************!*\
+  !*** ./src/models/SolverWokerMessages.ts ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.SolverWorkerMessage = void 0;\nvar SolverWorkerMessage;\n(function (SolverWorkerMessage) {\n    SolverWorkerMessage[\"PING\"] = \"PING\";\n    SolverWorkerMessage[\"PONG\"] = \"PONG\";\n    SolverWorkerMessage[\"SOLVE\"] = \"SOLVE\";\n    SolverWorkerMessage[\"SOLVE_END\"] = \"SOLVE_END\";\n    SolverWorkerMessage[\"SOLVE_PROGRESS\"] = \"SOLVE_PROGRESS\";\n})(SolverWorkerMessage = exports.SolverWorkerMessage || (exports.SolverWorkerMessage = {}));\n\n\n//# sourceURL=webpack:///./src/models/SolverWokerMessages.ts?");
+
+/***/ }),
+
+/***/ "./src/solver-utils.ts":
+/*!*****************************!*\
+  !*** ./src/solver-utils.ts ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.hasWall = exports.goEast = exports.goWest = exports.goSouth = exports.goNorth = void 0;\nconst Board_1 = __webpack_require__(/*! ./models/Board */ \"./src/models/Board.ts\");\nconst Direction_1 = __webpack_require__(/*! ./models/Direction */ \"./src/models/Direction.ts\");\nfunction goNorth(board, robot, otherRobots) {\n    const pos = { x: robot.x, y: robot.y };\n    const closestRobotY = Math.max(...otherRobots.filter(r => r.x === pos.x && r.y < pos.y).map(r => r.y));\n    for (; pos.y > 0; pos.y--) {\n        if (pos.y - 1 === closestRobotY || hasWall(board, pos.x, pos.y, Board_1.Wall.NORTH))\n            break;\n    }\n    if (pos.y === robot.y)\n        return null;\n    return { pos, dir: Direction_1.Direction.UP };\n}\nexports.goNorth = goNorth;\nfunction goSouth(board, robot, otherRobots) {\n    const pos = { x: robot.x, y: robot.y };\n    const closestRobotY = Math.min(...otherRobots.filter(r => r.x === robot.x && r.y > pos.y).map(r => r.y));\n    for (; pos.y < board.h; pos.y++) {\n        if (pos.y + 1 === closestRobotY || hasWall(board, robot.x, pos.y, Board_1.Wall.SOUTH))\n            break;\n    }\n    if (pos.y === robot.y)\n        return null;\n    return { pos, dir: Direction_1.Direction.DOWN };\n}\nexports.goSouth = goSouth;\nfunction goWest(board, robot, otherRobots) {\n    const pos = { x: robot.x, y: robot.y };\n    const closestRobotX = Math.max(...otherRobots.filter(r => r.y === pos.y && r.x < pos.x).map(r => r.x));\n    for (; pos.x > 0; pos.x--) {\n        if (pos.x - 1 === closestRobotX || hasWall(board, pos.x, pos.y, Board_1.Wall.WEST))\n            break;\n    }\n    if (pos.x === robot.x)\n        return null;\n    return { pos, dir: Direction_1.Direction.LEFT };\n}\nexports.goWest = goWest;\nfunction goEast(board, robot, otherRobots) {\n    const pos = { x: robot.x, y: robot.y };\n    const closestRobotX = Math.min(...otherRobots.filter(r => r.y === pos.y && r.x > pos.x).map(r => r.x));\n    for (; pos.x < board.w; pos.x++) {\n        if (pos.x + 1 === closestRobotX || hasWall(board, pos.x, pos.y, Board_1.Wall.EAST))\n            break;\n    }\n    if (pos.x === robot.x)\n        return null;\n    return { pos, dir: Direction_1.Direction.RIGHT };\n}\nexports.goEast = goEast;\nfunction hasWall(board, x, y, wall) {\n    return (board.tiles[y][x] & wall) !== 0;\n}\nexports.hasWall = hasWall;\n\n\n//# sourceURL=webpack:///./src/solver-utils.ts?");
+
+/***/ }),
+
+/***/ "./src/solver-worker.ts":
+/*!******************************!*\
+  !*** ./src/solver-worker.ts ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst Solver_1 = __webpack_require__(/*! ./Solver */ \"./src/Solver.ts\");\nconst SolverWokerMessages_1 = __webpack_require__(/*! ./models/SolverWokerMessages */ \"./src/models/SolverWokerMessages.ts\");\nconst Level_1 = __webpack_require__(/*! ./models/Level */ \"./src/models/Level.ts\");\nself.onmessage = processIncomingMessage;\nfunction processIncomingMessage(event) {\n    switch (event.data.type) {\n        case SolverWokerMessages_1.SolverWorkerMessage.SOLVE: {\n            const level = new Level_1.Level(event.data.levelString);\n            const solver = new Solver_1.Solver(level, { backAgain: event.data.backAgain });\n            solver.onComplete(onComplete);\n            solver.onProgress(onProgress);\n            solver.solve();\n            break;\n        }\n        default: {\n            throw Error(\"Worker recieved an unknown message\" + event.data.type);\n        }\n    }\n}\nfunction onComplete(result) {\n    postMessage({ type: SolverWokerMessages_1.SolverWorkerMessage.SOLVE_END, result });\n    close();\n}\nfunction onProgress(progress) {\n    postMessage({ type: SolverWokerMessages_1.SolverWorkerMessage.SOLVE_PROGRESS, progress });\n}\n\n\n//# sourceURL=webpack:///./src/solver-worker.ts?");
+
+/***/ })
+
+/******/ });

@@ -104,7 +104,7 @@ function createHTMLBoard(level: Level): string {
     if(walls & Wall.SOUTH) classes.push('wall-south')
     
     if(level.goal.x === x && level.goal.y ===y) {
-      text = `<div class="goal goal-${level.goal.color}"></div>`;
+      text = `<div class="goal goal-${level.goal.robotIdx}"></div>`;
     }
     
     level.robots.forEach(robot => {

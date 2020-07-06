@@ -1,6 +1,6 @@
 import { Level } from "./models/Level"
 import { cloneRobots, Robot } from "./models/Robot"
-import {solve, getResult} from "./solver-service"
+import { solve, getResult } from "./solver-service"
 import { Pos } from "./models/Pos"
 import * as GameBoard from "./game-board"
 import { Direction } from "./models/Direction"
@@ -118,13 +118,13 @@ function getMoveFunction(direction: Direction) {
 
 
 function goalIsReached() {
-  const correctRobot = robots[level.goal.color]
+  const correctRobot = robots[level.goal.robotIdx]
   return correctRobot.x === level.goal.x && correctRobot.y === level.goal.y
 }
 
 function isHome() {
-  const correctRobot = robots[level.goal.color]
-  const correctStart = level.robots[level.goal.color]
+  const correctRobot = robots[level.goal.robotIdx]
+  const correctStart = level.robots[level.goal.robotIdx]
   return correctRobot.x === correctStart.x && correctRobot.y === correctStart.y
 }
 
@@ -161,7 +161,7 @@ export function showSolution() {
 
   resetLevel()
   moveQueue.length = 0
-  moveQueue.push(...result.route.map(step => ({direction: step.dir, robotIndex: step.color})))
+  moveQueue.push(...result.route.map(step => ({direction: step.lastMoveDirection, robotIndex: step.lastMoveRobotIdx})))
   setTimeout(processMoveQueue, 400)
 }
 

@@ -113,7 +113,7 @@ level.robots.forEach(robot => {
 
 // Goal
 ctx.save()
-ctx.strokeStyle = robotColors[level.goal.color]
+ctx.strokeStyle = robotColors[level.goal.robotIdx]
 ctx.lineWidth = goalThickness
 ctx.translate(level.goal.x*(cellGap+cellSize)+cellGap, level.goal.y*(cellGap+cellSize)+cellGap)
 ctx.beginPath()
