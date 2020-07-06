@@ -3,9 +3,7 @@ import {Goal} from './models/Goal'
 import {Pos} from './models/Pos'
 import { goNorth, goSouth, goWest, goEast } from './solver-utils'
 import { Direction } from './models/Direction'
-import { time } from 'console'
 
-const MAX_CHECKED = 300000
 const STATE_DELIMITER = '|'
 
 interface Robot {
@@ -27,6 +25,7 @@ interface State {
 
 interface SolverOptions {
   backAgain?: boolean
+  abortAfter?: number
 }
 
 export interface CompletedData {
@@ -67,6 +66,7 @@ export class Solver {
   private duration = 0
   private minMoves: number
   private backAgain: boolean
+  private abortAfter: number
 
   private nextIndex = 0
 
@@ -79,13 +79,14 @@ export class Solver {
   }
 
   constructor(level, options: SolverOptions = {}) {
-    const {backAgain = false} = options
+    const {backAgain = false, abortAfter = 500000} = options
     this.board = level.board
     this.robots = level.robots
     this.goal = level.goal
     this.goalTile = this.pos2num(this.goal)
     this.mainHomeTile = this.pos2num(this.robots[this.goal.color])
     this.backAgain = backAgain
+    this.abortAfter = abortAfter
   }
 
   public solve() {
@@ -149,7 +150,7 @@ export class Solver {
     
     const state = this.states.get(nextStateHash)
 
-    if(this.checkedStates.size === MAX_CHECKED) {
+    if(this.checkedStates.size === this.abortAfter) {
       this.minMoves = state.moves
       this.aborted = true
       this.running = false

@@ -1,10 +1,7 @@
 import { expect } from "chai"
 import { Level } from "../src/models/Level"
 import { Solver } from "../src/Solver"
-
-const level_5x3 = '5|3111520004A888C|10|4|14'
-const level_impossible_3x3 = '3|315204A8C|4|0'
-const level_normal_10x10 = '10|3111111115200004a80c20000011052004200424200000800ca42000900534204a100420008520046204300004a8ca8888ce|78|94|93|13'
+import { level_5x3, level_normal_10x10 } from "./test-levels"
 
 describe("generate a level", () => {
   const seed = 66
@@ -50,27 +47,6 @@ describe("load a level", () => {
   })
 })
 
-describe("solve", () => {
-  it("level_5x3", () => {
-    const level = new Level(level_5x3)
-    const solver = new Solver(level)
-    const result = solver.solve()
-    expect(result.isRouteFound).to.be.true
-    expect(result.route).to.be.an('array').of.length(2)
-    expect(result.statesChecked).to.be.equal(2)
-  })
-
-  it("level_impossible_3x3", () => {
-    const level = new Level(level_impossible_3x3)
-    const solver = new Solver(level)
-    const result = solver.solve()
-    expect(result.isRouteFound).to.be.false
-    expect(result.isAllStatesChecked).to.be.true
-    expect(result.route).to.be.undefined
-    expect(result.statesChecked).to.be.equal(4)
-  })
-})
-
 describe("get hints", () => {
   it('robots used', () => {
     const level = new Level(level_normal_10x10)
@@ -80,21 +56,5 @@ describe("get hints", () => {
     expect(result.route).to.be.an('array')
     expect(result.robotsUsed).to.be.an('array').of.length(3)
     expect(result.statesChecked).to.equal(3586)
-  })
-})
-
-
-describe("Performance", () => {
-  it.only("Solve a difficult level in about 10s", function () {
-    this.timeout(20000)
-    const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 422367})
-    const solver = new Solver(level)
-    let now = new Date().getTime()
-    solver.onProgress((data => {
-      console.log("Progress", new Date().getTime() - now, data)
-      now = new Date().getTime()
-    }), 10000)
-    const result = solver.solve()
-    console.log("Solver result", result)
   })
 })
