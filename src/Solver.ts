@@ -3,6 +3,7 @@ import {Goal} from './models/Goal'
 import {Pos} from './models/Pos'
 import { goNorth, goSouth, goWest, goEast } from './solver-utils'
 import { Direction } from './models/Direction'
+import { time } from 'console'
 
 const MAX_CHECKED = 300000
 const STATE_DELIMITER = '|'
@@ -36,12 +37,14 @@ export interface CompletedData {
   isAborted: boolean
   route: State[]
   robotsUsed: number[]
-  minMoves: number
+  minMoves: number,
+  timers: object
 }
 
 export interface ProgressData {
   checkedStates: number
   currentMovesCount: number
+  timers: object
 }
 
 export class Solver {
@@ -51,18 +54,21 @@ export class Solver {
   private readonly goalTile: number
   private readonly mainHomeTile: number
   private checkedStates = new Set<string>()
-  private stateQueue: string[] = []
+  private statesQueue: string[] = []
   private states = new Map<string, State>()
   private routeFound = false
   private aborted = false
   private allStatesChecked = false
   private running = false
   private foundRoute: State[]
-  private completeCallback: Function|undefined
-  private progressCallback: Function|undefined
+  private completeCallback: Function
+  private progressCallback: (data: ProgressData) => void
+  private progressRatio = 1000
   private duration = 0
   private minMoves: number
   private backAgain: boolean
+
+  private nextIndex = 0
 
   private pos2num = (pos: Pos) => pos.x + pos.y * this.board.w
   private getState = (robots: Robot[], goalVisited: boolean) => {
@@ -84,20 +90,22 @@ export class Solver {
 
   public solve() {
     const startState = this.getState(this.robots, false)
-    this.stateQueue.push(startState)
+    this.statesQueue.push(startState)
     this.states.set(startState, {moves: 0, state: startState, robots: this.robots.slice(), goalVisited: false})
     const start = new Date()
 
     this.running = true
     while(this.running) {
-      this.checkNext()
+      Timer.time('check-next', () => {
+        this.checkNext()
+      })
     }
     this.duration = (new Date().getTime() - start.getTime()) / 1000
     const result = this.getResult()
     if(this.completeCallback) {
       this.completeCallback(result)
     }
-    this.stateQueue.length = 0
+    this.statesQueue.length = 0
     this.states.clear()
     this.checkedStates.clear()
     return result
@@ -116,7 +124,8 @@ export class Solver {
       isAborted: this.aborted,
       route: this.foundRoute,
       robotsUsed: getUsedRobots(this.foundRoute),
-      minMoves: this.minMoves
+      minMoves: this.minMoves,
+      timers: Timer.getTotals()
     }
   }
 
@@ -124,44 +133,53 @@ export class Solver {
     this.completeCallback = callback
   }
 
-  public onProgress(callback: (data: ProgressData) => void) {
+  public onProgress(callback: (data: ProgressData) => void, sendProgressEvery = 1000) {
+    this.progressRatio = sendProgressEvery
     this.progressCallback = callback
   }
 
   private checkNext() {
-      const nextStateHash = this.stateQueue.shift()
-      
-      if(nextStateHash === undefined) {
-        this.allStatesChecked = true
-        this.running = false
-        return
-      }
-      
-      const state = this.states.get(nextStateHash)
+    const nextStateHash = this.statesQueue[this.nextIndex++]
 
-      if(this.checkedStates.size === MAX_CHECKED) {
-        this.minMoves = state.moves
-        this.aborted = true
-        this.running = false
-        return
-      }
+    if(nextStateHash === undefined) {
+      this.allStatesChecked = true
+      this.running = false
+      return
+    }
+    
+    const state = this.states.get(nextStateHash)
 
-      if(this.progressCallback && (this.checkedStates.size % 100 === 0)) {
-        this.progressCallback({checkedStates: this.checkedStates.size, currentMovesCount: state.moves})
-      }
+    if(this.checkedStates.size === MAX_CHECKED) {
+      this.minMoves = state.moves
+      this.aborted = true
+      this.running = false
+      return
+    }
 
-      // console.debug("Checking", state, robots[nextStateHash.color], nextStateHash.dir, nextStateHash.previous)
-      state.robots.forEach((_, idx) => {
-        this.getNewStates(state, idx)
-        .filter(newState => !this.states.has(newState.state))
-        .forEach(newState => {
-          this.checkIfShortestRouteFound(newState)
-          this.stateQueue.push(newState.state)
-          this.states.set(newState.state, newState)
-        })
+    if(this.progressCallback && (this.checkedStates.size % this.progressRatio === 0)) {
+      this.progressCallback({checkedStates: this.checkedStates.size, currentMovesCount: state.moves, timers: Timer.getAndClear()})
+    }
+
+    // console.debug("Checking", state, robots[nextStateHash.color], nextStateHash.dir, nextStateHash.previous)
+    state.robots.forEach((_, idx) => {
+      let newStates
+      Timer.time('get-new-states', () => {
+        newStates = this.getNewStates(state, idx)
       })
-
-      this.checkedStates.add(nextStateHash)
+      newStates.filter(newState => {
+        let has
+        Timer.time('has-state', () => {
+          has = !this.states.has(newState.state)
+        })
+        return has
+      })
+      .forEach(newState => {
+        this.checkIfShortestRouteFound(newState)
+        this.statesQueue.push(newState.state)
+        this.states.set(newState.state, newState)
+      })
+    })
+    this.checkedStates.add(nextStateHash)
   }
 
   private checkIfShortestRouteFound(state: State) {
@@ -223,3 +241,40 @@ function getUsedRobots(route: State[]) {
   const makeUnique = (arr: any[]) => [...new Set(arr)]
   return makeUnique(route.map(r => r.color))
 }
+
+
+const Timer = (function() {
+  const results = {}
+
+  function time(name: string, fn) {
+    const start = new Date().getTime();
+    fn()
+    const end = new Date().getTime();
+    results[name] = (results[name] || 0) + end-start
+    if(name.startsWith('total-')) return
+    results['total-' + name] = (results['total-' + name] || 0) + end-start
+  }
+
+  function getAndClear() {
+    const out = {}
+    Object.entries(results).forEach(([key, value]) => {
+      if(key.startsWith('total-')) return
+      out[key] = value
+      results[key] = 0
+    })
+    return out
+  }
+  
+  function getTotals() {
+    const out = {}
+    Object.entries(results).forEach(([key, value]) => {
+      if(!key.startsWith('total-')) return
+      out[key] = value
+    })
+    return out
+  }
+
+  return {
+    time, getAndClear, getTotals
+  }
+}())

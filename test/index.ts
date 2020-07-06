@@ -85,10 +85,15 @@ describe("get hints", () => {
 
 
 describe("Performance", () => {
-  it.skip("Solve a difficult level in about 10s", function () {
+  it.only("Solve a difficult level in about 10s", function () {
     this.timeout(20000)
     const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 422367})
     const solver = new Solver(level)
+    let now = new Date().getTime()
+    solver.onProgress((data => {
+      console.log("Progress", new Date().getTime() - now, data)
+      now = new Date().getTime()
+    }), 10000)
     const result = solver.solve()
     console.log("Solver result", result)
   })
