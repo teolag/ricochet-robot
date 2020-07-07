@@ -37,8 +37,8 @@ const robotColors = ['red', 'green', 'blue', '#aa0', 'purple']
 const width = level.board.w
 const height = level.board.h
 
-const verticalWalls = level.board.tiles.map(row => row.slice(0,-1).reduce((str, cell) => str + (cell & Wall.EAST ? 1 : 0), "")).join('').split('').map(v => v === "1")
-const horizontalWalls = level.board.tiles.slice(0,-1).map(row => row.reduce((str, cell) => str + (cell & Wall.SOUTH ? 1 : 0), "")).join('').split('').map(v => v === "1")
+const verticalWalls = level.board.tiles.map(row => row.slice(0,-1).reduce((str, cell) => str + (cell & Wall.RIGHT ? 1 : 0), "")).join('').split('').map(v => v === "1")
+const horizontalWalls = level.board.tiles.slice(0,-1).map(row => row.reduce((str, cell) => str + (cell & Wall.DOWN ? 1 : 0), "")).join('').split('').map(v => v === "1")
 
 
 const cellColor = "white"

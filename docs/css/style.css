@@ -107,10 +107,10 @@ header {
   padding: 5px;
   box-shadow: 0 0 13px rgba(0,0,0,.41) inset;
 }
-.boardTable td.wall-south { border-bottom-color: inherit }
-.boardTable td.wall-north { border-top-color: inherit }
-.boardTable td.wall-west { border-left-color: inherit }
-.boardTable td.wall-east { border-right-color: inherit }
+.boardTable td.wall-up { border-top-color: inherit }
+.boardTable td.wall-left { border-left-color: inherit }
+.boardTable td.wall-right { border-right-color: inherit }
+.boardTable td.wall-down { border-bottom-color: inherit }
 
 .goal {
   width: 100%;

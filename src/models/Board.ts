@@ -1,9 +1,9 @@
 import * as Slumpa from '../libs/Slumpa'
 export enum Wall {
-  NORTH = 1 << 0,
-  WEST = 1 << 1,
-  EAST = 1 << 2,
-  SOUTH = 1 << 3
+  UP = 1 << 0,
+  LEFT = 1 << 1,
+  RIGHT = 1 << 2,
+  DOWN = 1 << 3
 }
 
 
@@ -50,7 +50,7 @@ export class Board {
     let attempt = 0
     while(builtWalls < wallCount && attempt<1000) {
       attempt++
-      const wallType = Slumpa.randomOne([Wall.NORTH,Wall.EAST,Wall.WEST,Wall.SOUTH])
+      const wallType = Slumpa.randomOne([Wall.UP,Wall.RIGHT,Wall.LEFT,Wall.DOWN])
       const x = Slumpa.randomInt(0, this.w-1)
       const y = Slumpa.randomInt(0, this.h-1)
       const hasWall = this.tiles[y][x] & wallType
@@ -67,44 +67,44 @@ export class Board {
   }
 
   private getTileBehindTheWall(x: number, y: number, wall: Wall): {x: number, y: number} | null {
-    if(wall === Wall.NORTH && y > 0) return {x, y: y-1}
-    if(wall === Wall.WEST && x > 0) return {x: x-1, y}
-    if(wall === Wall.EAST && x+1 < this.w) return {x: x+1, y}
-    if(wall === Wall.SOUTH && y+1 < this.h) return {x, y: y+1}
+    if(wall === Wall.UP && y > 0) return {x, y: y-1}
+    if(wall === Wall.LEFT && x > 0) return {x: x-1, y}
+    if(wall === Wall.RIGHT && x+1 < this.w) return {x: x+1, y}
+    if(wall === Wall.DOWN && y+1 < this.h) return {x, y: y+1}
     return null
   }
 
   private getOppositeWall(wall: Wall) {
     switch(wall) {
-      case Wall.NORTH: return Wall.SOUTH
-      case Wall.SOUTH: return Wall.NORTH
-      case Wall.EAST: return Wall.WEST
-      case Wall.WEST: return Wall.EAST
+      case Wall.UP: return Wall.DOWN
+      case Wall.DOWN: return Wall.UP
+      case Wall.RIGHT: return Wall.LEFT
+      case Wall.LEFT: return Wall.RIGHT
       default: throw Error("Invalid wall " + wall)
     }
   }
 
   private addTopWalls() {
     for(let x = 0; x<this.w; x++) {
-      this.addSingleWall(x, 0, Wall.NORTH)
+      this.addSingleWall(x, 0, Wall.UP)
     }
   }
 
   private addBottomWalls() {
     for(let x = 0; x<this.w; x++) {
-      this.addSingleWall(x, this.h-1, Wall.SOUTH)
+      this.addSingleWall(x, this.h-1, Wall.DOWN)
     }
   }
 
   private addLeftWalls() {
     for(let y = 0; y<this.h; y++) {
-      this.addSingleWall(0, y, Wall.WEST)
+      this.addSingleWall(0, y, Wall.LEFT)
     }
   }
 
   private addRightWalls() {
     for(let y = 0; y<this.h; y++) {
-      this.addSingleWall(this.w-1, y, Wall.EAST)
+      this.addSingleWall(this.w-1, y, Wall.RIGHT)
     }
   }
 

@@ -98,10 +98,10 @@ function createHTMLBoard(level: Level): string {
   return "<table class='boardTable'><tr>" + level.board.tiles.map((row, y) => row.map((walls, x) => {
     let text = ''
     const classes = []
-    if(walls & Wall.NORTH) classes.push('wall-north')
-    if(walls & Wall.EAST) classes.push('wall-east')
-    if(walls & Wall.WEST) classes.push('wall-west')
-    if(walls & Wall.SOUTH) classes.push('wall-south')
+    if(walls & Wall.UP) classes.push('wall-up')
+    if(walls & Wall.LEFT) classes.push('wall-left')
+    if(walls & Wall.RIGHT) classes.push('wall-right')
+    if(walls & Wall.DOWN) classes.push('wall-down')
     
     if(level.goal.x === x && level.goal.y ===y) {
       text = `<div class="goal goal-${level.goal.robotIdx}"></div>`;

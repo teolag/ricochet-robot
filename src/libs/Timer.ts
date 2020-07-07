@@ -1,27 +1,23 @@
 const results = {}
 const startedTimers = {}
 
-export function time(name: string, fn) {
-  const start = new Date().getTime();
-  const resp = fn()
-  const end = new Date().getTime();
-  results[name] = (results[name] || 0) + end-start
-  if(!name.startsWith('total-')) {
-    results['total-' + name] = (results['total-' + name] || 0) + end-start
-  }
-  return resp
-}
-
 export function startTimer(name: string) {
-  startedTimers[name] = new Date().getTime()
+  startedTimers[name] = process ? process.hrtime() : new Date().getTime()
 }
 
 export function pauseTimer(name: string) {
-  const from = startedTimers[name]
-  const to = new Date().getTime()
-  results[name] = (results[name] || 0) + to-from
+  let ms: number
+  if(process) {
+    const hr = process.hrtime(startedTimers[name])
+    ms = hr[0]*1000 + hr[1]/1000000
+  } else {
+    const from = startedTimers[name]
+    const to = new Date().getTime()
+    ms = to-from
+  }
+  results[name] = (results[name] || 0) + ms
   if(!name.startsWith('total-')) {
-    results['total-' + name] = (results['total-' + name] || 0) + to-from
+    results['total-' + name] = (results['total-' + name] || 0) + ms
   }
 }
 
