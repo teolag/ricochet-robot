@@ -25,7 +25,7 @@ describe("solve", () => {
 })
 
 describe("Performance", () => {
-  it.skip("Solve a 10 steps level in about 1.5s", function () {
+  it("Solve a 10 steps level in about 1.5s", function () {
     this.timeout(20000)
     const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 422367})
     const solver = new Solver(level)
@@ -44,5 +44,30 @@ describe("Performance", () => {
     solver.onProgress((data => {console.log("Progress", data)}), 10000)
     const result = solver.solve()
     console.log("Solver result", result)
+  })
+})
+
+
+describe("View checked states", () => {
+  it.skip('Solve with 17 states, 3 moves', () => {
+    // http://localhost:8080/?width=4&height=4&seed=1&robotCount=3&wallsCount=3&backAgain=false
+    const level = new Level({width:4, height:4, seed:1, robotCount:3, wallsCount:3})
+    const solver = new Solver(level)
+    const result = solver.solve()
+    expect(result.isRouteFound).to.be.true
+    expect(result.statesChecked).to.equal(17)
+    expect(result.route.length).to.equal(3)
+    /*
+    printBoard('0 - ' + result.route[0].previous+'.png', level.board, level.goal)
+    result.route.forEach((state, i) => {
+      console.log(state)
+      const file = i+1 + ' - ' + state.hash+'.png'
+      printBoard(file, level.board, level.goal, state)
+    })
+    */
+  })
+
+  it.skip('4 drag 108 states...  är det rimligt??', () => {
+    // http://localhost:8080/?width=4&height=4&seed=5&robotCount=3&wallsCount=3&backAgain=false
   })
 })

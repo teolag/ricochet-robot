@@ -15,15 +15,18 @@ interface Robot {
   idx: number
 }
 
-const notNull = <T>(value: T | null): value is T => value !== null
-interface State {
+export interface State {
   goalVisited: boolean
   moves: number
   previous?: string
   hash: string
   robots: Robot[]
-  lastMoveDirection: Direction
-  lastMoveRobotIdx: number
+  lastMove: {
+    direction: Direction
+    robotIdx: number
+    from: Pos
+    to: Pos
+  }
 }
 
 interface SolverOptions {
@@ -31,7 +34,7 @@ interface SolverOptions {
   abortAfter?: number
 }
 
-interface Move {
+export interface Move {
   pos: {
     x:number
     y:number
@@ -101,7 +104,7 @@ export class Solver {
   public solve() {
     const startState = this.getStateHash(this.robots, false)
     this.statesQueue.push(startState)
-    this.states.set(startState, {moves: 0, hash: startState, lastMoveDirection: null, lastMoveRobotIdx: null, robots: this.robots.slice(), goalVisited: false})
+    this.states.set(startState, {moves: 0, hash: startState, lastMove: null, robots: this.robots.slice(), goalVisited: false})
     const start = new Date()
 
     this.running = true
@@ -174,7 +177,7 @@ export class Solver {
   }
 
   private checkIfShortestRouteFound(state: State): void {
-    if(state.lastMoveRobotIdx !== this.goal.robotIdx) return
+    if(state.lastMove.robotIdx !== this.goal.robotIdx) return
     const goalRobot = state.robots[this.goal.robotIdx]
     if(this.isAtGoal(goalRobot)) {
       state.goalVisited = true
@@ -199,7 +202,16 @@ export class Solver {
     this.running = false
     let state = endState
     this.foundRoute = []
-    
+
+    /*
+    let i = 0
+    const u = Array.from(this.states.values())
+    u.forEach(state => {
+      printBoard(i+' - '+state.hash+'.png', this.board, this.goal, state)
+      i++
+    })
+    */
+
     while(state.previous) {
       this.foundRoute.unshift(state)
       const nextState = this.states.get(state.previous)
@@ -212,19 +224,19 @@ export class Solver {
   private processState (state: State) {
     const moves: Move[] = []
     for(const robot of state.robots) {
-      const otherRobots = state.robots.filter(r => r.idx !== robot.idx)
+      const helpers = state.robots.filter(r => r.idx !== robot.idx)
       
-      const up = goUp(this.board, robot, otherRobots)
-      if(up) moves.push({...up, robotIdx: robot.idx})
+      const up = goUp(this.board, robot, helpers)
+      if(up) moves.push(up)
       
-      const left = goLeft(this.board, robot, otherRobots)
-      if(left) moves.push({...left, robotIdx: robot.idx})
+      const left = goLeft(this.board, robot, helpers)
+      if(left) moves.push(left)
       
-      const right = goRight(this.board, robot, otherRobots)
-      if(right) moves.push({...right, robotIdx: robot.idx})
+      const right = goRight(this.board, robot, helpers)
+      if(right) moves.push(right)
       
-      const down = goDown(this.board, robot, otherRobots)
-      if(down) moves.push({...down, robotIdx: robot.idx})
+      const down = goDown(this.board, robot, helpers)
+      if(down) moves.push(down)
     }
     
 
@@ -241,8 +253,12 @@ export class Solver {
         hash: stateHash,
         previous: state.hash,
         robots: newRobots,
-        lastMoveDirection: move.dir,
-        lastMoveRobotIdx: move.robotIdx,
+        lastMove: {
+          direction: move.dir,
+          robotIdx: move.robotIdx,
+          from: {x: state.robots[move.robotIdx].x, y: state.robots[move.robotIdx].y},
+          to: {x: move.pos.x, y: move.pos.y}
+        },
         goalVisited: state.goalVisited,
         moves: state.moves+1
       }
@@ -257,5 +273,5 @@ export class Solver {
 function getUsedRobots(route: State[]): number[] {
   if(!route) return []
   const makeUnique = (arr: any[]) => [...new Set(arr)]
-  return makeUnique(route.map(route => route.lastMoveRobotIdx)).sort()
+  return makeUnique(route.map(route => route.lastMove.robotIdx)).sort()
 }

@@ -1,47 +1,58 @@
 import { Board, Wall } from "./models/Board"
 import { Pos } from "./models/Pos"
 import { Direction } from "./models/Direction"
+import { Move } from "./Solver"
 
-export function goUp (board: Board, robot: Pos, otherRobots: Pos[]) {
-  const pos = {x: robot.x, y: robot.y}
-  const closestRobotY = Math.max(...otherRobots.filter(r => r.x === pos.x && r.y < pos.y).map(r => r.y))
-  for(; pos.y > 0; pos.y--) {
-    if(pos.y-1 === closestRobotY || hasWall(board, pos.x, pos.y, Wall.UP)) break
-  }
-  if(pos.y === robot.y) return null
-  return {pos, dir: Direction.UP}
+interface Robot {
+  x: number
+  y: number
+  idx: number
 }
 
-export function goDown (board: Board, robot: Pos, otherRobots: Pos[]) {
-  const pos = {x: robot.x, y: robot.y}
-  const closestRobotY = Math.min(...otherRobots.filter(r => r.x === robot.x && r.y > pos.y).map(r => r.y))
-  for(; pos.y < board.h; pos.y++) {
-    if(pos.y+1 === closestRobotY || hasWall(board, robot.x, pos.y, Wall.DOWN)) break
+export function goUp (board: Board, robot: Robot, helpers: Pos[]): Move {
+  const dynPos: Pos = {x: robot.x, y: robot.y}
+  if(hasWall(board, dynPos, Wall.UP)) return null
+  const closestRobotY = Math.max(...helpers.filter(helper => helper.x === dynPos.x && helper.y < dynPos.y).map(helper => helper.y))
+  for(; dynPos.y > 0; dynPos.y--) {
+    if(dynPos.y-1 === closestRobotY || hasWall(board, dynPos, Wall.UP)) break
   }
-  if(pos.y===robot.y) return null
-  return {pos, dir: Direction.DOWN}
+  if(dynPos.y === robot.y) return null
+  return {pos: dynPos, robotIdx: robot.idx, dir: Direction.UP}
 }
 
-export function goLeft (board: Board, robot: Pos, otherRobots: Pos[]) {
-  const pos = {x: robot.x, y: robot.y}
-  const closestRobotX = Math.max(...otherRobots.filter(r => r.y === pos.y && r.x < pos.x).map(r => r.x))
-  for(; pos.x > 0; pos.x--) {
-    if(pos.x-1 === closestRobotX || hasWall(board, pos.x, pos.y, Wall.LEFT)) break
+export function goDown (board: Board, robot: Robot, helpers: Pos[]): Move {
+  const dynPos: Pos = {x: robot.x, y: robot.y}
+  if(hasWall(board, dynPos, Wall.DOWN)) return null
+  const closestRobotY = Math.min(...helpers.filter(helper => helper.x === dynPos.x && helper.y > dynPos.y).map(helper => helper.y))
+  for(; dynPos.y < board.h; dynPos.y++) {
+    if(dynPos.y+1 === closestRobotY || hasWall(board, dynPos, Wall.DOWN)) break
   }
-  if(pos.x===robot.x) return null
-  return {pos, dir: Direction.LEFT}
+  if(dynPos.y===robot.y) return null
+  return {pos: dynPos, robotIdx: robot.idx, dir: Direction.DOWN}
 }
 
-export function goRight (board: Board, robot: Pos, otherRobots: Pos[]) {
-  const pos = {x: robot.x, y: robot.y}
-  const closestRobotX = Math.min(...otherRobots.filter(r => r.y === pos.y && r.x > pos.x).map(r => r.x))
-  for(; pos.x < board.w; pos.x++) {
-    if(pos.x+1 === closestRobotX || hasWall(board, pos.x, pos.y, Wall.RIGHT)) break
+export function goLeft (board: Board, robot: Robot, helpers: Pos[]): Move {
+  const dynPos: Pos = {x: robot.x, y: robot.y}
+  if(hasWall(board, dynPos, Wall.LEFT)) return null
+  const closestRobotX = Math.max(...helpers.filter(helper => helper.y === dynPos.y && helper.x < dynPos.x).map(helper => helper.x))
+  for(; dynPos.x > 0; dynPos.x--) {
+    if(dynPos.x-1 === closestRobotX || hasWall(board, dynPos, Wall.LEFT)) break
   }
-  if(pos.x===robot.x) return null
-  return {pos, dir: Direction.RIGHT}
+  if(dynPos.x===robot.x) return null
+  return {pos: dynPos, robotIdx: robot.idx, dir: Direction.LEFT}
 }
 
-export function hasWall(board: Board, x:number, y:number, wall: Wall) {
-  return (board.tiles[y][x] & wall) !== 0
+export function goRight (board: Board, robot: Robot, helpers: Pos[]): Move {
+  const dynPos: Pos = {x: robot.x, y: robot.y}
+  if(hasWall(board, dynPos, Wall.RIGHT)) return null
+  const closestRobotX = Math.min(...helpers.filter(helper => helper.y === dynPos.y && helper.x > dynPos.x).map(helper => helper.x))
+  for(; dynPos.x < board.w; dynPos.x++) {
+    if(dynPos.x+1 === closestRobotX || hasWall(board, dynPos, Wall.RIGHT)) break
+  }
+  if(dynPos.x===robot.x) return null
+  return {pos: dynPos, robotIdx: robot.idx, dir: Direction.RIGHT}
+}
+
+export function hasWall(board: Board, pos: Pos, wall: Wall) {
+  return (board.tiles[pos.y][pos.x] & wall) !== 0
 }
