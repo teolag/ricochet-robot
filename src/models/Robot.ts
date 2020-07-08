@@ -1,5 +1,4 @@
-import { Pos } from "./Pos"
-
+import { IPos } from "./IPos"
 
 export class Robot {
   public idx: number
@@ -16,7 +15,7 @@ export class Robot {
     return {x: this.x, y: this.y }
   }
 
-  setPos(pos: Pos) {
+  setPos(pos: IPos) {
     this.x = pos.x
     this.y = pos.y
   } 

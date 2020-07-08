@@ -1,4 +1,4 @@
-export interface GameOptions {
+export interface IGameOptions {
   width: number
   height: number
   seed: number

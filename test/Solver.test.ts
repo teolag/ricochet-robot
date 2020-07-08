@@ -1,5 +1,5 @@
 import { Level } from "../src/models/Level"
-import { Solver } from "../src/Solver"
+import { Solver } from "../src/models/Solver"
 import { expect } from "chai"
 import { level_5x3, level_impossible_3x3 } from "./test-levels"
 
@@ -25,7 +25,7 @@ describe("solve", () => {
 })
 
 describe("Performance", () => {
-  it("Solve a 10 steps level in about 1.5s", function () {
+  it.skip("Solve a 10 steps level in about 1.5s", function () {
     this.timeout(20000)
     const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 422367})
     const solver = new Solver(level)

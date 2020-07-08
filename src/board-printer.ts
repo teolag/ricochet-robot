@@ -1,8 +1,10 @@
 import {createCanvas} from 'canvas'
 import * as fs from 'fs'
-import { Wall, Board } from './models/Board'
-import { State } from './Solver'
+
+import { Board } from './models/Board'
+import { IState } from './models/IState'
 import { Goal } from './models/Goal'
+import { Wall } from './enums/wall'
 
 const smallStyle = {
   cellSize: 10,
@@ -43,7 +45,7 @@ const gapColor = "#eee"
 const wallColor = "#666"
 
 
-export function printBoard(path: string, board: Board, goal: Goal, state?: State) {
+export function printBoard(path: string, board: Board, goal: Goal, state?: IState) {
   const width = board.w
   const height = board.h
   

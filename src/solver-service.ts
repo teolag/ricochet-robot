@@ -1,12 +1,13 @@
-import {SolverWorkerMessage} from './models/SolverWokerMessages'
-import { CompletedData, ProgressData } from './Solver';
+import {SolverWorkerMessage} from './enums/SolverWokerMessages'
 import { Level } from './models/Level';
 import { getElementById, getButton } from './utils';
+import { ICompletedData } from './models/ICompletedData';
+import { IProgressData } from './models/IProgressData';
 const colorNames = ['röd', 'grön', 'blå', 'gul']
 
 let solverWorker: Worker
-let result: CompletedData|null
-let progress: ProgressData|null
+let result: ICompletedData|null
+let progress: IProgressData|null
 
 const solverButton = getButton('btnSolver')
 const solverInfo = getElementById('solverInfo')
@@ -38,7 +39,7 @@ export function getResult() {
 function onWorkerMessage(e: MessageEvent) {
   switch(e.data.type) {
     case SolverWorkerMessage.SOLVE_END: {
-      result = e.data.result as CompletedData
+      result = e.data.result as ICompletedData
       solverButton.classList.remove("rotate")
       
       if(result.isRouteFound) {
@@ -70,7 +71,7 @@ function onWorkerMessage(e: MessageEvent) {
       break;
     }
     case SolverWorkerMessage.SOLVE_PROGRESS: {
-      progress = e.data.progress as ProgressData
+      progress = e.data.progress as IProgressData
       solverInfo.innerHTML = `
         ${progress.checkedStates} states undersökta<br>
         Letar nu efter lösningar med ${progress.currentMovesCount} drag

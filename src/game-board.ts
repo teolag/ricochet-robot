@@ -1,10 +1,10 @@
 import { Level } from "./models/Level"
 import { getElementById } from "./utils"
-import { Wall } from "./models/Board"
 import { Robot } from "./models/Robot"
-import { Pos } from "./models/Pos"
+import { IPos } from "./models/IPos"
 import * as Game from "./game"
-import { Direction } from "./models/Direction"
+import { Direction } from "./enums/Direction"
+import { Wall } from "./enums/wall"
 
 const TOUCH_MOVE_LENGTH = 40
 
@@ -14,7 +14,7 @@ let robotClickCallback
 let robotElems: HTMLDivElement[]
 
 let touchingIndex = null
-let touchStart: Pos
+let touchStart: IPos
 document.addEventListener('touchend', _ => touchingIndex=null)
 document.addEventListener('touchmove', touchMove, {passive: true})
 
@@ -44,7 +44,7 @@ export function setRobotsPositions(robots: Robot[]) {
   })
 }
 
-export function moveRobot(robotIndex: number, newPos: Pos) {
+export function moveRobot(robotIndex: number, newPos: IPos) {
   moveRobotElem(robotElems[robotIndex], newPos)
 }
 
@@ -55,7 +55,7 @@ export function setActiveRobot(robotIndex: number) {
 }
 
 
-function moveRobotElem(robot: HTMLElement, newPos: Pos) {
+function moveRobotElem(robot: HTMLElement, newPos: IPos) {
   robot.style.transform = `translate(${newPos.x*38+10}px, ${newPos.y*38+10}px)`
 }
 

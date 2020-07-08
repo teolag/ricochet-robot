@@ -1,11 +1,5 @@
 import * as Slumpa from '../libs/Slumpa'
-export enum Wall {
-  UP = 1 << 0,
-  LEFT = 1 << 1,
-  RIGHT = 1 << 2,
-  DOWN = 1 << 3
-}
-
+import { Wall } from '../enums/wall'
 
 export class Board {
   public tiles: number[][]

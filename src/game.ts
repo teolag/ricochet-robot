@@ -1,14 +1,14 @@
 import { Level } from "./models/Level"
 import { cloneRobots, Robot } from "./models/Robot"
 import { solve, getResult } from "./solver-service"
-import { Pos } from "./models/Pos"
+import { IPos } from "./models/IPos"
 import * as GameBoard from "./game-board"
-import { Direction } from "./models/Direction"
+import { Direction } from "./enums/Direction"
 import { goUp, goLeft, goRight, goDown } from "./solver-utils"
 import * as ActiveRoute from './active-route'
 import * as ColorControls from './components/color-controls'
 import { openModal } from "./components/dialog"
-import { CompletedData } from "./Solver"
+import { ICompletedData } from "./models/ICompletedData"
 
 let level: Level
 let robots: Robot[]
@@ -51,7 +51,7 @@ export function setGoalVisited(visited: boolean) {
   goalVisited = visited
 }
 
-export function setRobotPosition(robotIndex: number, newPos: Pos) {
+export function setRobotPosition(robotIndex: number, newPos: IPos) {
   robots[robotIndex].setPos(newPos)
   GameBoard.moveRobot(robotIndex, newPos)
 }
@@ -59,18 +59,19 @@ export function setRobotPosition(robotIndex: number, newPos: Pos) {
 export function moveActiveRobot(direction: Direction) {
   addToMoveQueue(activeRobotIndex, direction)
 }
-export function moveRobot(robotIndex: number, direction: Direction) {
+export function moveRobot(robotIdx: number, direction: Direction) {
   const moveFunction = getMoveFunction(direction)
-  const otherRobots = robots.filter(r => r.idx !== robotIndex)
-  const newPos = moveFunction(level.board, robots[robotIndex], otherRobots)
+  const movingRobot = robots[robotIdx]
+  const otherRobots = robots.filter(r => r.idx !== robotIdx)
+  const newPos = moveFunction(level.board, movingRobot, otherRobots)
   if(!newPos) return
 
-  setRobotPosition(robotIndex, newPos.pos)
+  setRobotPosition(robotIdx, newPos.pos)
   // gameBoard.moveRobot(activeRobotIndex, newPos.pos)
 
   const landedOnGoal = goalIsReached()
   if(landedOnGoal) goalVisited = true
-  ActiveRoute.addMove(robotIndex, direction, cloneRobots(robots), goalVisited)
+  ActiveRoute.addMove(robotIdx, direction, cloneRobots(robots), goalVisited)
 
   const gameCompleted = (landedOnGoal && !_backAgain) || (_backAgain && goalVisited && isHome())
   if(gameCompleted) {
@@ -82,7 +83,7 @@ export function moveRobot(robotIndex: number, direction: Direction) {
   }
 }
 
-function getResultText(result: CompletedData) {
+function getResultText(result: ICompletedData) {
   const moves = ActiveRoute.getMovesCount()
   if(!result) {
     return `Grattis, du klarade det på ${moves} drag innan solvern hittade en lösning`

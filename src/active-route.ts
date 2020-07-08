@@ -1,5 +1,5 @@
 import { getElementById, getButton } from "./utils"
-import { Direction } from "./models/Direction"
+import { Direction } from "./enums/Direction"
 import { Robot } from "./models/Robot"
 import * as Game from "./game"
 

@@ -1,96 +1,48 @@
-import {Board} from './models/Board'
-import {Goal} from './models/Goal'
-import {Pos} from './models/Pos'
-import { goUp, goDown, goLeft, goRight } from './solver-utils'
-import { Direction } from './models/Direction'
-import * as Timer from './libs/Timer'
-import { Level } from './models/Level'
+import {Board} from './Board'
+import {Goal} from './Goal'
+import {IPos} from './IPos'
+import { goUp, goDown, goLeft, goRight } from '../solver-utils'
+import * as Timer from '../libs/Timer'
+import { Level } from './Level'
+import { IState } from './IState'
+import { ICompletedData } from './ICompletedData'
+import { ISolverOptions } from './ISolverOptions'
+import { IMove } from './IMove'
+import { IProgressData } from './IProgressData'
+import { ISolverRobot } from './ISolverRobot'
 
 const STATE_DELIMITER = '|'
 
-interface Robot {
-  x: number
-  y: number
-  posNum: number
-  idx: number
-}
-
-export interface State {
-  goalVisited: boolean
-  moves: number
-  previous?: string
-  hash: string
-  robots: Robot[]
-  lastMove: {
-    direction: Direction
-    robotIdx: number
-    from: Pos
-    to: Pos
-  }
-}
-
-interface SolverOptions {
-  backAgain?: boolean
-  abortAfter?: number
-}
-
-export interface Move {
-  pos: {
-    x:number
-    y:number
-  }
-  dir: Direction
-  robotIdx: number
-}
-
-export interface CompletedData {
-  duration: number
-  statesChecked: number
-  isRouteFound: boolean
-  isAllStatesChecked: boolean
-  isAborted: boolean
-  route: State[]
-  robotsUsed: number[]
-  minMoves: number,
-  timers: object
-}
-
-export interface ProgressData {
-  checkedStates: number
-  currentMovesCount: number
-  timers: object
-}
-
 export class Solver {
   private readonly board: Board
-  private readonly robots: Robot[]
+  private readonly robots: ISolverRobot[]
   private readonly goal: Goal
   private readonly goalTile: number
   private readonly mainHomeTile: number
   private currentStateIndex = 0
   private statesQueue: string[] = []
-  private states = new Map<string, State>()
+  private states = new Map<string, IState>()
   private routeFound = false
   private aborted = false
   private allStatesChecked = false
   private running = false
-  private foundRoute: State[]
-  private completeCallback: (data: CompletedData) => void
-  private progressCallback: (data: ProgressData) => void
+  private foundRoute: IState[]
+  private completeCallback: (data: ICompletedData) => void
+  private progressCallback: (data: IProgressData) => void
   private progressRatio = 1000
   private duration = 0
   private minMoves: number
   private backAgain: boolean
   private abortAfter: number
 
-  private pos2num = (pos: Pos) => pos.x + pos.y * this.board.w
-  private getStateHash = (robots: Robot[], goalVisited: boolean) => {
+  private pos2num = (pos: IPos) => pos.x + pos.y * this.board.w
+  private getStateHash = (robots: ISolverRobot[], goalVisited: boolean) => {
     const helpers = robots.slice(1).map(r => r.posNum).sort().join(STATE_DELIMITER)
     const hash = robots[0].posNum + (goalVisited ? 'Y':'N') + helpers
     return hash
   }
 
-  constructor(level: Level, options: SolverOptions = {}) {
+  constructor(level: Level, options: ISolverOptions = {}) {
     const {backAgain = false, abortAfter = 1e7} = options
     this.board = level.board
     this.robots = level.robots.map(r => ({...r, posNum: r.x + r.y * this.board.w}))
@@ -125,7 +77,7 @@ export class Solver {
     return this.routeFound
   }
 
-  public getResult(): CompletedData {
+  public getResult(): ICompletedData {
     return {
       duration: this.duration,
       statesChecked: this.currentStateIndex,
@@ -139,11 +91,11 @@ export class Solver {
     }
   }
 
-  public onComplete(callback: (result: CompletedData) => void) {
+  public onComplete(callback: (result: ICompletedData) => void) {
     this.completeCallback = callback
   }
 
-  public onProgress(callback: (data: ProgressData) => void, sendProgressEvery = 1000) {
+  public onProgress(callback: (data: IProgressData) => void, sendProgressEvery = 1000) {
     this.progressRatio = sendProgressEvery
     this.progressCallback = callback
   }
@@ -169,14 +121,11 @@ export class Solver {
       this.progressCallback({checkedStates: this.currentStateIndex, currentMovesCount: state.moves, timers: Timer.getAndClear()})
     }
 
-    // console.debug("Checking", state, robots[nextStateHash.color], nextStateHash.dir, nextStateHash.previous)
-    
     this.processState(state)
-
     this.currentStateIndex++
   }
 
-  private checkIfShortestRouteFound(state: State): void {
+  private checkIfShortestRouteFound(state: IState): void {
     if(state.lastMove.robotIdx !== this.goal.robotIdx) return
     const goalRobot = state.robots[this.goal.robotIdx]
     if(this.isAtGoal(goalRobot)) {
@@ -189,28 +138,19 @@ export class Solver {
     }
   }
 
-  private isAtGoal(mainRobot: Robot) {
-    return this.pos2num(mainRobot) === this.goalTile
+  private isAtGoal(mainRobot: ISolverRobot) {
+    return mainRobot.posNum === this.goalTile
   }
 
-  private isAtHome(mainRobot: Robot) {
-    return this.pos2num(mainRobot) === this.mainHomeTile
+  private isAtHome(mainRobot: ISolverRobot) {
+    return mainRobot.posNum === this.mainHomeTile
   }
 
-  private shortestRouteFound(endState: State) {
+  private shortestRouteFound(endState: IState) {
     this.routeFound = true
     this.running = false
     let state = endState
     this.foundRoute = []
-
-    /*
-    let i = 0
-    const u = Array.from(this.states.values())
-    u.forEach(state => {
-      printBoard(i+' - '+state.hash+'.png', this.board, this.goal, state)
-      i++
-    })
-    */
 
     while(state.previous) {
       this.foundRoute.unshift(state)
@@ -221,8 +161,8 @@ export class Solver {
   }
 
 
-  private processState (state: State) {
-    const moves: Move[] = []
+  private processState (state: IState) {
+    const moves: IMove[] = []
     for(const robot of state.robots) {
       const helpers = state.robots.filter(r => r.idx !== robot.idx)
       
@@ -249,7 +189,7 @@ export class Solver {
       const exists = this.states.has(stateHash)
       if(exists) continue
       
-      const newState: State = {
+      const newState: IState = {
         hash: stateHash,
         previous: state.hash,
         robots: newRobots,
@@ -270,7 +210,7 @@ export class Solver {
   }
 }
 
-function getUsedRobots(route: State[]): number[] {
+function getUsedRobots(route: IState[]): number[] {
   if(!route) return []
   const makeUnique = (arr: any[]) => [...new Set(arr)]
   return makeUnique(route.map(route => route.lastMove.robotIdx)).sort()

@@ -3,9 +3,9 @@ import { getButton } from "./utils"
 import * as ColorControls from './components/color-controls'
 import * as Game from './game'
 import * as GameBoard from './game-board'
-import { Direction } from "./models/Direction"
+import { Direction } from "./enums/Direction"
 import { registerServiceWorker } from "./service-worker-utils"
-import { GameOptions } from "./models/GameOptions"
+import { IGameOptions } from "./models/IGameOptions"
 
 
 
@@ -27,7 +27,7 @@ https://www.youtube.com/watch?v=fvuK0Us4xC4
 !!!IMPROVEMENTS!!!
 
 * om två hjälprobotar byter plats är det ett redan besökt state ---- KLAR!
-* om en hjälprobot kommer tillbaka till en plats utan att ha krockat med någon annan är det ett onödigt drag
+* om en hjälprobot kommer tillbaka till en plats utan att ha krockat med någon annan är det ett onödigt drag. Nee. den kan ju ha flyttat undan för att släppa förbi en annan robot
 
 !!!!!!!!!!!!!!!!!!!!!
 
@@ -124,8 +124,8 @@ function keyHandler(e: KeyboardEvent) {
   }
 }
 
-function newGame(opts: Partial<GameOptions>) {
-  const defaults: GameOptions = {
+function newGame(opts: Partial<IGameOptions>) {
+  const defaults: IGameOptions = {
     seed: Math.floor(Math.random()*1000000),
     backAgain: false,
     width: 10,
@@ -133,7 +133,7 @@ function newGame(opts: Partial<GameOptions>) {
     wallsCount: 20,
     robotCount: 4,
   }
-  const options: GameOptions = Object.assign({}, defaults, opts)
+  const options: IGameOptions = Object.assign({}, defaults, opts)
   const query = gameOptionsToQueryString(options)
   history.replaceState(null, "title", '/?'+query)
   level = new Level(options)
@@ -151,7 +151,7 @@ window.addEventListener('beforeinstallprompt', (beforeInstallEvent: BeforeInstal
 
 
 
-function gameOptionsToQueryString(options: GameOptions): string {
+function gameOptionsToQueryString(options: IGameOptions): string {
   const query = new URLSearchParams({
     width: options.width.toString(),
     height: options.height.toString(),
@@ -163,9 +163,9 @@ function gameOptionsToQueryString(options: GameOptions): string {
   return query.toString()
 }
 
-function queryStringToGameOptions(queryString: string): Partial<GameOptions> {
+function queryStringToGameOptions(queryString: string): Partial<IGameOptions> {
   const queryParams = new URLSearchParams(queryString)
-  const options: Partial<GameOptions> = {}
+  const options: Partial<IGameOptions> = {}
   
   const seedStr = queryParams.get('seed')
   if(seedStr) options.seed = parseInt(seedStr)

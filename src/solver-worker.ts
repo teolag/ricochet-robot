@@ -1,13 +1,10 @@
-import { Solver, CompletedData, ProgressData } from "./Solver";
-import { SolverWorkerMessage } from "./models/SolverWokerMessages";
+import { Solver } from "./models/Solver";
+import { SolverWorkerMessage } from "./enums/SolverWokerMessages";
 import { Level } from "./models/Level";
+import { ICompletedData } from "./models/ICompletedData";
+import { IProgressData } from "./models/IProgressData";
 
-declare function postMessage(message: any): void;
 self.onmessage = processIncomingMessage
-
-
-
-
 
 function processIncomingMessage(event: MessageEvent) {
   switch(event.data.type) {
@@ -25,12 +22,11 @@ function processIncomingMessage(event: MessageEvent) {
   }
 }
 
-
-function onComplete(result: CompletedData) {
+function onComplete(result: ICompletedData) {
   postMessage({type: SolverWorkerMessage.SOLVE_END, result})
   close()
 }
 
-function onProgress(progress: ProgressData) {
+function onProgress(progress: IProgressData) {
   postMessage({type: SolverWorkerMessage.SOLVE_PROGRESS, progress})
 }

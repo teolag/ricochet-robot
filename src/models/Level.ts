@@ -2,16 +2,9 @@ import { Board } from "./Board";
 import { Robot } from "./Robot";
 import { Goal } from "./Goal";
 import * as Slumpa from "../libs/Slumpa"
+import { IGenerateOptions } from "./IGenerateOptions";
 
 const LEVEL_STRING_DELIMITER = '|'
-
-export interface GenerateOptions {
-  width: number
-  height: number
-  wallsCount: number
-  seed?: number
-  robotCount: number
-}
 
 export class Level {
   public readonly board: Board
@@ -19,8 +12,8 @@ export class Level {
   public readonly goal: Goal
   
   constructor(levelString: string)
-  constructor(generateOptions: GenerateOptions)
-  constructor(input: string|GenerateOptions) {
+  constructor(generateOptions: IGenerateOptions)
+  constructor(input: string|IGenerateOptions) {
     if(typeof input === "string") {
       const levelString = input
       const [widthStr, tiles, goalStr, ...robotsStr] = levelString.split(LEVEL_STRING_DELIMITER)
@@ -52,7 +45,7 @@ export class Level {
 }
 
 
-function generateLevelData({width, height, wallsCount, seed, robotCount}: GenerateOptions) {
+function generateLevelData({width, height, wallsCount, seed, robotCount}: IGenerateOptions) {
   Slumpa.setSeed(seed)
   const board = new Board(height, width)
   board.addRandomWalls(wallsCount)

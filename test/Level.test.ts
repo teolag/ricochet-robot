@@ -1,6 +1,6 @@
 import { expect } from "chai"
 import { Level } from "../src/models/Level"
-import { Solver } from "../src/Solver"
+import { Solver } from "../src/models/Solver"
 import { level_5x3, level_normal_10x10 } from "./test-levels"
 
 describe("generate a level", () => {
