@@ -7,83 +7,10 @@ import { Direction } from "./enums/Direction"
 import { registerServiceWorker } from "./service-worker-utils"
 import { IGameOptions } from "./models/IGameOptions"
 
-
-
-/*
-Rules
-https://www.youtube.com/watch?v=OQOMmftaWAQ
-https://images.zmangames.com/filer_public/c0/b4/c0b482f1-ad3e-4e5d-ae48-0c11aa7c317a/en-ricochet_robot-rules.pdf
-
-https://wiki.ubc.ca/Course:CPSC:Artificial_Intelligence/States_and_Searching
-
-https://www.youtube.com/watch?v=fvuK0Us4xC4
-  - Pre-compute stops. Var kan man åka från varje cell om det inte står en robot ivägen
-  - Robot Equivalent. Hjälprobotarna kan byta plats med varandra utan att det påverkar
-  - Arrays, not Sets. Hjälper det i JS?
-  - Less objects. ?
-
-
-
-!!!IMPROVEMENTS!!!
-
-* om två hjälprobotar byter plats är det ett redan besökt state ---- KLAR!
-* om en hjälprobot kommer tillbaka till en plats utan att ha krockat med någon annan är det ett onödigt drag. Nee. den kan ju ha flyttat undan för att släppa förbi en annan robot
-
-!!!!!!!!!!!!!!!!!!!!!
-
-
-
-
-1drag = 4^2 = 16
-2drag = 4^3 = 64
-3drag = 4^4 = 256
-4drag = 4^5 = 1024
-5drag = 4^6 = 4096
-6drag = 4^7 = 16384
-7drag = 4^8 = 65536
-8drag = 4^9 = 262144
-RIMLIGT??
-
-
-* There and back again
-
-* show and play solution
-
-* move robots with keyboard
-  - wasd of arrow-keys to move
-  - 1,2,3,... to switch robot
-
-* move robots with touch
-  - swipe on robots to move
-  - virtual controls with arrows and color buttons to change robot
-
-* solver info
-  - service worker
-  - status indicator
-  - click to show
-    - states checked
-    - best route
-    - solve duration
-  - inform user if a level is impossible / too hard?
-
-* Defined levels in different difficulty groups Easy/Medium/Hard
-
-* Collect stars.
-  1 star complete the level  >125%
-  2 stars complete within 5 moves or %? 100-125%
-  3 stars complete with best route 100%
-  
-  * Save progress in local storage
-  
-*/
-
 let level: Level
-// let gameBoard: GameBoard
 
 registerServiceWorker()
 startup()
-
-
 
 getButton('btnUp').addEventListener('click', _ => Game.moveActiveRobot(Direction.UP))
 getButton('btnLeft').addEventListener('click', _ => Game.moveActiveRobot(Direction.LEFT))
