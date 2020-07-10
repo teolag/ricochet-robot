@@ -2,7 +2,7 @@ import { Board } from "./models/Board"
 import { IPos } from "./models/IPos"
 import { Direction } from "./enums/Direction"
 import { Wall } from "./enums/wall"
-import { IMove } from "./models/IMove"
+import { ITestMove } from "./models/ITestMove"
 
 interface ISimpleRobot {
   x: number
@@ -10,7 +10,7 @@ interface ISimpleRobot {
   idx: number
 }
 
-export function goUp (board: Board, robot: ISimpleRobot, helpers: IPos[]): IMove {
+export function goUp (board: Board, robot: ISimpleRobot, helpers: IPos[]): ITestMove {
   const dynPos: IPos = {x: robot.x, y: robot.y}
   if(hasWall(board, dynPos, Wall.UP)) return null
   const closestRobotY = Math.max(...helpers.filter(helper => helper.x === dynPos.x && helper.y < dynPos.y).map(helper => helper.y))
@@ -21,7 +21,7 @@ export function goUp (board: Board, robot: ISimpleRobot, helpers: IPos[]): IMove
   return {pos: dynPos, robotIdx: robot.idx, dir: Direction.UP}
 }
 
-export function goDown (board: Board, robot: ISimpleRobot, helpers: IPos[]): IMove {
+export function goDown (board: Board, robot: ISimpleRobot, helpers: IPos[]): ITestMove {
   const dynPos: IPos = {x: robot.x, y: robot.y}
   if(hasWall(board, dynPos, Wall.DOWN)) return null
   const closestRobotY = Math.min(...helpers.filter(helper => helper.x === dynPos.x && helper.y > dynPos.y).map(helper => helper.y))
@@ -32,7 +32,7 @@ export function goDown (board: Board, robot: ISimpleRobot, helpers: IPos[]): IMo
   return {pos: dynPos, robotIdx: robot.idx, dir: Direction.DOWN}
 }
 
-export function goLeft (board: Board, robot: ISimpleRobot, helpers: IPos[]): IMove {
+export function goLeft (board: Board, robot: ISimpleRobot, helpers: IPos[]): ITestMove {
   const dynPos: IPos = {x: robot.x, y: robot.y}
   if(hasWall(board, dynPos, Wall.LEFT)) return null
   const closestRobotX = Math.max(...helpers.filter(helper => helper.y === dynPos.y && helper.x < dynPos.x).map(helper => helper.x))
@@ -43,7 +43,7 @@ export function goLeft (board: Board, robot: ISimpleRobot, helpers: IPos[]): IMo
   return {pos: dynPos, robotIdx: robot.idx, dir: Direction.LEFT}
 }
 
-export function goRight (board: Board, robot: ISimpleRobot, helpers: IPos[]): IMove {
+export function goRight (board: Board, robot: ISimpleRobot, helpers: IPos[]): ITestMove {
   const dynPos: IPos = {x: robot.x, y: robot.y}
   if(hasWall(board, dynPos, Wall.RIGHT)) return null
   const closestRobotX = Math.min(...helpers.filter(helper => helper.y === dynPos.y && helper.x > dynPos.x).map(helper => helper.x))

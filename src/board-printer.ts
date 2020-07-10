@@ -105,6 +105,7 @@ export function printBoard(path: string, board: Board, goal: Goal, state?: IStat
 
 
   // Move
+  /* NOT IMPLEMENTED!!
   if(state && state.lastMove) {
     ctx.globalAlpha = 0.2
     ctx.beginPath()
@@ -116,6 +117,7 @@ export function printBoard(path: string, board: Board, goal: Goal, state?: IStat
     ctx.closePath()
     ctx.globalAlpha = 1
   }
+  */
 
 
   // Robots

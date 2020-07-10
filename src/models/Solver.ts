@@ -7,9 +7,10 @@ import { Level } from './Level'
 import { IState } from './IState'
 import { ICompletedData } from './ICompletedData'
 import { ISolverOptions } from './ISolverOptions'
-import { IMove } from './IMove'
+import { ITestMove } from './ITestMove'
 import { IProgressData } from './IProgressData'
 import { ISolverRobot } from './ISolverRobot'
+import { IMove } from './IMove'
 
 const STATE_DELIMITER = '|'
 
@@ -26,7 +27,7 @@ export class Solver {
   private aborted = false
   private allStatesChecked = false
   private running = false
-  private foundRoute: IState[]
+  private foundRoute: IMove[]
   private completeCallback: (data: ICompletedData) => void
   private progressCallback: (data: IProgressData) => void
   private progressRatio = 1000
@@ -34,6 +35,7 @@ export class Solver {
   private minMoves: number
   private backAgain: boolean
   private abortAfter: number
+  private robotsUsed: number[]
 
   private pos2num = (pos: IPos) => pos.x + pos.y * this.board.w
   private getStateHash = (robots: ISolverRobot[], goalVisited: boolean) => {
@@ -56,7 +58,7 @@ export class Solver {
   public solve() {
     const startState = this.getStateHash(this.robots, false)
     this.statesQueue.push(startState)
-    this.states.set(startState, {moves: 0, hash: startState, lastMove: null, robots: this.robots.slice(), goalVisited: false})
+    this.states.set(startState, {moves: 0, hash: startState, robots: this.robots.slice(), goalVisited: false, direction:null, robotIdx:null})
     const start = new Date()
 
     this.running = true
@@ -85,7 +87,7 @@ export class Solver {
       isAllStatesChecked: this.allStatesChecked,
       isAborted: this.aborted,
       route: this.foundRoute,
-      robotsUsed: getUsedRobots(this.foundRoute),
+      robotsUsed: this.robotsUsed,
       minMoves: this.minMoves,
       timers: Timer.getTotals()
     }
@@ -126,7 +128,7 @@ export class Solver {
   }
 
   private checkIfShortestRouteFound(state: IState): void {
-    if(state.lastMove.robotIdx !== this.goal.robotIdx) return
+    if(state.robotIdx !== this.goal.robotIdx) return
     const goalRobot = state.robots[this.goal.robotIdx]
     if(this.isAtGoal(goalRobot)) {
       state.goalVisited = true
@@ -151,18 +153,22 @@ export class Solver {
     this.running = false
     let state = endState
     this.foundRoute = []
-
+    
+    const uniqueRobots = new Set<number>()
     while(state.previous) {
-      this.foundRoute.unshift(state)
+      this.foundRoute.unshift({robotIdx: state.robotIdx, direction: state.direction})
+      uniqueRobots.add(state.robotIdx)
       const nextState = this.states.get(state.previous)
       if(nextState === undefined) throw Error(`state ${state.previous} not found`)
       state = nextState
     }
+
+    this.robotsUsed = [...uniqueRobots].sort()
   }
 
 
   private processState (state: IState) {
-    const moves: IMove[] = []
+    const moves: ITestMove[] = []
     for(const robot of state.robots) {
       const helpers = state.robots.filter(r => r.idx !== robot.idx)
       
@@ -193,25 +199,20 @@ export class Solver {
         hash: stateHash,
         previous: state.hash,
         robots: newRobots,
-        lastMove: {
-          direction: move.dir,
-          robotIdx: move.robotIdx,
-          from: {x: state.robots[move.robotIdx].x, y: state.robots[move.robotIdx].y},
-          to: {x: move.pos.x, y: move.pos.y}
-        },
         goalVisited: state.goalVisited,
-        moves: state.moves+1
+        moves: state.moves+1,
+        direction: move.dir,
+        robotIdx: move.robotIdx
       }
       
       this.checkIfShortestRouteFound(newState)
       this.statesQueue.push(newState.hash)
       this.states.set(newState.hash, newState)
     }
+    state.robots.length = 0
+    state.robots = undefined
+    state.hash = undefined
+    state.goalVisited = undefined
+    state.moves = undefined
   }
-}
-
-function getUsedRobots(route: IState[]): number[] {
-  if(!route) return []
-  const makeUnique = (arr: any[]) => [...new Set(arr)]
-  return makeUnique(route.map(route => route.lastMove.robotIdx)).sort()
 }

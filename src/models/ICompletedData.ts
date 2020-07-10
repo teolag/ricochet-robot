@@ -1,4 +1,4 @@
-import { IState } from "./IState";
+import { IMove } from "./IMove";
 
 export interface ICompletedData {
   duration: number
@@ -6,7 +6,7 @@ export interface ICompletedData {
   isRouteFound: boolean
   isAllStatesChecked: boolean
   isAborted: boolean
-  route: IState[]
+  route: IMove[]
   robotsUsed: number[]
   minMoves: number,
   timers: object

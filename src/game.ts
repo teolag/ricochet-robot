@@ -161,7 +161,7 @@ export function showSolution() {
 
   resetLevel()
   moveQueue.length = 0
-  moveQueue.push(...result.route.map(step => ({direction: step.lastMove.direction, robotIndex: step.lastMove.robotIdx})))
+  moveQueue.push(...result.route.map(step => ({direction: step.direction, robotIndex: step.robotIdx})))
   setTimeout(processMoveQueue, 400)
 }
 
