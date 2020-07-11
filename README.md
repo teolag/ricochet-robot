@@ -23,12 +23,12 @@ https://github.com/smack42/DriftingDroids
 
 ## To do
 * Handle memory problems. Searching for a solution scanning över 1M states uses 1GB of RAM.  Not OK.
-* Toggle "There and back again" game mode
 * Defined levels in different difficulty groups Easy/Medium/Hard
 * Save completed levels and the achieved stars
-* Button to stop the solver
 
 
 ## Done
+* Button to stop the solver
+* Toggle "There and back again" game mode
 * om två hjälprobotar byter plats är det ett redan besökt state ---- KLAR!
 * om en hjälprobot kommer tillbaka till en plats utan att ha krockat med någon annan är det ett onödigt drag. Nee. den kan ju ha flyttat undan för att släppa förbi en annan robot
