@@ -1,5 +1,5 @@
 import { Level } from "./models/Level"
-import { getButton } from "./utils"
+import { getButton, getElementById } from "./utils"
 import * as ColorControls from './components/color-controls'
 import * as Game from './game'
 import * as GameBoard from './game-board'
@@ -8,26 +8,36 @@ import { registerServiceWorker } from "./service-worker-utils"
 import { IGameOptions } from "./models/IGameOptions"
 
 let level: Level
-
-registerServiceWorker()
-startup()
-
+document.body.addEventListener('keydown', keyHandler)
+getButton('btnNewGame').addEventListener('click', _ => newGame({}))
+const cbxBackAgain = getElementById<HTMLInputElement>('cbxBackAgain')
+cbxBackAgain.addEventListener('click', toggleBackAgain)
 getButton('btnUp').addEventListener('click', _ => Game.moveActiveRobot(Direction.UP))
 getButton('btnLeft').addEventListener('click', _ => Game.moveActiveRobot(Direction.LEFT))
 getButton('btnRight').addEventListener('click', _ => Game.moveActiveRobot(Direction.RIGHT))
 getButton('btnDown').addEventListener('click', _ => Game.moveActiveRobot(Direction.DOWN))
 
-document.body.addEventListener('keydown', keyHandler)
+registerServiceWorker()
+startup()
 
-getButton('btnNewGame').addEventListener('click', _ => newGame({}))
+
+
 
 
 function startup() {
   const queryString = location.search
   const options = queryStringToGameOptions(queryString)
   newGame(options)
+  cbxBackAgain.checked = options.backAgain
   ColorControls.onColorSelect(color => Game.switchRobot(color))
   GameBoard.onRobotClick(robotClick)
+}
+
+function toggleBackAgain() {
+  const queryString = location.search
+  const options = queryStringToGameOptions(queryString)
+  options.backAgain = !options.backAgain
+  newGame(options)
 }
 
 
@@ -53,7 +63,7 @@ function keyHandler(e: KeyboardEvent) {
 function newGame(opts: Partial<IGameOptions>) {
   const defaults: IGameOptions = {
     seed: Math.floor(Math.random()*1000000),
-    backAgain: false,
+    backAgain: cbxBackAgain.checked,
     width: 10,
     height: 10,
     wallsCount: 20,

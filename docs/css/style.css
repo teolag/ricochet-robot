@@ -186,23 +186,6 @@ header {
 
 
 
-
-
-/* Canvas renderer... not used */
-
-#canvases {
-  position: relative;
-}
-#backgroundCanvas,
-#robotCanvas {
-  position: absolute;
-  top: 0;
-  left: 0
-}
-
-
-
-
 /* Color Controls */
 
 #colorControls button {
