@@ -1,5 +1,6 @@
 import {SolverWorkerMessage} from './enums/SolverWokerMessages'
 import { Level } from './models/Level';
+import * as Game from './game'
 import { getElementById, getButton } from './utils';
 import { ICompletedData } from './models/ICompletedData';
 import { IProgressData } from './models/IProgressData';
@@ -15,8 +16,32 @@ const dialog = getElementById<HTMLDialogElement>('solverDialog')
 const setSolverButtonIcon = (icon: string) => solverButton.children[0].children[0].setAttribute('xlink:href', `icons.svg#icon-${icon}`)
 solverButton.addEventListener('click', _ => dialog.showModal())
 const showSolutionButton = getButton('btnShowSolution')
-showSolutionButton.addEventListener('click', _ => dialog.close())
+const abortSolverButton = getButton('btnAbortSolver')
+const closeSolverButton = getButton('btnCloseSolver')
+showSolutionButton.addEventListener('click', showSolution)
+abortSolverButton.addEventListener('click', abortSolver)
+closeSolverButton.addEventListener('click', closeSolverDialog)
 
+
+function showSolution() {
+  dialog.close()
+  Game.showSolution()
+}
+
+function closeSolverDialog() {
+  dialog.close()
+}
+
+function abortSolver() {
+  solverWorker.terminate()
+  abortSolverButton.hidden = true
+  solverInfo.innerHTML = `
+    Solver aborted. ${progress.checkedStates} states undersökta<br>
+    Lösningen har minst ${progress.currentMovesCount} drag.
+  `
+  solverButton.classList.remove("rotate")
+  setSolverButtonIcon('info')
+}
 
 export function solve(level: Level, backAgain = false) {
   if(solverWorker) {
@@ -26,6 +51,7 @@ export function solve(level: Level, backAgain = false) {
   setSolverButtonIcon('spinner')
   solverButton.classList.add("rotate")
   showSolutionButton.hidden = true
+  abortSolverButton.removeAttribute('hidden')
   solverWorker = new Worker('js/solver-worker.js');
   solverWorker.onmessage = onWorkerMessage
   solverWorker.postMessage({type: SolverWorkerMessage.SOLVE, levelString: level.getLevelString(), backAgain});
@@ -41,6 +67,7 @@ function onWorkerMessage(e: MessageEvent) {
     case SolverWorkerMessage.SOLVE_END: {
       result = e.data.result as ICompletedData
       solverButton.classList.remove("rotate")
+      abortSolverButton.hidden = true
       
       if(result.isRouteFound) {
         setSolverButtonIcon('check')

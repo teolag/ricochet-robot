@@ -67,7 +67,6 @@ export function moveRobot(robotIdx: number, direction: Direction) {
   if(!newPos) return
 
   setRobotPosition(robotIdx, newPos.pos)
-  // gameBoard.moveRobot(activeRobotIndex, newPos.pos)
 
   const landedOnGoal = goalIsReached()
   if(landedOnGoal) goalVisited = true

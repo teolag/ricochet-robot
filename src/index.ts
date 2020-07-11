@@ -19,7 +19,6 @@ getButton('btnDown').addEventListener('click', _ => Game.moveActiveRobot(Directi
 
 document.body.addEventListener('keydown', keyHandler)
 
-getButton('btnShowSolution').addEventListener('click', Game.showSolution)
 getButton('btnNewGame').addEventListener('click', _ => newGame({}))
 
 
