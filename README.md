@@ -26,10 +26,10 @@ https://github.com/smack42/DriftingDroids
 * Defined levels in different difficulty groups Easy/Medium/Hard
 * Save completed levels and the achieved stars
 * Node workers to generate pre-solved levels.  Thread-pooling?  https://blog.insiderattack.net/deep-dive-into-worker-threads-in-node-js-e75e10546b11
-* WakeLock. available in chrome 84. 
 
 
 ## Done
+* WakeLock. available in chrome 84. 
 * Button to stop the solver
 * Toggle "There and back again" game mode
 * om två hjälprobotar byter plats är det ett redan besökt state ---- KLAR!

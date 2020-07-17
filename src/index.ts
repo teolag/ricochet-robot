@@ -24,13 +24,15 @@ startup()
 
 
 
-function startup() {
+async function startup() {
   const queryString = location.search
   const options = queryStringToGameOptions(queryString)
   newGame(options)
   cbxBackAgain.checked = options.backAgain
   ColorControls.onColorSelect(color => Game.switchRobot(color))
   GameBoard.onRobotClick(robotClick)
+
+  const wakeLock = await (navigator as NavigatorExtended).wakeLock.request('screen')
 }
 
 function toggleBackAgain() {
