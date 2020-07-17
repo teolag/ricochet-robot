@@ -42,11 +42,11 @@ describe("Performance", () => {
     const result = solver.solve()
     // console.log("Solver result", result)
     const heapUsed = process.memoryUsage().heapUsed-baseMem;
-    console.log(`The script uses approximately ${Math.round(heapUsed/1024/1024)} MB`, heapUsed/result.statesChecked, 'bytes per state');
+    // console.log(`The script uses approximately ${Math.round(heapUsed/1024/1024)} MB`, heapUsed/result.statesChecked, 'bytes per state');
     expect(result.isRouteFound).to.be.true
     expect(result.statesChecked).to.equal(122231)
     expect(result.robotsUsed).to.eql([0, 2, 3])
-    expect(result.duration).to.be.a('number').gt(1.3).lt(1.6)
+    expect(result.duration).to.be.a('number').gt(1).lt(1.6)
     expect(result.route.length).to.equal(10)
     expect(result.route).to.eql([
       {robotIdx: 0, direction: Direction.LEFT},
