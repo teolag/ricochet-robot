@@ -27,7 +27,7 @@ describe("load a level", () => {
   })
 
   it("correct number of robots", () => {
-    expect(level.robots).to.be.an('array').of .length(2)
+    expect(level.robots).to.be.an('array').of.length(2)
   })
 
   it("correct robot positions", () => {
@@ -40,7 +40,7 @@ describe("load a level", () => {
   
   it("level string vs options", () => {
     const levelA = new Level({seed: 876, width:3, height:2, robotCount:2, wallsCount:6})
-    const levelB = new Level("3|fbdfff|0|1|5")
+    const levelB = new Level("3|fbdfff|0|0|1|5")
     
     expect(levelA.board.getTilesString()).to.equal(levelB.board.getTilesString())
     expect(levelA.robots.length).to.equal(levelB.robots.length)

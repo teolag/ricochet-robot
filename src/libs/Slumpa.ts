@@ -56,7 +56,7 @@
 		}
 	}
 
-	export function randomOne(arr: any[]) {
+	export function randomOne<T>(arr: T[]): T {
 		return arr[randomInt(0, arr.length-1)];
 	}
 

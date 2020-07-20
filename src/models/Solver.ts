@@ -19,7 +19,7 @@ export class Solver {
   private readonly robots: ISolverRobot[]
   private readonly goal: Goal
   private readonly goalTile: number
-  private readonly mainHomeTile: number
+  private readonly primaryHomeTile: number
   private currentStateIndex = 0
   private statesQueue: string[] = []
   private states = new Map<string, IState>()
@@ -39,8 +39,10 @@ export class Solver {
 
   private pos2num = (pos: IPos) => pos.x + pos.y * this.board.w
   private getStateHash = (robots: ISolverRobot[], goalVisited: boolean) => {
-    const helpers = robots.slice(1).map(r => r.posNum).sort().join(STATE_DELIMITER)
-    const hash = robots[0].posNum + (goalVisited ? 'Y':'N') + helpers
+    const primaryRobotIndex = this.goal.robotIdx
+    const helpers = robots.filter(r => r.idx !== primaryRobotIndex)
+    const helpersHash = helpers.map(r => r.posNum).sort().join(STATE_DELIMITER)
+    const hash = robots[primaryRobotIndex].posNum + (goalVisited ? 'Y':'N') + helpersHash
     return hash
   }
 
@@ -50,7 +52,7 @@ export class Solver {
     this.robots = level.robots.map(r => ({...r, posNum: r.x + r.y * this.board.w}))
     this.goal = level.goal
     this.goalTile = this.pos2num(this.goal)
-    this.mainHomeTile = this.pos2num(this.robots[this.goal.robotIdx])
+    this.primaryHomeTile = this.pos2num(this.robots[this.goal.robotIdx])
     this.backAgain = backAgain
     this.abortAfter = abortAfter
   }
@@ -140,12 +142,12 @@ export class Solver {
     }
   }
 
-  private isAtGoal(mainRobot: ISolverRobot) {
-    return mainRobot.posNum === this.goalTile
+  private isAtGoal(primaryRobot: ISolverRobot) {
+    return primaryRobot.posNum === this.goalTile
   }
 
-  private isAtHome(mainRobot: ISolverRobot) {
-    return mainRobot.posNum === this.mainHomeTile
+  private isAtHome(primaryRobot: ISolverRobot) {
+    return primaryRobot.posNum === this.primaryHomeTile
   }
 
   private shortestRouteFound(endState: IState) {

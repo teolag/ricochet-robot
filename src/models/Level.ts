@@ -16,11 +16,12 @@ export class Level {
   constructor(input: string|IGenerateOptions) {
     if(typeof input === "string") {
       const levelString = input
-      const [widthStr, tiles, goalStr, ...robotsStr] = levelString.split(LEVEL_STRING_DELIMITER)
+      const [widthStr, tiles, goalStr, goalRobotIdxStr, ...robotsStr] = levelString.split(LEVEL_STRING_DELIMITER)
       const width = parseInt(widthStr)
       const height = tiles.length / width
       const goal = parseInt(goalStr)
-      this.goal = new Goal(goal%width, Math.floor(goal/width), 0)
+      const goalRobotIdx = parseInt(goalRobotIdxStr)
+      this.goal = new Goal(goal%width, Math.floor(goal/width), goalRobotIdx)
       this.robots = robotsStr.map(Number).map((r, i) => new Robot(i, r%width, Math.floor(r/width)))
       this.board = new Board(height, width)
       this.board.setTiles(tiles)
@@ -36,11 +37,11 @@ export class Level {
     return pos.x + pos.y * this.board.w
   }
 
-  getLevelString(): any {
+  getLevelString(): string {
     const goalStr = this.pos2num(this.goal)
     const tiles = this.board.getTilesString()
     const robotsStr = this.robots.map(r => this.pos2num(r)).join(LEVEL_STRING_DELIMITER)
-    return `${this.board.w}|${tiles}|${goalStr}|${robotsStr}`
+    return `${this.board.w}|${tiles}|${goalStr}|${this.goal.robotIdx}|${robotsStr}`
   }
 }
 
@@ -64,7 +65,7 @@ function generateLevelData({width, height, wallsCount, seed, robotCount}: IGener
   })
   
   const tile = randomTiles.pop()
-  const robotIndex = 0//Math.floor(Math.random()*robots)
+  const robotIndex = Slumpa.randomOne(robots).idx
   const goal = new Goal(tile.x, tile.y, robotIndex)
   return {goal, robots, board}
 }

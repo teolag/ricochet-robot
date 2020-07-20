@@ -29,7 +29,8 @@ describe("solve", () => {
 describe("Performance", () => {
   it("Solve a 10 steps level in about 1.5s", function () {
     this.timeout(20000)
-    const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 422367})
+    // const level = new Level({height: 10, width: 10, wallsCount: 20, robotCount: 4, seed: 422367})
+    const level = new Level("10|7311531115200080088420801001562052042004200000800c2000001005242000042420000c200c2004e30005aca898888c|72|0|12|37|13|24")
     const solver = new Solver(level)
     const baseMem = process.memoryUsage().heapUsed
     /*
