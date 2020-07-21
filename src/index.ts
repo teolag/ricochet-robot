@@ -9,7 +9,7 @@ import { IGameOptions } from "./models/IGameOptions"
 
 let level: Level
 document.body.addEventListener('keydown', keyHandler)
-getButton('btnNewGame').addEventListener('click', _ => newGame({}))
+getButton('btnNewGame').addEventListener('click', _ => regenerateGame())
 const cbxBackAgain = getElementById<HTMLInputElement>('cbxBackAgain')
 cbxBackAgain.addEventListener('click', toggleBackAgain)
 getButton('btnUp').addEventListener('click', _ => Game.moveActiveRobot(Direction.UP))
@@ -21,7 +21,12 @@ registerServiceWorker()
 startup()
 
 
-
+function regenerateGame() {
+  const queryString = location.search
+  const options = queryStringToGameOptions(queryString)
+  delete options.seed
+  newGame(options)
+}
 
 
 async function startup() {
@@ -53,7 +58,7 @@ function keyHandler(e: KeyboardEvent) {
   }
 
   switch(e.key) {
-    case 'F2': newGame({}); break;
+    case 'F2': regenerateGame(); break;
     case 'Escape': Game.resetLevel(); break;
     case 'ArrowUp': Game.moveActiveRobot(Direction.UP); break;
     case 'ArrowLeft': Game.moveActiveRobot(Direction.LEFT); break;

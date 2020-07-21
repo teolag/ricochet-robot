@@ -22,9 +22,7 @@ https://github.com/smack42/DriftingDroids
 
 
 ## To do
-* Handle memory problems. Searching for a solution scanning över 1M states uses 1GB of RAM.  Not OK.
 * Defined levels in different difficulty groups Easy/Medium/Hard
-* Save completed levels and the achieved stars
 * Node workers to generate pre-solved levels.  Thread-pooling?  https://blog.insiderattack.net/deep-dive-into-worker-threads-in-node-js-e75e10546b11
 
 
