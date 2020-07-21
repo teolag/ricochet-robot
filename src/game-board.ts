@@ -12,6 +12,7 @@ const boardElem = getElementById('board')
 
 let robotClickCallback
 let robotElems: HTMLDivElement[]
+let goalElem: HTMLDivElement
 
 let touchingIndex = null
 let touchStart: IPos
@@ -22,7 +23,9 @@ document.addEventListener('touchmove', touchMove, {passive: true})
 export function loadLevel(level: Level) {
   const html = createHTMLBoard(level)
   boardElem.innerHTML = html
-  
+
+  goalElem = boardElem.querySelector('.goal')
+
   robotElems = level.robots.map(r => {
     const elem = document.createElement('div')
     elem.classList.add('robot', 'robot-'+r.idx)
@@ -91,6 +94,10 @@ function touchMove(e: TouchEvent) {
     touchingIndex = null
     touchStart = null
   }
+}
+
+export function setGoalVisited(value: boolean) {
+  goalElem.classList.toggle('visited', value)
 }
 
 

@@ -32,7 +32,7 @@ export function startGame(loadedlevel: Level, backAgain: boolean) {
 export function resetLevel() {
   resetRobots()
   switchRobot(0)
-  goalVisited = false
+  setGoalVisited(false)
   ActiveRoute.reset()
 }
 
@@ -49,6 +49,7 @@ export function setRobotsPostitions(robots: Robot[]) {
 
 export function setGoalVisited(visited: boolean) {
   goalVisited = visited
+  GameBoard.setGoalVisited(visited)
 }
 
 export function setRobotPosition(robotIndex: number, newPos: IPos) {
@@ -69,7 +70,7 @@ export function moveRobot(robotIdx: number, direction: Direction) {
   setRobotPosition(robotIdx, newPos.pos)
 
   const landedOnGoal = goalIsReached()
-  if(landedOnGoal) goalVisited = true
+  if(landedOnGoal) setGoalVisited(true)
   ActiveRoute.addMove(robotIdx, direction, cloneRobots(robots), goalVisited)
 
   const gameCompleted = (landedOnGoal && !_backAgain) || (_backAgain && goalVisited && isHome())
