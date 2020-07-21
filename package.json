@@ -17,7 +17,7 @@
     "@types/chai": "^4.2.11",
     "@types/expect": "^24.3.0",
     "@types/mocha": "^8.0.0",
-    "@types/node": "^14.0.23",
+    "@types/node": "^14.0.24",
     "chai": "^4.2.0",
     "mocha": "^8.0.1",
     "ts-mocha": "^7.0.0",
