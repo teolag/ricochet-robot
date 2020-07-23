@@ -1,3 +1,10 @@
+let muteVibrations = false
+
 export function vibrateRobotCollision() {
-  window.navigator.vibrate(100);
+  vibrate(10)
+}
+
+function vibrate(ms: number): void {
+  if(muteVibrations) return
+  window.navigator.vibrate(ms);
 }
