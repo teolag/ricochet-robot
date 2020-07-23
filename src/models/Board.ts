@@ -1,6 +1,20 @@
 import * as Slumpa from '../libs/Slumpa'
 import { Wall } from '../enums/wall'
 
+/*
+10: 0123456789
+26: abcdefghijklmnopqrsyuvwxyz
+26: ABCDEFGHIJKLMNOPQRSYUVWXYZ
+02: +/
+
+0100010010010010100101101011011001
+010001 001001 001010 010110 101101 1001
+17     9      10     22     45     9
+h      9      a      m      J      9
+h9amJ9
+*/
+
+
 export class Board {
   public tiles: number[][]
   public w: number
