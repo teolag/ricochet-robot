@@ -1,3 +1,3 @@
 export function vibrateRobotCollision() {
-  window.navigator.vibrate(200);
+  window.navigator.vibrate(100);
 }
