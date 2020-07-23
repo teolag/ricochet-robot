@@ -41,14 +41,23 @@ export function loadLevel(level: Level) {
   setRobotsPositions(level.robots)
 }
 
-export function setRobotsPositions(robots: Robot[]) {
-  robots.forEach((robot, i) => {
-    moveRobot(i, robot.getPos())
-  })
+export function setRobotsPositions(robots: Robot[]): Promise<void[]> {
+  return Promise.all(robots.map((robot, i) => moveRobot(i, robot.getPos())))
 }
 
-export function moveRobot(robotIndex: number, newPos: IPos) {
-  moveRobotElem(robotElems[robotIndex], newPos)
+export function moveRobot(robotIndex: number, newPos: IPos): Promise<void> {
+  return new Promise((resolve) => {
+    const robotElem = robotElems[robotIndex]
+
+    const callback = e => {
+      if(e.propertyName !== 'transform') return
+      robotElem.removeEventListener('transitionend', callback)
+      resolve()
+    }
+
+    robotElem.addEventListener('transitionend', callback)
+    moveRobotElem(robotElem, newPos)
+  })
 }
 
 export function setActiveRobot(robotIndex: number) {

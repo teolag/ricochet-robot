@@ -9,6 +9,7 @@ import * as ActiveRoute from './active-route'
 import * as ColorControls from './components/color-controls'
 import { openModal } from "./components/dialog"
 import { ICompletedData } from "./models/ICompletedData"
+import { vibrateRobotCollision } from "./vibration-utils"
 
 let level: Level
 let robots: Robot[]
@@ -52,22 +53,23 @@ export function setGoalVisited(visited: boolean) {
   GameBoard.setGoalVisited(visited)
 }
 
-export function setRobotPosition(robotIndex: number, newPos: IPos) {
+export async function setRobotPosition(robotIndex: number, newPos: IPos) {
   robots[robotIndex].setPos(newPos)
-  GameBoard.moveRobot(robotIndex, newPos)
+  await GameBoard.moveRobot(robotIndex, newPos)
 }
 
 export function moveActiveRobot(direction: Direction) {
   addToMoveQueue(activeRobotIndex, direction)
 }
-export function moveRobot(robotIdx: number, direction: Direction) {
+export async function moveRobot(robotIdx: number, direction: Direction) {
   const moveFunction = getMoveFunction(direction)
   const movingRobot = robots[robotIdx]
   const otherRobots = robots.filter(r => r.idx !== robotIdx)
   const newPos = moveFunction(level.board, movingRobot, otherRobots)
   if(!newPos) return
 
-  setRobotPosition(robotIdx, newPos.pos)
+  await setRobotPosition(robotIdx, newPos.pos)
+  vibrateRobotCollision()
 
   const landedOnGoal = goalIsReached()
   if(landedOnGoal) setGoalVisited(true)
@@ -75,11 +77,9 @@ export function moveRobot(robotIdx: number, direction: Direction) {
 
   const gameCompleted = (landedOnGoal && !_backAgain) || (_backAgain && goalVisited && isHome())
   if(gameCompleted) {
-    setTimeout(() => {
-      const result = getResult()
-      const resultText = getResultText(result)
-      openModal(resultText)
-    }, 400);
+    const result = getResult()
+    const resultText = getResultText(result)
+    openModal(resultText)
   }
 }
 
