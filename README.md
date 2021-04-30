@@ -1,4 +1,12 @@
-
+## Controls
+```
+F2               : New Game
+Esc              : Reset current level
+1-9              : Change active robot
+Arrow keys       : Move active robot
+Arrow buttons    : Move active robot
+Swipe on robot   : Move
+```
 
 
 ## Rules
